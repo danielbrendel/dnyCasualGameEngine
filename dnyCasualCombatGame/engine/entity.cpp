@@ -117,6 +117,37 @@ namespace Entity {
 			return pRenderer->DrawString(pFont, Utils::ConvertToWideString(szText), pos[0], pos[1], color.r, color.g, color.b, color.a);
 		}
 
+		bool ShouldDraw(const Vector& vMyPos, const Vector& vMySize)
+		{
+			//Determine whether this entity is in viewport so it should be drawn
+
+			Vector* vecPlayerPos;
+			Vector* vecPlayerSize;
+			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetPosition()", nullptr, &vecPlayerPos, Scripting::FA_OBJECT);
+			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetSize()", nullptr, &vecPlayerSize, Scripting::FA_OBJECT);
+			
+			Vector vDistance;
+			vDistance[0] = vMyPos[0] - (*vecPlayerPos)[0];
+			vDistance[1] = vMyPos[1] - (*vecPlayerPos)[1];
+
+			return (vDistance[0] + vMySize[0] > pRenderer->GetWindowWidth() / 2 * -1) && (vDistance[0] < pRenderer->GetWindowWidth() / 2) &&
+				(vDistance[1] + vMySize[1] > pRenderer->GetWindowHeight() / 2 * -1) && (vDistance[1] < pRenderer->GetWindowHeight() / 2);
+		}
+
+		void GetDrawingPosition(const Vector& vMyPos, const Vector& vMySize, Vector& out)
+		{
+			//Convert world position to drawing position on screen
+			//Calculate distance of the position and add the center to it for each coordinate
+
+			Vector* vecPlayerPos;
+			Vector* vecPlayerSize;
+			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetPosition()", nullptr, &vecPlayerPos, Scripting::FA_OBJECT);
+			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetSize()", nullptr, &vecPlayerSize, Scripting::FA_OBJECT);
+
+			out[0] = (vMyPos[0] - (*vecPlayerPos)[0]) + pRenderer->GetWindowWidth() / 2 - vMySize[0] / 2;
+			out[1] = (vMyPos[1] - (*vecPlayerPos)[1]) + pRenderer->GetWindowHeight() / 2 - vMySize[1] / 2;
+		}
+
 		DxSound::HDXSOUND QuerySound(const std::string& szSoundFile)
 		{
 			return pSound->QuerySound(Utils::ConvertToWideString(szSoundFile));
@@ -239,6 +270,31 @@ namespace Entity {
 			}
 
 			return (rand() % (end - start)) + start;
+		}
+	}
+
+	void CSolidSprite::Draw(void)
+	{
+		//Draw solid sprite
+
+		for (size_t i = 0; i < this->m_vSprites.size(); i++) {
+			int xpos = this->m_vecPos[0];
+			int ypos = this->m_vecPos[1];
+
+			if (this->m_iDir == 0) {
+				xpos += i * this->m_vecSize[0];
+			}
+			else {
+				ypos += i * this->m_vecSize[1];
+			}
+
+			if (!APIFuncs::ShouldDraw(Vector(xpos, ypos), this->m_vecSize))
+				continue;
+
+			Vector vecOut;
+			APIFuncs::GetDrawingPosition(Vector(xpos, ypos), this->m_vecSize, vecOut);
+
+			pRenderer->DrawSprite(this->m_vSprites[i], vecOut[0], vecOut[1], 0, this->m_fRotation);
 		}
 	}
 
@@ -434,11 +490,11 @@ namespace Entity {
 		REG_IFM("IScriptedEntity", "void OnDamage(DamageValue dv)");
 		REG_IFM("IScriptedEntity", "Model& GetModel()");
 		REG_IFM("IScriptedEntity", "Vector& GetPosition()");
+		REG_IFM("IScriptedEntity", "Vector& GetSize()");
 		REG_IFM("IScriptedEntity", "float GetRotation()");
 		REG_IFM("IScriptedEntity", "DamageValue GetDamageValue()");
 		REG_IFM("IScriptedEntity", "bool NeedsRemoval()");
 		REG_IFM("IScriptedEntity", "string GetName()");
-		REG_IFM("IScriptedEntity", "Vector& GetSelectionSize()");
 
 		REG_IF("IPlayerEntity");
 		REG_IFM("IPlayerEntity", "void OnKeyPress(int vKey, bool bDown)");
@@ -462,6 +518,8 @@ namespace Entity {
 			{ "bool R_DrawLine(const Vector&in start, const Vector&in end, const Color&in color)", &APIFuncs::DrawLine },
 			{ "bool R_DrawSprite(const SpriteHandle hSprite, const Vector&in pos, int iFrame, float fRotation, const Vector &in vRotPos, float fScale1, float fScale2, bool bUseCustomColorMask, const Color&in color)", &APIFuncs::DrawSprite },
 			{ "bool R_DrawString(const FontHandle font, const string&in szText, const Vector&in pos, const Color&in color)", &APIFuncs::DrawString },
+			{ "bool R_ShouldDraw(const Vector &in vMyPos, const Vector &in vMySize)", APIFuncs::ShouldDraw },
+			{ "void R_GetDrawingPosition(const Vector &in vMyPos, const Vector &in vMySize, Vector &out)", &APIFuncs::GetDrawingPosition },
 			{ "FontHandle R_GetDefaultFont()", &APIFuncs::GetDefaultFont },
 			{ "SoundHandle S_QuerySound(const string&in szSoundFile)", &APIFuncs::QuerySound },
 			{ "bool S_PlaySound(SoundHandle hSound, int32 lVolume)", &APIFuncs::PlaySound_ },

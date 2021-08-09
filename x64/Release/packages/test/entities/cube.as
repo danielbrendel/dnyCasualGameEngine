@@ -13,17 +13,16 @@ string g_szPackagePath = "";
 	you don't need to use them. A scripted entity is passed to the 
 	game engine via the SpawnEntity(<object handle>, <spawn position>) function. 
 */
-class CPlayerEntity : IScriptedEntity, IPlayerEntity
+class CCubeEntity : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
-	SpriteHandle m_hSprite;
 	float m_fRotation;
 	
-	CPlayerEntity()
+	CCubeEntity()
     {
-		this.m_vecSize = Vector(59, 52);
+		this.m_vecSize = Vector(50, 50);
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
@@ -31,7 +30,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	{
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
-		this.m_hSprite = R_LoadSprite(g_szPackagePath + "gfx\\mech.png", 1, 59, 52, 1, true);
 		this.m_oModel.Alloc();
 	}
 	
@@ -53,7 +51,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Entity can draw on-top stuff here
 	void OnDrawOnTop()
 	{
-		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
+		if (!R_ShouldDraw(this.m_vecPos, this.m_vecSize))
+			return;
+			
+		Vector vOut;
+		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
+		R_DrawFilledBox(vOut, this.m_vecSize, Color(255, 0, 0, 150));
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -109,33 +112,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
-		return "player";
-	}
-	
-	//Called for key presses
-	void OnKeyPress(int vKey, bool bDown)
-	{
-		Print("Pressing key: " + formatInt(vKey));
-		if (vKey == 39) {
-			this.m_fRotation += 0.05f;
-		} else if (vKey == 37) {
-			this.m_fRotation -= 0.05f;
-		} else if (vKey == 87) {
-			this.m_vecPos[0] += int(sin(this.m_fRotation + 0.014) * 10);
-			this.m_vecPos[1] -= int(cos(this.m_fRotation + 0.014) * 10);
-		}
-	}
-	
-	//Called for mouse presses
-	void OnMousePress(int key, bool bDown)
-	{
-		Print("Pressing key: " + formatInt(key));
-	}
-	
-	//Called for getting current cursor position
-	void OnUpdateCursor(const Vector &in pos)
-	{
-	
+		return "cube";
 	}
 }
 
@@ -144,7 +121,7 @@ void OnSpawn(const Vector &in vecPos, const string &in szIdent, const string &in
 {
 	g_szPackagePath = szPath;
 
-	CPlayerEntity @player = CPlayerEntity();
-	Ent_SpawnEntity(szIdent, @player, vecPos);
+	CCubeEntity @cube = CCubeEntity();
+	Ent_SpawnEntity(szIdent, @cube, vecPos);
 }
 

@@ -946,23 +946,7 @@ namespace Entity {
 			return true;
 		}
 
-		void Draw(void)
-		{
-			//Draw solid sprite
-
-			for (size_t i = 0; i < this->m_vSprites.size(); i++) {
-				int xpos = this->m_vecPos[0];
-				int ypos = this->m_vecPos[1];
-
-				if (this->m_iDir == 0) {
-					xpos += i * this->m_vecSize[0];
-				} else {
-					ypos += i * this->m_vecSize[1];
-				}
-
-				pRenderer->DrawSprite(this->m_vSprites[i], xpos, ypos, 0, this->m_fRotation);
-			}
-		}
+		void Draw(void);
 
 		void Release(void)
 		{

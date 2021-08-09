@@ -688,8 +688,14 @@ namespace Entity {
 
 	/* Scripted entity manager */
 	class CScriptedEntsMgr {
+	public:
+		struct playerentity_s {
+			Scripting::HSISCRIPT hScript;
+			asIScriptObject* pObject;
+		};
 	private:
 		std::vector<CScriptedEntity*> m_vEnts;
+		playerentity_s m_sPlayerEntity;
 
 		void Release(void)
 		{
@@ -706,29 +712,7 @@ namespace Entity {
 		CScriptedEntsMgr() {}
 		~CScriptedEntsMgr() { this->Release(); }
 
-		bool Spawn(const Scripting::HSISCRIPT hScript, asIScriptObject* pObject, const Vector& vAtPos)
-		{
-			//Spawn new entity
-
-			//Instantiate entity object
-			CScriptedEntity* pEntity = new CScriptedEntity(hScript, pObject);
-			if (!pEntity)
-				return false;
-
-			//Check if ready
-			if (!pEntity->IsReady()) {
-				delete pEntity;
-				return false;
-			}
-
-			//Inform of being spawned
-			pEntity->OnSpawn(vAtPos);
-
-			//Add to list
-			this->m_vEnts.push_back(pEntity);
-
-			return true;
-		}
+		bool Spawn(const std::wstring& wszIdent, asIScriptObject* pObject, const Vector& vAtPos);
 
 		void Process(void)
 		{
@@ -831,6 +815,7 @@ namespace Entity {
 
 			return (size_t)-1;
 		}
+		const playerentity_s& GetPlayerEntity(void) const { return this->m_sPlayerEntity; }
 	};
 
 	extern CScriptedEntsMgr oScriptedEntMgr;
@@ -1214,4 +1199,6 @@ namespace Entity {
 		void Construct(void* pMemory) { new (pMemory) CFileWriter(); }
 		void Destruct(void* pMemory) { ((CFileWriter*)pMemory)->~CFileWriter(); }
 	};
+
+	bool Initialize(void);
 }

@@ -1,8 +1,45 @@
 #include "entity.h"
 #include "console.h"
-
+#include "game.h"
 
 namespace Entity {
+	bool CScriptedEntsMgr::Spawn(const std::wstring& wszIdent, asIScriptObject* pObject, const Vector& vAtPos)
+	{
+		//Spawn new entity
+		
+		//Query script ident
+		Scripting::HSISCRIPT hScript = Game::pGame->GetScriptHandleByIdent(wszIdent);
+		if (hScript == SI_INVALID_ID)
+			return false;
+		
+		//Instantiate entity object
+		CScriptedEntity* pEntity = new CScriptedEntity(hScript, pObject);
+		if (!pEntity)
+			return false;
+		
+		//Check if ready
+		if (!pEntity->IsReady()) {
+			delete pEntity;
+			return false;
+		}
+		
+		//Inform of being spawned
+		pEntity->OnSpawn(vAtPos);
+		
+		//Add to list
+		this->m_vEnts.push_back(pEntity);
+
+		//Handle special entity case: player
+		if (wszIdent == L"player") {
+			this->m_sPlayerEntity.hScript = hScript;
+			this->m_sPlayerEntity.pObject = pObject;
+		}
+
+		return true;
+	}
+
+	CScriptedEntsMgr oScriptedEntMgr;
+
 	namespace APIFuncs {
 		void Print(const std::string& in)
 		{
@@ -100,9 +137,9 @@ namespace Entity {
 			return pRenderer->GetWindowHeight() / 2;
 		}
 
-		bool SpawnScriptedEntity(asIScriptObject* ref, const Vector& vPos)
+		bool SpawnScriptedEntity(const std::string& szIdent, asIScriptObject* ref, const Vector& vPos)
 		{
-			//return oScriptedEntMgr.Spawn(_pGameToolMgrInstance->GetScriptHandleOfSelection(), ref, vPos);
+			return oScriptedEntMgr.Spawn(Utils::ConvertToWideString(szIdent), ref, vPos);
 		}
 
 		size_t GetEntityCount()
@@ -386,7 +423,8 @@ namespace Entity {
 		ADD_CLASSF("void WriteLine(const string &in)", asMETHOD(CFileWriter, WriteLine), hClasses);
 		ADD_CLASSF("void Close()", asMETHOD(CFileWriter, Close), hClasses);
 
-		//Register interface
+		//Register interfaces
+
 		REG_IF("IScriptedEntity");
 		REG_IFM("IScriptedEntity", "void OnSpawn(const Vector& in vec)");
 		REG_IFM("IScriptedEntity", "void OnRelease()");
@@ -400,9 +438,12 @@ namespace Entity {
 		REG_IFM("IScriptedEntity", "DamageValue GetDamageValue()");
 		REG_IFM("IScriptedEntity", "bool NeedsRemoval()");
 		REG_IFM("IScriptedEntity", "string GetName()");
-		REG_IFM("IScriptedEntity", "bool IsMovable()");
 		REG_IFM("IScriptedEntity", "Vector& GetSelectionSize()");
-		REG_IFM("IScriptedEntity", "void MoveTo(const Vector& in vec)");
+
+		REG_IF("IPlayerEntity");
+		REG_IFM("IPlayerEntity", "void OnKeyPress(int vKey, bool bDown)");
+		REG_IFM("IPlayerEntity", "void OnMousePress(int key, bool bDown)");
+		REG_IFM("IPlayerEntity", "void OnUpdateCursor(const Vector &in pos)")
 
 		//Register scripting API
 
@@ -426,7 +467,7 @@ namespace Entity {
 			{ "bool S_PlaySound(SoundHandle hSound, int32 lVolume)", &APIFuncs::PlaySound_ },
 			{ "int Wnd_GetWindowCenterX()", &APIFuncs::GetWindowCenterX },
 			{ "int Wnd_GetWindowCenterY()", &APIFuncs::GetWindowCenterY },
-			{ "bool Ent_SpawnEntity(IScriptedEntity @obj, const Vector& in)", &APIFuncs::SpawnScriptedEntity },
+			{ "bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in)", &APIFuncs::SpawnScriptedEntity },
 			{ "size_t Ent_GetEntityCount()", &APIFuncs::GetEntityCount },
 			{ "IScriptedEntity@+ Ent_GetEntityHandle(size_t uiEntityId)", &APIFuncs::GetEntityHandle },
 			{ "IScriptedEntity@+ Ent_TraceLine(const Vector&in vStart, const Vector&in vEnd, IScriptedEntity@+ pIgnoredEnt)", &APIFuncs::EntityTrace },

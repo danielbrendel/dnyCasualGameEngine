@@ -15,7 +15,7 @@ namespace Scripting {
 	{
 		//Initialize scripting interface object
 
-		if ((!szScriptDir.length()) || (!pCallbackFunction))
+		if (/*(!szScriptDir.length()) ||*/ (!pCallbackFunction))
 			return false;
 
 		//Initialize AngelScript
@@ -70,31 +70,31 @@ namespace Scripting {
 	HSISCRIPT CScriptInt::LoadScript(const std::string& szScriptName)
 	{
 		//Load script
-
+		
 		if ((!this->m_bInitialized) || (!szScriptName.length()))
 			return SI_INVALID_ID;
 
 		CScriptBuilder oScriptBuilder;
-
+		
 		//Start new module
 		if (AS_FAILED(oScriptBuilder.StartNewModule(this->m_pScriptEngine, szScriptName.c_str())))
 			return SI_INVALID_ID;
-
+		
 		//Add script file to module
 		if (AS_FAILED(oScriptBuilder.AddSectionFromFile((/*this->m_szScriptPath +*/ szScriptName).c_str())))
 			return SI_INVALID_ID;
-
+		
 		//Build script module
 		if (AS_FAILED(oScriptBuilder.BuildModule()))
 			return SI_INVALID_ID;
-
+		
 		//Setup struct
 		si_script_s sScriptData;
 		sScriptData.szName = szScriptName;
 		sScriptData.pModule = this->m_pScriptEngine->GetModule(szScriptName.c_str()); //Get pointer to script module
 		if (!sScriptData.pModule)
 			return SI_INVALID_ID;
-
+		
 		//Add to list
 		this->m_vScripts.push_back(sScriptData);
 

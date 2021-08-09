@@ -23,6 +23,7 @@ namespace Game {
 	extern CWindowEvents oDxWindowEvents;
 
 	void UnknownExpressionHandler(const std::wstring& szCmdName);
+	void AS_MessageCallback(const asSMessageInfo* msg, void* param);
 
 	void Cmd_PackageName(void);
 	void Cmd_PackageVersion(void);
@@ -31,8 +32,8 @@ namespace Game {
 	void Cmd_MapIndex(void);
 	void Cmd_MapName(void);
 	void Cmd_MapBackground(void);
-	void Cmd_PlayerSpawn(void);
 	void Cmd_EnvSolidSprite(void);
+	void Cmd_EntSpawn(void);
 
 	class CGame {
 	private:
@@ -54,6 +55,11 @@ namespace Game {
 			Entity::Vector pos;
 		};
 
+		struct entityscript_s {
+			Scripting::HSISCRIPT hScript;
+			std::wstring wszIdent;
+		};
+
 		bool m_bInit;
 		bool m_bGameStarted;
 		DxRenderer::HD3DSPRITE m_hBanner;
@@ -62,6 +68,7 @@ namespace Game {
 		map_s m_sMap;
 		player_s m_sPlayerSpawn;
 		std::vector<Entity::CSolidSprite> m_vSolidSprites;
+		std::vector<entityscript_s> m_vEntityScripts;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -70,8 +77,8 @@ namespace Game {
 		friend void Cmd_MapIndex(void);
 		friend void Cmd_MapName(void);
 		friend void Cmd_MapBackground(void);
-		friend void Cmd_PlayerSpawn(void);
 		friend void Cmd_EnvSolidSprite(void);
+		friend void Cmd_EntSpawn(void);
 
 		bool LoadPackage(const std::wstring& wszPackage)
 		{
@@ -106,6 +113,49 @@ namespace Game {
 			this->m_bGameStarted = true;
 
 			return this->m_bGameStarted;
+		}
+
+		bool SpawnEntity(const std::wstring& wszName, int x, int y)
+		{
+			//Spawn entity into world
+
+			if (!Utils::FileExists(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as")) {
+				pConsole->AddLine(L"Entity script does not exist");
+				return false;
+			}
+
+			Scripting::HSISCRIPT hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as"));
+			if (hScript == SI_INVALID_ID) {
+				pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as");
+				return false;
+			}
+
+			entityscript_s sEntScript;
+			sEntScript.hScript = hScript;
+			sEntScript.wszIdent = wszName;
+			this->m_vEntityScripts.push_back(sEntScript);
+
+			Entity::Vector vecPos(x, y);
+			std::string szIdent = Utils::ConvertToAnsiString(wszName);
+			std::string szPath = Utils::ConvertToAnsiString(wszBasePath) + "packages\\" + Utils::ConvertToAnsiString(this->m_sPackage.wszPakName) + "\\";
+
+			BEGIN_PARAMS(vArgs);
+			PUSH_OBJECT(&vecPos);
+			PUSH_OBJECT(&szIdent);
+			PUSH_OBJECT(&szPath);
+			
+			bool bResult = pScriptingInt->CallScriptFunction(hScript, true, "OnSpawn", &vArgs, nullptr, Scripting::FA_VOID);
+
+			END_PARAMS(vArgs);
+
+			if (!bResult) {
+				pConsole->AddLine(L"Failed to call OnSpawn() in script");
+				pScriptingInt->UnloadScript(hScript);
+				this->m_vEntityScripts.erase(this->m_vEntityScripts.begin() + this->m_vEntityScripts.size() - 1);
+				return false;
+			}
+
+			return true;
 		}
 	public:
 		CGame() : m_bInit(false), m_bGameStarted(false) { pGame = this; }
@@ -152,8 +202,8 @@ namespace Game {
 			pConfigMgr->CCommand::Add(L"map_index", L"Map to begin game with", &Cmd_MapIndex);
 			pConfigMgr->CCommand::Add(L"map_name", L"Map name", &Cmd_MapName);
 			pConfigMgr->CCommand::Add(L"map_background", L"Map background", &Cmd_MapBackground);
-			pConfigMgr->CCommand::Add(L"player_spawn", L"Player spawn position", &Cmd_PlayerSpawn);
 			pConfigMgr->CCommand::Add(L"env_solidsprite", L"Solid sprite placement", &Cmd_EnvSolidSprite);
+			pConfigMgr->CCommand::Add(L"ent_spawn", L"Spawn scripted entity", &Cmd_EntSpawn);
 
 			pConfigMgr->Execute(wszBasePath + L"config.cfg");
 
@@ -200,6 +250,17 @@ namespace Game {
 				this->Release();
 				return false;
 			}
+
+			pScriptingInt = new Scripting::CScriptInt("", &AS_MessageCallback);
+			if (!pScriptingInt) {
+				this->Release();
+				return false;
+			}
+
+			if (!Entity::Initialize()) {
+				this->Release();
+				return false;
+			}
 			
 			if (!m_oMenu.Initialize(pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue)) {
 				this->Release();
@@ -207,7 +268,6 @@ namespace Game {
 			}
 
 			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\banner.png", 1, 768, 150, 1, false);
-			
 			
 			pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");
 			this->m_oMenu.SetOpenStatus(true);
@@ -236,48 +296,44 @@ namespace Game {
 
 		void StopGame(void)
 		{
-			//Stop game
+			//Stop game and cleanup
 
+			//Unload entity scripts
+			for (size_t i = 0; i < this->m_vEntityScripts.size(); i++) {
+				pScriptingInt->UnloadScript(this->m_vEntityScripts[i].hScript);
+			}
+
+			//Release solid sprites
 			for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
 				this->m_vSolidSprites[i].Release();
 			}
 
+			//Clear lists
+			this->m_vEntityScripts.clear();
 			this->m_vSolidSprites.clear();
-			
 
+			//Reset indicator
 			this->m_bGameStarted = false;
 		}
 
-		void Process(void)
+		void Process(void);
+		void Draw(void);
+
+		Scripting::HSISCRIPT GetScriptHandleByIdent(const std::wstring& wszIdent)
 		{
-			while (this->m_bInit) {
-				pWindow->Process();
-				
-				Sleep(1);
+			//Get script handle by ident
+
+			for (size_t i = 0; i < this->m_vEntityScripts.size(); i++) {
+				if (this->m_vEntityScripts[i].wszIdent == wszIdent) {
+					return this->m_vEntityScripts[i].hScript;
+				}
 			}
+
+			return SI_INVALID_ID;
 		}
 
-		void Draw(void)
-		{
-			//pConsole->Draw();
-
-			for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
-				this->m_vSolidSprites[i].Draw();
-			}
-
-			if (!this->m_bGameStarted) {
-				pRenderer->DrawSprite(this->m_hBanner, pGfxResolutionWidth->iValue / 2 - 768 / 2, 10, 0, 0.0f);
-			}
-			
-			if (this->m_oMenu.IsOpen()) {
-				this->m_oMenu.Draw();
-			}
-		}
-
-		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
-		{
-			this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
-		}
+		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
+		void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
 
 		void Release(void)
 		{
@@ -287,9 +343,13 @@ namespace Game {
 			FREE(pSound);
 			FREE(pRenderer);
 			FREE(pWindow);
+			FREE(pScriptingInt);
+			FREE(pConfigMgr);
 
 			this->m_bGameStarted = false;
 			this->m_bInit = false;
 		}
 	};
+
+
 }

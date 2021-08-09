@@ -16,6 +16,7 @@
 #include <d3d9.h>
 #include <d3dx9core.h>
 #include <DxErr.h>
+#include "utils.h"
 
 /* Renderer management component */
 namespace DxRenderer {
@@ -564,7 +565,7 @@ namespace DxRenderer {
 		bool DrawSprite(const HD3DSPRITE hSprite, int x, int y, int iFrame, float fRotation, int rotx, int roty, float fScale1, float fScale2, const bool bUseCustomColorMask, byte r, byte g, byte b, byte a)
 		{
 			//Add sprite to drawing list
-
+			
 			if (!hSprite)
 				return false;
 
@@ -572,10 +573,10 @@ namespace DxRenderer {
 			size_t uiSprite = this->FindSprite(hSprite);
 			if (uiSprite == GFX_INVALID_LIST_ID)
 				return false;
-
+			
 			if ((!this->m_vSprites[uiSprite].pTexture) || (!this->m_pSpriteMgr))
 				return false;
-
+			
 			//Calculate horizontal line ID
 			int iFrameLineId = (this->m_vSprites[uiSprite].iFramesPerLine > 0) ? iFrame / this->m_vSprites[uiSprite].iFramesPerLine : 0;
 			//Calculate vertical frame ID
@@ -615,7 +616,7 @@ namespace DxRenderer {
 			//Apply transformation
 			if (FAILED(this->m_pSpriteMgr->SetTransform(&vNewMatrix)))
 				return false;
-
+			
 			//Add sprite to batch list
 			return (SUCCEEDED(this->m_pSpriteMgr->Draw(this->m_vSprites[uiSprite].pTexture, &sRect, nullptr, nullptr, (bUseCustomColorMask) ? D3DCOLOR_RGBA(r, g, b, a) : 0xFFFFFFFF)));
 		}

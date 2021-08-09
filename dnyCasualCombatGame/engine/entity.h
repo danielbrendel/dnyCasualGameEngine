@@ -6,9 +6,6 @@
 #include "scriptint.h"
 
 namespace Entity {
-	extern DxRenderer::CDxRenderer* pRenderer;
-	extern DxSound::CDxSound* pSound;
-
 	enum DamageType { DAMAGEABLE_NO = 0, DAMAGEABLE_ALL, DAMAGEABLE_NOTSQUAD };
 
 	struct Color {
@@ -573,17 +570,6 @@ namespace Entity {
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnDrawOnTop()", nullptr, nullptr);
 		}
 
-		bool DoUserCleaning(void)
-		{
-			//Query whether entity shall be cleaned by user
-
-			bool bResult;
-
-			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "bool DoUserCleaning()", nullptr, &bResult, Scripting::FA_BYTE);
-
-			return bResult;
-		}
-
 		byte IsDamageable(void)
 		{
 			//Query if entity is damageable (0 = non-damageable, 1 = damage all, 2 = damage only entities with different name)
@@ -693,20 +679,6 @@ namespace Entity {
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "string GetName()", nullptr, &szResult, Scripting::FA_STRING);
 
 			return szResult;
-		}
-
-		void MoveTo(const Vector& vToPos)
-		{
-			//Inform to move to a target
-
-			Vector v(vToPos);
-
-			BEGIN_PARAMS(vArgs);
-			PUSH_OBJECT(&v);
-
-			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void MoveTo(const Vector& in vec)", &vArgs, nullptr);
-
-			END_PARAMS(vArgs);
 		}
 
 		//Getters
@@ -819,19 +791,6 @@ namespace Entity {
 
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
 				this->m_vEnts[i]->OnDrawOnTop();
-			}
-		}
-
-		void OnUserClean(void)
-		{
-			//Cleanup entities which indicate permission of user cleaning
-
-			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
-				if (this->m_vEnts[i]->DoUserCleaning()) {
-					this->m_vEnts[i]->OnRelease();
-					delete this->m_vEnts[i];
-					this->m_vEnts.erase(this->m_vEnts.begin() + i);
-				}
 			}
 		}
 
@@ -963,6 +922,73 @@ namespace Entity {
 		inline const bool IsEmpty(void) const { return this->m_vEntities.size() == 0; }
 		inline asIScriptObject* EntityObject(const size_t uiId) { if (uiId >= this->m_vEntities.size()) return nullptr; return this->m_vEntities[uiId]->Object(); }
 		inline const size_t EntityCount(void) const { return this->m_vEntities.size(); }
+	};
+
+	/* Solid sprite class */
+	class CSolidSprite {
+	private:
+		std::vector<DxRenderer::HD3DSPRITE> m_vSprites;
+		Vector m_vecPos;
+		Vector m_vecSize;
+		int m_iDir;
+		float m_fRotation;
+	public:
+		CSolidSprite() {}
+		~CSolidSprite() {}
+
+		bool Initialize(int x, int y, int w, int h, const std::wstring& wszFile, int repeat, int dir, float rot)
+		{
+			//Initialize entity
+
+			if (!repeat) {
+				repeat = 1;
+			}
+
+			this->m_vecPos = Vector(x, y);
+			this->m_vecSize = Vector(w, h);
+			this->m_iDir = dir;
+			this->m_fRotation = rot;
+
+			for (size_t i = 0; i < repeat; i++) {
+				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszFile, 1, w, h, 1, false);
+				if (!hSprite) {
+					return false;
+				}
+
+				this->m_vSprites.push_back(hSprite);
+			}
+
+			return true;
+		}
+
+		void Draw(void)
+		{
+			//Draw solid sprite
+
+			for (size_t i = 0; i < this->m_vSprites.size(); i++) {
+				int xpos = this->m_vecPos[0];
+				int ypos = this->m_vecPos[1];
+
+				if (this->m_iDir == 0) {
+					xpos += i * this->m_vecSize[0];
+				} else {
+					ypos += i * this->m_vecSize[1];
+				}
+
+				pRenderer->DrawSprite(this->m_vSprites[i], xpos, ypos, 0, this->m_fRotation);
+			}
+		}
+
+		void Release(void)
+		{
+			//Free resources
+
+			for (size_t i = 0; i < this->m_vSprites.size(); i++) {
+				pRenderer->FreeSprite(this->m_vSprites[i]);
+			}
+
+			this->m_vSprites.clear();
+		}
 	};
 
 	/* File reader class */
@@ -1187,16 +1213,5 @@ namespace Entity {
 		void Constr_Init(const std::string& szFile) { this->Open(szFile); }
 		void Construct(void* pMemory) { new (pMemory) CFileWriter(); }
 		void Destruct(void* pMemory) { ((CFileWriter*)pMemory)->~CFileWriter(); }
-	};
-
-	class CPlayer {
-	private:
-		Vector m_vecPos;
-		DxRenderer::HD3DSPRITE m_hSprite;
-	public:
-		CPlayer() {}
-		~CPlayer() {}
-
-		
 	};
 }

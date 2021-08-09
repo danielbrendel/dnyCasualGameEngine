@@ -147,6 +147,7 @@
     <ClCompile Include="as\add_on\scriptmath\scriptmath.cpp" />
     <ClCompile Include="as\add_on\scriptstdstring\scriptstdstring.cpp" />
     <ClCompile Include="engine\console.cpp" />
+    <ClCompile Include="engine\entity.cpp" />
     <ClCompile Include="engine\game.cpp" />
     <ClCompile Include="engine\main.cpp" />
     <ClCompile Include="engine\menu.cpp" />

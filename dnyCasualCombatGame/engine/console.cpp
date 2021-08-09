@@ -1,6 +1,5 @@
 #include "console.h"
-
-
+#include "utils.h"
 
 namespace Console {
 	bool CConsole::Initialize(DxRenderer::CDxRenderer* pRenderer, int iWidth, int iHeight, unsigned short wMaxHistory, const ConColor& rColor)
@@ -42,7 +41,8 @@ namespace Console {
 	void CConsole::AddLine(const std::wstring& wszText, const ConColor& rColor)
 	{
 		//Add line
-
+		//TODO: DELETE
+		std::cout << Utils::ConvertToAnsiString(wszText) << std::endl;
 		//Setup data struct
 		console_line_s sLine;
 		sLine.wszText = wszText;

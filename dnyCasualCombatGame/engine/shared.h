@@ -1,5 +1,16 @@
 #pragma once
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 #define APP_NAME L"Casual Combat Game"
 #define APP_VERSION L"1.0"
 #define APP_AUTHOR L"Daniel Brendel"

@@ -115,12 +115,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
-		Print("Pressing key: " + formatInt(vKey));
 		if (vKey == 39) {
 			this.m_fRotation += 0.05f;
 		} else if (vKey == 37) {
 			this.m_fRotation -= 0.05f;
-		} else if (vKey == 87) {
+		} 
+		
+		if (vKey == 87) {
 			this.m_vecPos[0] += int(sin(this.m_fRotation + 0.014) * 10);
 			this.m_vecPos[1] -= int(cos(this.m_fRotation + 0.014) * 10);
 		}
@@ -129,7 +130,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Called for mouse presses
 	void OnMousePress(int key, bool bDown)
 	{
-		Print("Pressing key: " + formatInt(key));
 	}
 	
 	//Called for getting current cursor position

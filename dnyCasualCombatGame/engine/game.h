@@ -1,5 +1,16 @@
 #pragma once
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 #include "renderer.h"
 #include "sound.h"
 #include "window.h"
@@ -7,6 +18,7 @@
 #include "entity.h"
 #include "menu.h"
 
+/* Game specific environment */
 namespace Game {
 	extern class CGame* pGame;
 
@@ -34,6 +46,7 @@ namespace Game {
 	void Cmd_MapBackground(void);
 	void Cmd_EnvSolidSprite(void);
 	void Cmd_EntSpawn(void);
+	void Cmd_EnvGoal(void);
 
 	class CGame {
 	private:
@@ -69,6 +82,7 @@ namespace Game {
 		player_s m_sPlayerSpawn;
 		std::vector<Entity::CSolidSprite> m_vSolidSprites;
 		std::vector<entityscript_s> m_vEntityScripts;
+		Entity::CGoalEntity* m_pGoalEntity;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -79,6 +93,7 @@ namespace Game {
 		friend void Cmd_MapBackground(void);
 		friend void Cmd_EnvSolidSprite(void);
 		friend void Cmd_EntSpawn(void);
+		friend void Cmd_EnvGoal(void);
 
 		bool LoadPackage(const std::wstring& wszPackage)
 		{
@@ -86,16 +101,19 @@ namespace Game {
 
 			this->m_sPackage.wszPakName = wszPackage;
 
+			//Check if package folder exists
 			if (!Utils::DirExists(wszBasePath + L"packages\\" + wszPackage)) {
 				pConsole->AddLine(L"Package not found: " + wszPackage);
 				return false;
 			}
-			std::cout << Utils::ConvertToAnsiString(wszBasePath + L"packages\\" + wszPackage + L"\\" + wszPackage + L".cfg") <<std::endl;
+			
+			//Check if package index config exists
 			if (!Utils::FileExists(wszBasePath + L"packages\\" + wszPackage + L"\\" + wszPackage + L".cfg")) {
 				pConsole->AddLine(L"Package configuration script not found");
 				return false;
 			}
 
+			//Execute package index config
 			if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + wszPackage + L"\\" + wszPackage + L".cfg")) {
 				pConsole->AddLine(L"Failed to execute package configuration script");
 				return false;
@@ -103,11 +121,13 @@ namespace Game {
 
 			pConsole->AddLine(L"Package " + this->m_sPackage.wszName + L" v" + this->m_sPackage.wszVersion + L" by " + this->m_sPackage.wszAuthor + L" (" + this->m_sPackage.wszContact + L")");
 
+			//Execute package index map file
 			if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + wszPackage + L"\\maps\\" + this->m_sPackage.wszMapIndex)) {
 				pConsole->AddLine(L"Failed to execute package index map script");
 				return false;
 			}
 
+			//Set map background
 			pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + wszPackage + L"\\gfx\\" + this->m_sMap.wszBackground);
 
 			this->m_bGameStarted = true;
@@ -115,25 +135,39 @@ namespace Game {
 			return this->m_bGameStarted;
 		}
 
+		bool LoadMap(const std::wstring& wszMap);
+
 		bool SpawnEntity(const std::wstring& wszName, int x, int y)
 		{
 			//Spawn entity into world
 
+			//Check if entity script exists
 			if (!Utils::FileExists(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as")) {
 				pConsole->AddLine(L"Entity script does not exist");
 				return false;
 			}
 
-			Scripting::HSISCRIPT hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as"));
-			if (hScript == SI_INVALID_ID) {
-				pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as");
-				return false;
+			//Load entity script if not already loaded
+			Scripting::HSISCRIPT hScript;
+			size_t uiScriptListId = this->FindScript(wszName);
+			if (uiScriptListId == std::string::npos) {
+				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as"));
+				if (hScript == SI_INVALID_ID) {
+					pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as");
+					return false;
+				}
+
+				//Store data
+				entityscript_s sEntScript;
+				sEntScript.hScript = hScript;
+				sEntScript.wszIdent = wszName;
+				this->m_vEntityScripts.push_back(sEntScript);
+				uiScriptListId = this->m_vEntityScripts.size() - 1;
+			} else {
+				hScript = this->m_vEntityScripts[uiScriptListId].hScript;
 			}
 
-			entityscript_s sEntScript;
-			sEntScript.hScript = hScript;
-			sEntScript.wszIdent = wszName;
-			this->m_vEntityScripts.push_back(sEntScript);
+			//Call OnSpawn() script function to let the entity be created
 
 			Entity::Vector vecPos(x, y);
 			std::string szIdent = Utils::ConvertToAnsiString(wszName);
@@ -151,11 +185,39 @@ namespace Game {
 			if (!bResult) {
 				pConsole->AddLine(L"Failed to call OnSpawn() in script");
 				pScriptingInt->UnloadScript(hScript);
-				this->m_vEntityScripts.erase(this->m_vEntityScripts.begin() + this->m_vEntityScripts.size() - 1);
+				this->m_vEntityScripts.erase(this->m_vEntityScripts.begin() + uiScriptListId);
 				return false;
 			}
 
 			return true;
+		}
+
+		void SpawnGoal(int x, int y, const std::wstring& wszGoal)
+		{
+			//Spawn goal entity
+
+			//Free previous goal entity if was spawned
+			if (this->m_pGoalEntity) {
+				delete this->m_pGoalEntity;
+				this->m_pGoalEntity = nullptr;
+			}
+
+			this->m_pGoalEntity = new Entity::CGoalEntity();
+			this->m_pGoalEntity->SetPosition(x, y);
+			this->m_pGoalEntity->SetGoal(wszGoal);
+		}
+
+		size_t FindScript(const std::wstring& wszName)
+		{
+			//Find script by name if loaded
+
+			for (size_t i = 0; i < this->m_vEntityScripts.size(); i++) {
+				if (this->m_vEntityScripts[i].wszIdent == wszName) {
+					return i;
+				}
+			}
+
+			return std::string::npos;
 		}
 	public:
 		CGame() : m_bInit(false), m_bGameStarted(false) { pGame = this; }
@@ -163,6 +225,7 @@ namespace Game {
 
 		bool Initialize(void)
 		{
+			//Initialize game
 			AllocConsole();
 			FILE* fDummy;
 			freopen_s(&fDummy, "CONIN$", "r", stdin);
@@ -171,6 +234,8 @@ namespace Game {
 			if (this->m_bInit) {
 				return true;
 			}
+
+			//Get base game path
 
 			wchar_t wszAppPath[2080];
 			GetModuleFileName(0, wszAppPath, sizeof(wszAppPath));
@@ -184,6 +249,8 @@ namespace Game {
 			
 			wszBasePath = wszAppPath;
 			
+			//Initialize config manager
+
 			pConfigMgr = new ConfigMgr::CConfigInt();
 			if (!pConfigMgr) {
 				this->Release();
@@ -192,9 +259,11 @@ namespace Game {
 
 			pConfigMgr->SetUnknownExpressionInformer(&UnknownExpressionHandler);
 
+			//Add CVars
 			pGfxResolutionWidth = pConfigMgr->CCVar::Add(L"gfx_resolution_width", ConfigMgr::CCVar::CVAR_TYPE_INT, L"1024");
 			pGfxResolutionHeight = pConfigMgr->CCVar::Add(L"gfx_resolution_height", ConfigMgr::CCVar::CVAR_TYPE_INT, L"768");
 
+			//Add commands
 			pConfigMgr->CCommand::Add(L"package_name", L"Package name", &Cmd_PackageName);
 			pConfigMgr->CCommand::Add(L"package_version", L"Package version", &Cmd_PackageVersion);
 			pConfigMgr->CCommand::Add(L"package_author", L"Package author", &Cmd_PackageAuthor);
@@ -204,71 +273,86 @@ namespace Game {
 			pConfigMgr->CCommand::Add(L"map_background", L"Map background", &Cmd_MapBackground);
 			pConfigMgr->CCommand::Add(L"env_solidsprite", L"Solid sprite placement", &Cmd_EnvSolidSprite);
 			pConfigMgr->CCommand::Add(L"ent_spawn", L"Spawn scripted entity", &Cmd_EntSpawn);
+			pConfigMgr->CCommand::Add(L"env_goal", L"Spawn goal entity", &Cmd_EnvGoal);
 
+			//Execute game config script
 			pConfigMgr->Execute(wszBasePath + L"config.cfg");
 
+			//Instantiate window manager
 			pWindow = new DxWindow::CDxWindow();
 			if (!pWindow) {
 				this->Release();
 				return false;
 			}
 			
+			//Instantiate renderer
 			pRenderer = new DxRenderer::CDxRenderer();
 			if (!pRenderer) {
 				this->Release();
 				return false;
 			}
 
+			//Instantiate sound manager
 			pSound = new DxSound::CDxSound();
 			if (!pSound) {
 				this->Release();
 				return false;
 			}
 			
+			//Initialize game window
 			if (!pWindow->Initialize(APP_NAME, pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue, &oDxWindowEvents)) {
 				this->Release();
 				return false;
 			}
 			
+			//Initialize renderer
 			if (!pRenderer->Initialize(pWindow->GetHandle(), true, pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue, 0, 0, 0, 255)) {
 				this->Release();
 				return false;
 			}
 
+			//Initialize sound
 			if (!pSound->Initialize(pWindow->GetHandle())) {
 				this->Release();
 				return false;
 			}
 
+			//Instantiate console manager
 			pConsole = new Console::CConsole();
 			if (!pConsole) {
 				this->Release();
 				return false;
 			}
 			
+			//Initialize console
 			if (!pConsole->Initialize(pRenderer, pGfxResolutionWidth->iValue, 500, 50, Console::ConColor(100, 100, 50))) {
 				this->Release();
 				return false;
 			}
 
+			//Instantiate and initialize AngelScript scripting interface
 			pScriptingInt = new Scripting::CScriptInt("", &AS_MessageCallback);
 			if (!pScriptingInt) {
 				this->Release();
 				return false;
 			}
 
+			//Initialize entity environment
 			if (!Entity::Initialize()) {
 				this->Release();
 				return false;
 			}
 			
+			//Initialize menu
 			if (!m_oMenu.Initialize(pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue)) {
 				this->Release();
 				return false;
 			}
 
+			//Load banner
 			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\banner.png", 1, 768, 150, 1, false);
 			
+			//Set game menu background and open the menu
 			pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");
 			this->m_oMenu.SetOpenStatus(true);
 
@@ -280,8 +364,11 @@ namespace Game {
 
 		bool StartGame(const std::wstring& wszPackage)
 		{
+			//Start a new game from package
+
 			pConsole->AddLine(L"Starting new game using package \"" + wszPackage + L"\"...");
 
+			//Stop current game if running any
 			if (this->m_bGameStarted) {
 				this->StopGame();
 				pConsole->AddLine(L"Stopped previous game");
@@ -291,6 +378,7 @@ namespace Game {
 				return false;
 			}
 
+			//Load package
 			return this->LoadPackage(wszPackage);
 		}
 
@@ -311,6 +399,12 @@ namespace Game {
 			//Clear lists
 			this->m_vEntityScripts.clear();
 			this->m_vSolidSprites.clear();
+
+			//Free memory
+			if (this->m_pGoalEntity) {
+				delete this->m_pGoalEntity;
+				this->m_pGoalEntity = nullptr;
+			}
 
 			//Reset indicator
 			this->m_bGameStarted = false;
@@ -337,8 +431,12 @@ namespace Game {
 
 		void Release(void)
 		{
+			//Release game component
+
+			//Stop current game
 			this->StopGame();
 
+			//Free memory
 			FREE(pConsole);
 			FREE(pSound);
 			FREE(pRenderer);
@@ -346,6 +444,7 @@ namespace Game {
 			FREE(pScriptingInt);
 			FREE(pConfigMgr);
 
+			//Clear indicators
 			this->m_bGameStarted = false;
 			this->m_bInit = false;
 		}

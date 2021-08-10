@@ -1,6 +1,18 @@
 #include "console.h"
 #include "utils.h"
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
+/* Console environment */
 namespace Console {
 	bool CConsole::Initialize(DxRenderer::CDxRenderer* pRenderer, int iWidth, int iHeight, unsigned short wMaxHistory, const ConColor& rColor)
 	{

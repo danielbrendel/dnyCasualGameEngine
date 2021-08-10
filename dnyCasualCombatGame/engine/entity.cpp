@@ -2,6 +2,17 @@
 #include "console.h"
 #include "game.h"
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 namespace Entity {
 	bool CScriptedEntsMgr::Spawn(const std::wstring& wszIdent, asIScriptObject* pObject, const Vector& vAtPos)
 	{
@@ -40,7 +51,7 @@ namespace Entity {
 
 	CScriptedEntsMgr oScriptedEntMgr;
 
-	namespace APIFuncs {
+	namespace APIFuncs { //API functions usable in scripts
 		void Print(const std::string& in)
 		{
 			pConsole->AddLine(Utils::ConvertToWideString(in));
@@ -69,6 +80,8 @@ namespace Entity {
 
 		bool GetSpriteInfo(const std::string& szFile, SpriteInfo& out)
 		{
+			//Get sprite info
+
 			SpriteInfo sInfo;
 			D3DXIMAGE_INFO sImageInfo;
 
@@ -201,19 +214,23 @@ namespace Entity {
 
 		bool ListFilesByExt(const std::string& szBaseDir, asIScriptFunction* pFunction, const char** pFileList, const size_t uiListLen)
 		{
+			//List files by extension list
+
 			WIN32_FIND_DATAA sFindData = { 0 };
 			HANDLE hFileSearch;
 			std::vector<std::string> vNames;
 
+			//Initiate file search
 			hFileSearch = FindFirstFileA((szBaseDir + "\\*.*").c_str(), &sFindData);
 			if (hFileSearch == INVALID_HANDLE_VALUE)
 				return false;
 
-			while (FindNextFileA(hFileSearch, &sFindData)) {
-				if (sFindData.cFileName[0] == '.')
+			while (FindNextFileA(hFileSearch, &sFindData)) { //While next file found in list
+				if (sFindData.cFileName[0] == '.') //Ignore special folder
 					continue;
 
-				if ((sFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
+				if ((sFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) { //If not a directory
+					//Extract file ext and check with extension list
 					std::string szFileExt = Utils::ExtractFileExt(sFindData.cFileName);
 					for (size_t i = 0; i < uiListLen; i++) {
 						if (szFileExt == pFileList[i]) {
@@ -225,6 +242,7 @@ namespace Entity {
 
 			FindClose(hFileSearch);
 
+			//For each found file with given extension call the script callback function
 			for (size_t i = 0; i < vNames.size(); i++) {
 				bool bResult = true;
 				BEGIN_PARAMS(vArgs);
@@ -263,6 +281,8 @@ namespace Entity {
 
 		int Random(int start, int end)
 		{
+			//Generate and return a random number
+
 			static bool bRndSeedOnce = false;
 			if (!bRndSeedOnce) {
 				srand((unsigned int)time(nullptr));
@@ -277,7 +297,9 @@ namespace Entity {
 	{
 		//Draw solid sprite
 
-		for (size_t i = 0; i < this->m_vSprites.size(); i++) {
+		for (size_t i = 0; i < this->m_vSprites.size(); i++) { //Loop through sprite list
+			//Calculate absolute x and y positions for current iterated entry
+
 			int xpos = this->m_vecPos[0];
 			int ypos = this->m_vecPos[1];
 
@@ -288,14 +310,33 @@ namespace Entity {
 				ypos += i * this->m_vecSize[1];
 			}
 
+			//Check if is inside screen
 			if (!APIFuncs::ShouldDraw(Vector(xpos, ypos), this->m_vecSize))
 				continue;
+
+			//Calculate drawing position and draw sprite
 
 			Vector vecOut;
 			APIFuncs::GetDrawingPosition(Vector(xpos, ypos), this->m_vecSize, vecOut);
 
 			pRenderer->DrawSprite(this->m_vSprites[i], vecOut[0], vecOut[1], 0, this->m_fRotation);
 		}
+	}
+
+	void CGoalEntity::Draw(void)
+	{
+		//Draw entity sprite
+
+		//Check if is inside screen
+		if (!APIFuncs::ShouldDraw(this->m_vecPosition, this->m_vecSize))
+			return;
+
+		//Calculate drawing position and draw sprite
+
+		Vector vecOut;
+		APIFuncs::GetDrawingPosition(this->m_vecPosition, this->m_vecSize, vecOut);
+
+		pRenderer->DrawSprite(this->m_hSprite, vecOut[0], vecOut[1], 0, 0.0f);
 	}
 
 	bool Initialize(void)

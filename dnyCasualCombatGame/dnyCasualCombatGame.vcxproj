@@ -161,7 +161,6 @@
     <ClInclude Include="engine\console.h" />
     <ClInclude Include="engine\entity.h" />
     <ClInclude Include="engine\game.h" />
-    <ClInclude Include="engine\map.h" />
     <ClInclude Include="engine\menu.h" />
     <ClInclude Include="engine\renderer.h" />
     <ClInclude Include="engine\scriptint.h" />

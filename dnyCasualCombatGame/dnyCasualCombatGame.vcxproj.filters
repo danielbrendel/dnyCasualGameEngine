@@ -86,9 +86,6 @@
     <ClInclude Include="engine\scriptint.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="engine\map.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="engine\configmgr.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>

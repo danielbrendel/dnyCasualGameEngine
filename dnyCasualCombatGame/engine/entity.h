@@ -1,10 +1,22 @@
 #pragma once
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 #include "shared.h"
 #include "vars.h"
 #include "utils.h"
 #include "scriptint.h"
 
+/* Entity environment */
 namespace Entity {
 	enum DamageType { DAMAGEABLE_NO = 0, DAMAGEABLE_ALL, DAMAGEABLE_NOTSQUAD };
 
@@ -696,18 +708,6 @@ namespace Entity {
 	private:
 		std::vector<CScriptedEntity*> m_vEnts;
 		playerentity_s m_sPlayerEntity;
-
-		void Release(void)
-		{
-			//Release resources
-
-			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
-				this->m_vEnts[i]->OnRelease();
-				delete this->m_vEnts[i];
-			}
-
-			this->m_vEnts.clear();
-		}
 	public:
 		CScriptedEntsMgr() {}
 		~CScriptedEntsMgr() { this->Release(); }
@@ -776,6 +776,18 @@ namespace Entity {
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
 				this->m_vEnts[i]->OnDrawOnTop();
 			}
+		}
+
+		void Release(void)
+		{
+			//Release resources
+
+			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
+				this->m_vEnts[i]->OnRelease();
+				delete this->m_vEnts[i];
+			}
+
+			this->m_vEnts.clear();
 		}
 
 		//Entity querying
@@ -925,15 +937,18 @@ namespace Entity {
 		{
 			//Initialize entity
 
+			//Set default value
 			if (!repeat) {
 				repeat = 1;
 			}
 
+			//Store data
 			this->m_vecPos = Vector(x, y);
 			this->m_vecSize = Vector(w, h);
 			this->m_iDir = dir;
 			this->m_fRotation = rot;
 
+			//Load repated sprites if any
 			for (size_t i = 0; i < repeat; i++) {
 				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszFile, 1, w, h, 1, false);
 				if (!hSprite) {
@@ -957,6 +972,70 @@ namespace Entity {
 			}
 
 			this->m_vSprites.clear();
+		}
+	};
+
+	class CGoalEntity {
+	private:
+		DxRenderer::HD3DSPRITE m_hSprite;
+		Vector m_vecPosition;
+		Vector m_vecSize;
+		std::wstring m_wszGoal;
+		bool m_bGoalReached;
+	public:
+		CGoalEntity()
+		{
+			//Setup data and load sprite
+
+			this->m_bGoalReached = false;
+			this->m_vecSize = Vector(64, 64);
+			this->m_hSprite = pRenderer->LoadSprite(wszBasePath + L"media\\goal.png", 1, this->m_vecSize[0], this->m_vecSize[1], 1, false);
+		}
+
+		~CGoalEntity()
+		{
+			//Free sprite
+
+			pRenderer->FreeSprite(this->m_hSprite);
+		}
+
+		void SetPosition(int x, int y)
+		{
+			//Set position
+
+			this->m_vecPosition = Vector(x, y);
+		}
+
+		void SetGoal(const std::wstring& wszGoal)
+		{
+			//Set goal
+
+			this->m_wszGoal = wszGoal;
+		}
+
+		//Indicate if goal reached
+		bool IsGoalReached(void) const { return this->m_bGoalReached; }
+
+		//Get goal type/map
+		const std::wstring& GetGoal(void) const { return this->m_wszGoal; }
+
+		void Draw(void);
+		void Process(void)
+		{
+			//Process entity
+
+			Vector* vecPosition;
+			Vector* vecSize;
+
+			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetPosition()", nullptr, &vecPosition, Scripting::FA_OBJECT);
+			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetSize()", nullptr, &vecSize, Scripting::FA_OBJECT);
+
+			//Check if player is collided with goal entity
+			if (((*vecPosition)[0] >= this->m_vecPosition[0]) && ((*vecPosition)[0] <= this->m_vecPosition[0] + this->m_vecSize[0]) && ((*vecPosition)[1] >= this->m_vecPosition[1]) && ((*vecPosition)[1] <= this->m_vecPosition[1] + this->m_vecSize[1])) {
+				if (!this->m_bGoalReached) {
+					this->m_bGoalReached = true;
+				}
+			}
 		}
 	};
 

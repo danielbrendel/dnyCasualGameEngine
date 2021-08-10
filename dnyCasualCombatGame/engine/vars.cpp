@@ -1,5 +1,16 @@
 #include "vars.h"
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 DxWindow::CDxWindow* pWindow = nullptr;
 DxRenderer::CDxRenderer* pRenderer = nullptr;
 DxSound::CDxSound* pSound = nullptr;

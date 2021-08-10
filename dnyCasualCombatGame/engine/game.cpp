@@ -1,14 +1,73 @@
 #include "game.h"
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 namespace Game {
 	class CGame* pGame = nullptr;
 	CWindowEvents oDxWindowEvents;
 
+	bool CGame::LoadMap(const std::wstring& wszMap)
+	{
+		//Load package map file
+
+		pConsole->AddLine(L"Loading map: " + wszMap);
+
+		//Free old resources
+
+		for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
+			this->m_vSolidSprites[i].Release();
+		}
+
+		this->m_vSolidSprites.clear();
+
+		Entity::oScriptedEntMgr.Release();
+
+		//Execute package map file
+		if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\maps\\" + wszMap)) {
+			pConsole->AddLine(L"Failed to execute package map script");
+			return false;
+		}
+
+		//Set map background
+		return pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\gfx\\" + this->m_sMap.wszBackground);
+	}
+
 	void CGame::Process(void)
 	{
+		//Process game
+
 		while (this->m_bInit) {
+			//Perform window processing
 			pWindow->Process();
-			Entity::oScriptedEntMgr.Process();
+
+			if (this->m_bGameStarted) {
+				//Process scripted entities
+				Entity::oScriptedEntMgr.Process();
+
+				//Process goal entity
+				if (this->m_pGoalEntity) {
+					this->m_pGoalEntity->Process();
+
+					//Handle if game goal reached
+					if (this->m_pGoalEntity->IsGoalReached()) {
+						if (this->m_pGoalEntity->GetGoal() == L"#finished") { //Package game has finished
+							pConsole->AddLine(L"Game has finished!");
+							this->StopGame();
+						} else { //Load next map
+							this->LoadMap(this->m_pGoalEntity->GetGoal() + L".cfg");
+						}
+					}
+				}
+			}
 
 			Sleep(1);
 		}
@@ -18,17 +77,28 @@ namespace Game {
 	{
 		//pConsole->Draw();
 
+		//Draw solid sprites
 		for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
 			this->m_vSolidSprites[i].Draw();
 		}
 
-		Entity::oScriptedEntMgr.Draw();
-		Entity::oScriptedEntMgr.DrawOnTop();
+		if (this->m_bGameStarted) {
+			//Draw scripted entities
+			Entity::oScriptedEntMgr.Draw();
+			Entity::oScriptedEntMgr.DrawOnTop();
 
+			//Draw goal entity
+			if (this->m_pGoalEntity) {
+				this->m_pGoalEntity->Draw();
+			}
+		}
+
+		//Draw banner if in main menu and no game is running
 		if (!this->m_bGameStarted) {
 			pRenderer->DrawSprite(this->m_hBanner, pGfxResolutionWidth->iValue / 2 - 768 / 2, 10, 0, 0.0f);
 		}
-
+		
+		//Draw menu if opened
 		if (this->m_oMenu.IsOpen()) {
 			this->m_oMenu.Draw();
 		}
@@ -197,5 +267,14 @@ namespace Game {
 		int y = _wtoi(pConfigMgr->ExpressionItemValue(3).c_str());
 
 		pGame->SpawnEntity(wszEntityName, x, y);
+	}
+
+	void Cmd_EnvGoal(void)
+	{
+		int x = _wtoi(pConfigMgr->ExpressionItemValue(1).c_str());
+		int y = _wtoi(pConfigMgr->ExpressionItemValue(2).c_str());
+		std::wstring wszGoal = pConfigMgr->ExpressionItemValue(3);
+
+		pGame->SpawnGoal(x, y, wszGoal);
 	}
 }

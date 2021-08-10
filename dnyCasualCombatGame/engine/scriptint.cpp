@@ -3,6 +3,17 @@
 #include <scriptstdstring\scriptstdstring.h>
 #include <scriptmath\scriptmath.h>
 
+/*
+	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 namespace Scripting {
 	CScriptInt::CScriptInt(const std::string& szScriptDir, void* pCallbackFunction) : m_bInitialized(false)
 	{

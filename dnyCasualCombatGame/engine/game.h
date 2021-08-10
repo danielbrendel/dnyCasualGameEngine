@@ -100,22 +100,22 @@ namespace Game {
 			//Load package game
 
 			this->m_sPackage.wszPakName = wszPackage;
-
+			
 			//Check if package folder exists
 			if (!Utils::DirExists(wszBasePath + L"packages\\" + wszPackage)) {
-				pConsole->AddLine(L"Package not found: " + wszPackage);
+				pConsole->AddLine(L"Package not found: " + wszPackage, Console::ConColor(255, 0, 0));
 				return false;
 			}
 			
 			//Check if package index config exists
 			if (!Utils::FileExists(wszBasePath + L"packages\\" + wszPackage + L"\\" + wszPackage + L".cfg")) {
-				pConsole->AddLine(L"Package configuration script not found");
+				pConsole->AddLine(L"Package configuration script not found", Console::ConColor(255, 0, 0));
 				return false;
 			}
 
 			//Execute package index config
 			if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + wszPackage + L"\\" + wszPackage + L".cfg")) {
-				pConsole->AddLine(L"Failed to execute package configuration script");
+				pConsole->AddLine(L"Failed to execute package configuration script", Console::ConColor(255, 0, 0));
 				return false;
 			}
 
@@ -123,7 +123,7 @@ namespace Game {
 
 			//Execute package index map file
 			if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + wszPackage + L"\\maps\\" + this->m_sPackage.wszMapIndex)) {
-				pConsole->AddLine(L"Failed to execute package index map script");
+				pConsole->AddLine(L"Failed to execute package index map script", Console::ConColor(255, 0, 0));
 				return false;
 			}
 
@@ -143,7 +143,7 @@ namespace Game {
 
 			//Check if entity script exists
 			if (!Utils::FileExists(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as")) {
-				pConsole->AddLine(L"Entity script does not exist");
+				pConsole->AddLine(L"Entity script does not exist", Console::ConColor(255, 0, 0));
 				return false;
 			}
 
@@ -153,7 +153,7 @@ namespace Game {
 			if (uiScriptListId == std::string::npos) {
 				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as"));
 				if (hScript == SI_INVALID_ID) {
-					pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as");
+					pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
 					return false;
 				}
 
@@ -183,7 +183,7 @@ namespace Game {
 			END_PARAMS(vArgs);
 
 			if (!bResult) {
-				pConsole->AddLine(L"Failed to call OnSpawn() in script");
+				pConsole->AddLine(L"Failed to call OnSpawn() in script", Console::ConColor(255, 0, 0));
 				pScriptingInt->UnloadScript(hScript);
 				this->m_vEntityScripts.erase(this->m_vEntityScripts.begin() + uiScriptListId);
 				return false;
@@ -226,11 +226,7 @@ namespace Game {
 		bool Initialize(void)
 		{
 			//Initialize game
-			AllocConsole();
-			FILE* fDummy;
-			freopen_s(&fDummy, "CONIN$", "r", stdin);
-			freopen_s(&fDummy, "CONOUT$", "w", stderr);
-			freopen_s(&fDummy, "CONOUT$", "w", stdout);
+			
 			if (this->m_bInit) {
 				return true;
 			}
@@ -355,6 +351,10 @@ namespace Game {
 			//Set game menu background and open the menu
 			pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");
 			this->m_oMenu.SetOpenStatus(true);
+
+			//Add info text
+			pConsole->AddLine(APP_NAME L" v" APP_VERSION L" developed by " APP_AUTHOR L" (" APP_CONTACT L")", Console::ConColor(100, 215, 255));
+			pConsole->AddLine(L"");
 
 			this->m_bInit = true;
 			this->m_bGameStarted = false;

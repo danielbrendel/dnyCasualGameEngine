@@ -304,10 +304,10 @@ namespace Entity {
 			int ypos = this->m_vecPos[1];
 
 			if (this->m_iDir == 0) {
-				xpos += i * this->m_vecSize[0];
+				xpos += (int)i * this->m_vecSize[0];
 			}
 			else {
-				ypos += i * this->m_vecSize[1];
+				ypos += (int)i * this->m_vecSize[1];
 			}
 
 			//Check if is inside screen
@@ -388,29 +388,6 @@ namespace Entity {
 
 		//Register function def
 		REG_FUNCDEF("bool FuncFileListing(const string& in)");
-		
-		//Register structs
-		Scripting::HSISTRUCT hStructs;
-		/*REG_STRUCT("GameKeys", sizeof(Entity::game_keys_s), hStructs);
-		ADD_STRUCT("int vkTrigger", asOFFSET(Entity::game_keys_s, vkTrigger), hStructs);
-		ADD_STRUCT("int vkClean", asOFFSET(Entity::game_keys_s, vkClean), hStructs);
-		ADD_STRUCT("int vkMenu", asOFFSET(Entity::game_keys_s, vkMenu), hStructs);
-		ADD_STRUCT("int vkScrollUp", asOFFSET(Entity::game_keys_s, vkScrollUp), hStructs);
-		ADD_STRUCT("int vkScrollDown", asOFFSET(Entity::game_keys_s, vkScrollDown), hStructs);
-		ADD_STRUCT("int vkTeamSelect", asOFFSET(Entity::game_keys_s, vkTeamSelect), hStructs);
-		ADD_STRUCT("int vkConsole", asOFFSET(Entity::game_keys_s, vkConsole), hStructs);
-		ADD_STRUCT("int vkTakeScreen", asOFFSET(Entity::game_keys_s, vkTakeScreen), hStructs);
-		ADD_STRUCT("int vkKey1", asOFFSET(Entity::game_keys_s, vkKey1), hStructs);
-		ADD_STRUCT("int vkKey2", asOFFSET(Entity::game_keys_s, vkKey2), hStructs);
-		ADD_STRUCT("int vkKey3", asOFFSET(Entity::game_keys_s, vkKey3), hStructs);
-		ADD_STRUCT("int vkKey4", asOFFSET(Entity::game_keys_s, vkKey4), hStructs);
-		ADD_STRUCT("int vkKey5", asOFFSET(Entity::game_keys_s, vkKey5), hStructs);
-		ADD_STRUCT("int vkKey6", asOFFSET(Entity::game_keys_s, vkKey6), hStructs);
-		ADD_STRUCT("int vkKey7", asOFFSET(Entity::game_keys_s, vkKey7), hStructs);
-		ADD_STRUCT("int vkKey8", asOFFSET(Entity::game_keys_s, vkKey8), hStructs);
-		ADD_STRUCT("int vkKey9", asOFFSET(Entity::game_keys_s, vkKey9), hStructs);
-		ADD_STRUCT("int vkKey0", asOFFSET(Entity::game_keys_s, vkKey0), hStructs);
-		ADD_STRUCT("int vkExit", asOFFSET(Entity::game_keys_s, vkExit), hStructs);*/
 
 		//Register classes
 		Scripting::HSICLASS hClasses;

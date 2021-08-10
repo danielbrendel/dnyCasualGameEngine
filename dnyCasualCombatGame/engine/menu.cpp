@@ -15,18 +15,17 @@
 namespace Menu {
 	void MainMenu_onOpenNews(void)
 	{
-		std::cout << "MainMenu_onOpenNews" << std::endl;
+		pConsole->AddLine(L"MainMenu_onOpenNews");
 	}
 
 	void MainMenu_onOpenPackages(void)
 	{
-		std::cout << "MainMenu_onOpenPackages" << std::endl;
+		pConsole->AddLine(L"MainMenu_onOpenPackages");
 	}
 
 	void MainMenu_onOpenSettings(void)
 	{
-		std::cout << "MainMenu_onOpenSettings" << std::endl;
-
+		pConsole->AddLine(L"MainMenu_onOpenSettings");
 	}
 
 	void MainMenu_onQuitGame(void)

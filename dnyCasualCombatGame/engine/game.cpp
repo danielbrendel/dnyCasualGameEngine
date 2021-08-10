@@ -75,8 +75,6 @@ namespace Game {
 
 	void CGame::Draw(void)
 	{
-		//pConsole->Draw();
-
 		//Draw solid sprites
 		for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
 			this->m_vSolidSprites[i].Draw();
@@ -101,6 +99,11 @@ namespace Game {
 		//Draw menu if opened
 		if (this->m_oMenu.IsOpen()) {
 			this->m_oMenu.Draw();
+		}
+
+		//Draw console if opened
+		if (pConsole) {
+			pConsole->Draw();
 		}
 	}
 
@@ -132,10 +135,11 @@ namespace Game {
 		//Called for key events
 
 		const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
+
 		BEGIN_PARAMS(vArgs);
 		PUSH_DWORD(vKey);
 		PUSH_BYTE(bDown);
-		std::cout << "KEYEVENT" << std::endl;
+		
 		pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnKeyPress(int vKey, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
 	}
 
@@ -147,7 +151,7 @@ namespace Game {
 	{
 		//Handle key input
 
-		if (vKey == VK_F1) {
+		if (vKey == VK_F1 && bDown) {
 			pConsole->Toggle();
 		}
 
@@ -250,7 +254,7 @@ namespace Game {
 		int y = _wtoi(pConfigMgr->ExpressionItemValue(3).c_str());
 		int w = _wtoi(pConfigMgr->ExpressionItemValue(4).c_str());
 		int h = _wtoi(pConfigMgr->ExpressionItemValue(5).c_str());
-		float rot = _wtof(pConfigMgr->ExpressionItemValue(6).c_str());
+		float rot = (float)_wtof(pConfigMgr->ExpressionItemValue(6).c_str());
 		int repeat = _wtoi(pConfigMgr->ExpressionItemValue(7).c_str());
 		int dir = _wtoi(pConfigMgr->ExpressionItemValue(8).c_str());
 

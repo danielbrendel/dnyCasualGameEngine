@@ -979,11 +979,11 @@ inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
 
 			//Load repated sprites if any
 			for (size_t i = 0; i < repeat; i++) {
-				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszFile, 1, w, h, 1, true);
-				if (!hSprite) {
+				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszFile, 1, w, h, 1, false);
+				if (hSprite == GFX_INVALID_SPRITE_ID) {
 					return false;
 				}
-
+				
 				this->m_vSprites.push_back(hSprite);
 			}
 

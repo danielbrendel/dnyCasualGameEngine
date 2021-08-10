@@ -345,7 +345,7 @@ return true;
 			} else {
 				ypos += (int)i * this->m_vecSize[1];
 			}
-
+			
 			//Check if is inside screen
 			if (!APIFuncs::ShouldDraw(Vector(xpos, ypos), this->m_vecSize))
 				continue;
@@ -356,23 +356,6 @@ return true;
 			APIFuncs::GetDrawingPosition(Vector(xpos, ypos), this->m_vecSize, vecOut);
 
 			pRenderer->DrawSprite(this->m_vSprites[i], vecOut[0], vecOut[1], 0, this->m_fRotation);
-		}
-
-		if (this->m_bWall) {
-			Vector vecEntireSize;
-			//Calculate entire size according to direction
-			if (this->m_iDir == 0) {
-				vecEntireSize[0] = (int)this->m_vSprites.size() * this->m_vecSize[0];
-				vecEntireSize[1] = this->m_vecSize[1];
-			}
-			else {
-				vecEntireSize[0] = this->m_vecSize[0];
-				vecEntireSize[1] = (int)this->m_vSprites.size() * this->m_vecSize[1];
-			}
-			Vector vOut;
-			APIFuncs::GetDrawingPosition(this->m_vecPos, vecEntireSize, vOut);
-			APIFuncs::DrawBox(vOut, vecEntireSize, 2, Color(255, 0, 0, 15));
-			APIFuncs::DrawString(APIFuncs::GetDefaultFont(), std::to_string(vecEntireSize[0]) + "x" + std::to_string(vecEntireSize[1]), vOut, Color(0, 0, 255, 150));
 		}
 	}
 

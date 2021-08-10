@@ -19,10 +19,11 @@ class CCubeEntity : IScriptedEntity
 	Vector m_vecSize;
 	Model m_oModel;
 	float m_fRotation;
+	SpriteHandle m_hSprite;
 	
 	CCubeEntity()
     {
-		this.m_vecSize = Vector(50, 50);
+		this.m_vecSize = Vector(64, 64);
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
@@ -30,6 +31,7 @@ class CCubeEntity : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
+		this.m_hSprite = R_LoadSprite(g_szPackagePath + "gfx\\cube.png", 1, 64, 64, 1, false);
 		this.m_oModel.Alloc();
 	}
 	
@@ -56,7 +58,8 @@ class CCubeEntity : IScriptedEntity
 			
 		Vector vOut;
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
-		R_DrawFilledBox(vOut, this.m_vecSize, Color(255, 0, 0, 150));
+		
+		R_DrawSprite(this.m_hSprite, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
 	}
 	
 	//Indicate whether this entity shall be removed by the game

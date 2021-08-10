@@ -54,10 +54,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	void OnDrawOnTop()
 	{
 		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
-		
-		Vector vOut;
-		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
-		R_DrawBox(vOut, this.m_vecSize, 1, Color(255, 0, 0, 150));
 	}
 	
 	//Indicate whether this entity shall be removed by the game

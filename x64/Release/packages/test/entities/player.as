@@ -15,6 +15,14 @@ string g_szPackagePath = "";
 	you don't need to use them. A scripted entity is passed to the 
 	game engine via the SpawnEntity(<object handle>, <spawn position>) function. 
 */
+const int BTN_FORWARD = (1 << 0);
+const int BTN_BACKWARD = (1 << 1);
+const int BTN_MOVELEFT = (1 << 2);
+const int BTN_MOVERIGHT = (1 << 3);
+const int BTN_TURNLEFT = (1 << 4);
+const int BTN_TURNRIGHT = (1 << 5);
+const int BTN_SPEED = (1 << 6);
+const int BTN_ATTACK = (1 << 7);
 class CPlayerEntity : IScriptedEntity, IPlayerEntity
 {
 	Vector m_vecPos;
@@ -22,9 +30,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	Model m_oModel;
 	SpriteHandle m_hSprite;
 	float m_fRotation;
+	uint32 m_uiButtons;
 	
 	CPlayerEntity()
     {
+		this.m_uiButtons = 0;
 		this.m_vecSize = Vector(59, 52);
     }
 	
@@ -45,6 +55,38 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
+			Ent_Move(this, 10, MOVE_FORWARD);
+		} 
+		
+		if ((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD) {
+			Ent_Move(this, 10, MOVE_BACKWARD);
+		} 
+		
+		if ((this.m_uiButtons & BTN_MOVELEFT) == BTN_MOVELEFT) {
+			Ent_Move(this, 10, MOVE_LEFT);
+		} 
+		
+		if ((this.m_uiButtons & BTN_MOVERIGHT) == BTN_MOVERIGHT) {
+			Ent_Move(this, 10, MOVE_RIGHT);
+		} 
+
+		if ((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT) {
+			this.m_fRotation += 0.05f;
+		} 
+
+		if ((this.m_uiButtons & BTN_TURNRIGHT) == BTN_TURNRIGHT) {
+			this.m_fRotation -= 0.05f;
+		} 
+
+		if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
+			CLaserEntity @laser = CLaserEntity();
+			Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
+			laser.SetRotation(this.m_fRotation);
+			bool r = Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
+			SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
+			S_PlaySound(hSound, 10);
+		}
 	}
 	
 	//Entity can draw everything in default order here
@@ -136,28 +178,79 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		Print("OnKeyPress: " + formatInt(vKey));
 	
 		if (vKey == 39) {
-			this.m_fRotation += 0.05f;
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT)) {
+					this.m_uiButtons |= BTN_TURNLEFT;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT) {
+					this.m_uiButtons &= ~BTN_TURNLEFT;
+				}
+			}
 		} else if (vKey == 37) {
-			this.m_fRotation -= 0.05f;
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_TURNRIGHT) == BTN_TURNRIGHT)) {
+					this.m_uiButtons |= BTN_TURNRIGHT;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_TURNRIGHT) == BTN_TURNRIGHT) {
+					this.m_uiButtons &= ~BTN_TURNRIGHT;
+				}
+			}
 		} 
 		
-		if (vKey == 87 && bDown) {
-			Ent_Move(this, 10, MOVE_FORWARD);
-		} else if (vKey == 83 && bDown) {
-			Ent_Move(this, 10, MOVE_BACKWARD);
-		} else if (vKey == 65 && bDown) {
-			Ent_Move(this, 10, MOVE_LEFT);
-		} else if (vKey == 68 && bDown) {
-			Ent_Move(this, 10, MOVE_RIGHT);
+		if (vKey == 87) {
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD)) {
+					this.m_uiButtons |= BTN_FORWARD;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
+					this.m_uiButtons &= ~BTN_FORWARD;
+				}
+			}
+		} else if (vKey == 83) {
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD)) {
+					this.m_uiButtons |= BTN_BACKWARD;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD) {
+					this.m_uiButtons &= ~BTN_BACKWARD;
+				}
+			}
+		} else if (vKey == 65) {
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_MOVELEFT) == BTN_MOVELEFT)) {
+					this.m_uiButtons |= BTN_MOVELEFT;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_MOVELEFT) == BTN_MOVELEFT) {
+					this.m_uiButtons &= ~BTN_MOVELEFT;
+				}
+			}
+		} else if (vKey == 68) {
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_MOVERIGHT) == BTN_MOVERIGHT)) {
+					this.m_uiButtons |= BTN_MOVERIGHT;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_MOVERIGHT) == BTN_MOVERIGHT) {
+					this.m_uiButtons &= ~BTN_MOVERIGHT;
+				}
+			}
 		}
 		
 		if (vKey == 32) {
-			CLaserEntity @laser = CLaserEntity();
-			Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
-			laser.SetRotation(this.m_fRotation);
-			bool r = Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
-			SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
-			S_PlaySound(hSound, 10);
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK)) {
+					this.m_uiButtons |= BTN_ATTACK;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
+					this.m_uiButtons &= ~BTN_ATTACK;
+				}
+			}
 		}
 	}
 	

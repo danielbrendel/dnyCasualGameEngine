@@ -1,6 +1,8 @@
 
 string g_szPackagePath = "";
 
+#include "weapon_laser.as"
+
 /* 
 	Scripted entity 
 	
@@ -123,6 +125,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		return "player";
 	}
 	
+	//Called for wall collisions
+	void OnWallCollided()
+	{
+	}
+	
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
@@ -142,6 +149,15 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 			Ent_Move(this, 10, MOVE_LEFT);
 		} else if (vKey == 68 && bDown) {
 			Ent_Move(this, 10, MOVE_RIGHT);
+		}
+		
+		if (vKey == 32) {
+			CLaserEntity @laser = CLaserEntity();
+			Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
+			laser.SetRotation(this.m_fRotation);
+			bool r = Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
+			SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
+			S_PlaySound(hSound, 10);
 		}
 	}
 	

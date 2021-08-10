@@ -45,6 +45,7 @@ namespace Game {
 	void Cmd_MapName(void);
 	void Cmd_MapBackground(void);
 	void Cmd_EnvSolidSprite(void);
+	void Cmd_EntRequire(void);
 	void Cmd_EntSpawn(void);
 	void Cmd_EnvGoal(void);
 
@@ -93,6 +94,7 @@ namespace Game {
 		friend void Cmd_MapBackground(void);
 		friend void Cmd_EnvSolidSprite(void);
 		friend void Cmd_EntSpawn(void);
+		friend void Cmd_EntRequire(void);
 		friend void Cmd_EnvGoal(void);
 
 		bool LoadPackage(const std::wstring& wszPackage)
@@ -192,6 +194,36 @@ namespace Game {
 			return true;
 		}
 
+		bool RequireEntityScript(const std::wstring& wszName)
+		{
+			//Load entity script
+			// 
+			//Check if entity script exists
+			if (!Utils::FileExists(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as")) {
+				pConsole->AddLine(L"Entity script does not exist", Console::ConColor(255, 0, 0));
+				return false;
+			}
+
+			//Load entity script if not already loaded
+			Scripting::HSISCRIPT hScript;
+			size_t uiScriptListId = this->FindScript(wszName);
+			if (uiScriptListId == std::string::npos) {
+				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as"));
+				if (hScript == SI_INVALID_ID) {
+					pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
+					return false;
+				}
+
+				//Store data
+				entityscript_s sEntScript;
+				sEntScript.hScript = hScript;
+				sEntScript.wszIdent = wszName;
+				this->m_vEntityScripts.push_back(sEntScript);
+			}
+
+			return true;
+		}
+
 		void SpawnGoal(int x, int y, const std::wstring& wszGoal)
 		{
 			//Spawn goal entity
@@ -270,6 +302,7 @@ namespace Game {
 			pConfigMgr->CCommand::Add(L"map_background", L"Map background", &Cmd_MapBackground);
 			pConfigMgr->CCommand::Add(L"env_solidsprite", L"Solid sprite placement", &Cmd_EnvSolidSprite);
 			pConfigMgr->CCommand::Add(L"ent_spawn", L"Spawn scripted entity", &Cmd_EntSpawn);
+			pConfigMgr->CCommand::Add(L"ent_require", L"Require entity script", &Cmd_EntRequire);
 			pConfigMgr->CCommand::Add(L"env_goal", L"Spawn goal entity", &Cmd_EnvGoal);
 
 			//Execute game config script
@@ -440,7 +473,8 @@ namespace Game {
 			this->m_bGameStarted = false;
 			this->m_bInit = false;
 		}
+
+		//Return package path
+		std::wstring GetPackagePath(void) { return wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\"; }
 	};
-
-
 }

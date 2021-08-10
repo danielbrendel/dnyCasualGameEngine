@@ -583,6 +583,13 @@ namespace Entity {
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnDrawOnTop()", nullptr, nullptr);
 		}
 
+		void OnWallCollided(void)
+		{
+			//Inform class instance of event
+
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnWallCollided()", nullptr, nullptr);
+		}
+
 		byte IsDamageable(void)
 		{
 			//Query if entity is damageable (0 = non-damageable, 1 = damage all, 2 = damage only entities with different name)

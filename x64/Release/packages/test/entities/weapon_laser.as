@@ -1,38 +1,37 @@
 
-string g_szPackagePath = "";
-
-/* 
-	Scripted entity 
-	
-	A scripted entity is a dynamic interface class for implementing
-	custom entities such as explosions, decals, etc
-	
-	It is derived from the IScriptedEntity interface and must define
-	all the following interface functions. Also it must have at least
-	one Vector and Model which are returned in certain methods. Tho
-	you don't need to use them. A scripted entity is passed to the 
-	game engine via the SpawnEntity(<object handle>, <spawn position>) function. 
-*/
-class CCubeEntity : IScriptedEntity
+class CLaserEntity : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
+	SpriteHandle m_hLaser;
 	float m_fRotation;
-	SpriteHandle m_hSprite;
+	float m_fSpeed;
+	bool m_bRemove;
+	Timer m_tmrAlive;
 	
-	CCubeEntity()
+	CLaserEntity()
     {
-		this.m_vecSize = Vector(64, 64);
+		this.m_vecSize = Vector(60, 99);
+		this.m_fSpeed = 35.0;
+		this.m_bRemove = false;
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_fRotation = 0.0f;
-		this.m_hSprite = R_LoadSprite(g_szPackagePath + "gfx\\cube.png", 1, 64, 64, 1, false);
+		this.m_hLaser = R_LoadSprite(GetPackagePath() + "gfx\\laser.png", 1, 60, 99, 1, true);
+		this.m_tmrAlive.SetDelay(10000);
+		this.m_tmrAlive.Reset();
+		this.m_tmrAlive.SetActive(true);
 		this.m_oModel.Alloc();
+		BoundingBox bbox;
+		bbox.Alloc();
+		bbox.AddBBoxItem(Vector(0, 0), Vector(60, 99));
+		this.m_oModel.Alloc();
+		this.m_oModel.SetCenter(Vector(60 / 2, 99 / 2));
+		this.m_oModel.Initialize2(bbox, this.m_hLaser);
 	}
 	
 	//Called when the entity gets released
@@ -43,15 +42,16 @@ class CCubeEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		Ent_Move(this, this.m_fSpeed, MOVE_FORWARD);
+		
+		this.m_tmrAlive.Update();
+		if (this.m_tmrAlive.IsElapsed()) {
+			this.m_bRemove = true;
+		}
 	}
 	
 	//Entity can draw everything in default order here
 	void OnDraw()
-	{
-	}
-	
-	//Called for wall collisions
-	void OnWallCollided()
 	{
 	}
 	
@@ -64,13 +64,19 @@ class CCubeEntity : IScriptedEntity
 		Vector vOut;
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
-		R_DrawSprite(this.m_hSprite, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
+		R_DrawSprite(this.m_hLaser, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+	}
+	
+	//Called for wall collisions
+	void OnWallCollided()
+	{
+		this.m_bRemove = true;
 	}
 	
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{
-		return false;
+		return (this.m_bRemove); //Remove laser when reached position
 	}
 	
 	//Indicate whether this entity is damageable. Damageable entities can collide with other
@@ -84,6 +90,7 @@ class CCubeEntity : IScriptedEntity
 	//Called when the entity recieves damage
 	void OnDamage(DamageValue dv)
 	{
+		this.m_bRemove = true;
 	}
 	
 	//Called for recieving the model data for this entity. This is only used for
@@ -102,24 +109,19 @@ class CCubeEntity : IScriptedEntity
 	//Set new position
 	void SetPosition(const Vector &in vecPos)
 	{
-	
-	}
-	
-	//This vector is used for getting the overall drawing size
-	Vector& GetSize()
-	{
-		return this.m_vecSize;
+		this.m_vecPos = vecPos;
 	}
 	
 	//Return the rotation. This is actually not used by the host application, but might be useful to other entities
 	float GetRotation()
 	{
-		return 0.0;
+		return this.m_fRotation;
 	}
 	
 	//Set new rotation
 	void SetRotation(float fRot)
 	{
+		this.m_fRotation = fRot;
 	}
 	
 	//Called for querying the damage value for this entity
@@ -131,16 +133,12 @@ class CCubeEntity : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
-		return "cube";
+		return "weapon_laser";
+	}
+	
+	//This vector is used for drawing the selection box
+	Vector& GetSize()
+	{
+		return this.m_vecPos;
 	}
 }
-
-
-void OnSpawn(const Vector &in vecPos, const string &in szIdent, const string &in szPath)
-{
-	g_szPackagePath = szPath;
-
-	CCubeEntity @cube = CCubeEntity();
-	Ent_SpawnEntity(szIdent, @cube, vecPos);
-}
-

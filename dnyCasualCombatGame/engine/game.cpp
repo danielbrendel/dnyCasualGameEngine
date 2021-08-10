@@ -300,6 +300,13 @@ namespace Game {
 		pGame->m_vSolidSprites.push_back(oSprite);
 	}
 
+	void Cmd_EntRequire(void)
+	{
+		std::wstring wszEntScript = pConfigMgr->ExpressionItemValue(1);
+
+		pGame->RequireEntityScript(wszEntScript);
+	}
+
 	void Cmd_EntSpawn(void)
 	{
 		std::wstring wszEntityName = pConfigMgr->ExpressionItemValue(1);

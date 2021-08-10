@@ -34,19 +34,19 @@ namespace Entity {
 			return false;
 		}
 		
-		//Inform of being spawned
+		//Call spawn function if required
 		pEntity->OnSpawn(vAtPos);
 		
 		//Add to list
 		this->m_vEnts.push_back(pEntity);
 
-//Handle special entity case: player
-if (wszIdent == L"player") {
-	this->m_sPlayerEntity.hScript = hScript;
-	this->m_sPlayerEntity.pObject = pObject;
-}
+		//Handle special entity case: player
+		if (wszIdent == L"player") {
+			this->m_sPlayerEntity.hScript = hScript;
+			this->m_sPlayerEntity.pObject = pObject;
+		}
 
-return true;
+		return true;
 	}
 
 	CScriptedEntsMgr oScriptedEntMgr;
@@ -219,6 +219,8 @@ return true;
 				//If not collided then move forward
 				if (!Game::pGame->IsVectorFieldInsideWall(vecPosition, vecSize)) {
 					pEntity->SetPosition(vecPosition);
+				} else {
+					pEntity->OnWallCollided();
 				}
 			}
 		}
@@ -327,6 +329,11 @@ return true;
 			}
 
 			return (rand() % (end - start)) + start;
+		}
+
+		std::string GetPackagePath(void)
+		{
+			return Utils::ConvertToAnsiString(Game::pGame->GetPackagePath());
 		}
 	}
 
@@ -550,6 +557,7 @@ return true;
 		REG_IFM("IScriptedEntity", "void OnRelease()");
 		REG_IFM("IScriptedEntity", "void OnProcess()");
 		REG_IFM("IScriptedEntity", "void OnDraw()");
+		REG_IFM("IScriptedEntity", "void OnWallCollided()");
 		REG_IFM("IScriptedEntity", "DamageType IsDamageable()");
 		REG_IFM("IScriptedEntity", "void OnDamage(DamageValue dv)");
 		REG_IFM("IScriptedEntity", "Model& GetModel()");
@@ -575,6 +583,7 @@ return true;
 		} sGameAPIFunctions[] = {
 			{ "void Print(const string& in)", &APIFuncs::Print },
 			{ "void PrintClr(const string& in, const ConColor &in)", &APIFuncs::Print2 },
+			{ "string GetPackagePath()", &APIFuncs::GetPackagePath },
 			{ "FontHandle R_LoadFont(const string& in, uint8 ucFontSizeW, uint8 ucFontSizeH)", &APIFuncs::LoadFont },
 			{ "bool R_GetSpriteInfo(const string &in, SpriteInfo &out)", &APIFuncs::GetSpriteInfo },
 			{ "SpriteHandle R_LoadSprite(const string& in szFile, int iFrameCount, int iFrameWidth, int iFrameHeight, int iFramesPerLine, bool bForceCustomSize)", &APIFuncs::LoadSprite },
@@ -591,7 +600,7 @@ return true;
 			{ "bool S_PlaySound(SoundHandle hSound, int32 lVolume)", &APIFuncs::PlaySound_ },
 			{ "int Wnd_GetWindowCenterX()", &APIFuncs::GetWindowCenterX },
 			{ "int Wnd_GetWindowCenterY()", &APIFuncs::GetWindowCenterY },
-			{ "bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in)", &APIFuncs::SpawnScriptedEntity },
+			{ "bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in, bool bSpawn = true)", &APIFuncs::SpawnScriptedEntity },
 			{ "size_t Ent_GetEntityCount()", &APIFuncs::GetEntityCount },
 			{ "IScriptedEntity@+ Ent_GetEntityHandle(size_t uiEntityId)", &APIFuncs::GetEntityHandle },
 			{ "IScriptedEntity@+ Ent_TraceLine(const Vector&in vStart, const Vector&in vEnd, IScriptedEntity@+ pIgnoredEnt)", &APIFuncs::EntityTrace },
@@ -600,7 +609,7 @@ return true;
 			{ "void Ent_Move(IScriptedEntity@ pThis, float fSpeed, MovementDir dir)", &APIFuncs::Ent_Move },
 			{ "bool Util_ListSprites(const string& in, FuncFileListing @cb)", &APIFuncs::ListSprites },
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
-			{ "int Util_Random(int start, int end)", &APIFuncs::Random } 
+			{ "int Util_Random(int start, int end)", &APIFuncs::Random }
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

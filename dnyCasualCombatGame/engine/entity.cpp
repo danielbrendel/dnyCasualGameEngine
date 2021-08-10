@@ -40,13 +40,13 @@ namespace Entity {
 		//Add to list
 		this->m_vEnts.push_back(pEntity);
 
-		//Handle special entity case: player
-		if (wszIdent == L"player") {
-			this->m_sPlayerEntity.hScript = hScript;
-			this->m_sPlayerEntity.pObject = pObject;
-		}
+//Handle special entity case: player
+if (wszIdent == L"player") {
+	this->m_sPlayerEntity.hScript = hScript;
+	this->m_sPlayerEntity.pObject = pObject;
+}
 
-		return true;
+return true;
 	}
 
 	CScriptedEntsMgr oScriptedEntMgr;
@@ -134,11 +134,15 @@ namespace Entity {
 		{
 			//Determine whether this entity is in viewport so it should be drawn
 
-			Vector* vecPlayerPos;
-			Vector* vecPlayerSize;
+			Vector* vecPlayerPos = nullptr;
+			Vector* vecPlayerSize = nullptr;
 			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetPosition()", nullptr, &vecPlayerPos, Scripting::FA_OBJECT);
 			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetSize()", nullptr, &vecPlayerSize, Scripting::FA_OBJECT);
-			
+
+			if ((!vecPlayerPos) || (!vecPlayerSize)) {
+				return false;
+			}
+
 			Vector vDistance;
 			vDistance[0] = vMyPos[0] - (*vecPlayerPos)[0];
 			vDistance[1] = vMyPos[1] - (*vecPlayerPos)[1];
@@ -184,6 +188,39 @@ namespace Entity {
 		bool SpawnScriptedEntity(const std::string& szIdent, asIScriptObject* ref, const Vector& vPos)
 		{
 			return oScriptedEntMgr.Spawn(Utils::ConvertToWideString(szIdent), ref, vPos);
+		}
+
+		void Ent_Move(asIScriptObject* ref, float fSpeed, MovementDir dir)
+		{
+			//Move entity according to view
+
+			CScriptedEntity* pEntity = oScriptedEntMgr.GetEntity(oScriptedEntMgr.GetEntityId(ref)); //Get entity class object pointer
+			if (pEntity) {
+				//Query position and rotation
+				Vector vecPosition = pEntity->GetPosition();
+				float fRotation = pEntity->GetRotation();
+				Vector vecSize = pEntity->GetSize();
+
+				//Calculate forward or backward vector according to dir
+				if (dir == MOVE_FORWARD) {
+					vecPosition[0] += (int)(sin(fRotation + 0.015) * fSpeed);
+					vecPosition[1] -= (int)(cos(fRotation + 0.015) * fSpeed);
+				} else if (dir == MOVE_BACKWARD) {
+					vecPosition[0] -= (int)(sin(fRotation + 0.015) * fSpeed);
+					vecPosition[1] += (int)(cos(fRotation + 0.015) * fSpeed);
+				} else if (dir == MOVE_LEFT) {
+					vecPosition[0] += (int)(sin(fRotation + 80.0) * fSpeed);
+					vecPosition[1] -= (int)(cos(fRotation + 80.0) * fSpeed);
+				} else if (dir == MOVE_RIGHT) {
+					vecPosition[0] -= (int)(sin(fRotation + 80.0) * fSpeed);
+					vecPosition[1] += (int)(cos(fRotation + 80.0) * fSpeed);
+				}
+
+				//If not collided then move forward
+				if (!Game::pGame->IsVectorFieldInsideWall(vecPosition, vecSize)) {
+					pEntity->SetPosition(vecPosition);
+				}
+			}
 		}
 
 		size_t GetEntityCount()
@@ -305,8 +342,7 @@ namespace Entity {
 
 			if (this->m_iDir == 0) {
 				xpos += (int)i * this->m_vecSize[0];
-			}
-			else {
+			} else {
 				ypos += (int)i * this->m_vecSize[1];
 			}
 
@@ -321,6 +357,28 @@ namespace Entity {
 
 			pRenderer->DrawSprite(this->m_vSprites[i], vecOut[0], vecOut[1], 0, this->m_fRotation);
 		}
+
+		if (this->m_bWall) {
+			Vector vecEntireSize;
+			//Calculate entire size according to direction
+			if (this->m_iDir == 0) {
+				vecEntireSize[0] = (int)this->m_vSprites.size() * this->m_vecSize[0];
+				vecEntireSize[1] = this->m_vecSize[1];
+			}
+			else {
+				vecEntireSize[0] = this->m_vecSize[0];
+				vecEntireSize[1] = (int)this->m_vSprites.size() * this->m_vecSize[1];
+			}
+			Vector vOut;
+			APIFuncs::GetDrawingPosition(this->m_vecPos, vecEntireSize, vOut);
+			APIFuncs::DrawBox(vOut, vecEntireSize, 2, Color(255, 0, 0, 15));
+			APIFuncs::DrawString(APIFuncs::GetDefaultFont(), std::to_string(vecEntireSize[0]) + "x" + std::to_string(vecEntireSize[1]), vOut, Color(0, 0, 255, 150));
+		}
+	}
+
+	void CSolidSprite::Process(void)
+	{
+		//Process solid entity
 	}
 
 	void CGoalEntity::Draw(void)
@@ -381,6 +439,11 @@ namespace Entity {
 		ADD_ENUM(hEnum, "DAMAGEABLE_NO", DAMAGEABLE_NO);
 		ADD_ENUM(hEnum, "DAMAGEABLE_ALL", DAMAGEABLE_ALL);
 		ADD_ENUM(hEnum, "DAMAGEABLE_NOTSQUAD", DAMAGEABLE_NOTSQUAD);
+		REG_ENUM("MovementDir", hEnum);
+		ADD_ENUM(hEnum, "MOVE_FORWARD", MOVE_FORWARD);
+		ADD_ENUM(hEnum, "MOVE_BACKWARD", MOVE_BACKWARD);
+		ADD_ENUM(hEnum, "MOVE_LEFT", MOVE_LEFT);
+		ADD_ENUM(hEnum, "MOVE_RIGHT", MOVE_RIGHT);
 		REG_ENUM("FileSeekWay", hEnum);
 		ADD_ENUM(hEnum, "SEEKW_BEGIN", CFileReader::SEEKW_BEGIN);
 		ADD_ENUM(hEnum, "SEEKW_CURRENT", CFileReader::SEEKW_CURRENT);
@@ -508,8 +571,10 @@ namespace Entity {
 		REG_IFM("IScriptedEntity", "void OnDamage(DamageValue dv)");
 		REG_IFM("IScriptedEntity", "Model& GetModel()");
 		REG_IFM("IScriptedEntity", "Vector& GetPosition()");
+		REG_IFM("IScriptedEntity", "void SetPosition(const Vector &in)");
 		REG_IFM("IScriptedEntity", "Vector& GetSize()");
 		REG_IFM("IScriptedEntity", "float GetRotation()");
+		REG_IFM("IScriptedEntity", "void SetRotation(float)");
 		REG_IFM("IScriptedEntity", "DamageValue GetDamageValue()");
 		REG_IFM("IScriptedEntity", "bool NeedsRemoval()");
 		REG_IFM("IScriptedEntity", "string GetName()");
@@ -549,6 +614,7 @@ namespace Entity {
 			{ "IScriptedEntity@+ Ent_TraceLine(const Vector&in vStart, const Vector&in vEnd, IScriptedEntity@+ pIgnoredEnt)", &APIFuncs::EntityTrace },
 			{ "bool Ent_IsValid(IScriptedEntity@ pEntity)", &APIFuncs::Ent_IsValid },
 			{ "size_t Ent_GetId(IScriptedEntity@ pEntity)", &APIFuncs::Ent_GetId },
+			{ "void Ent_Move(IScriptedEntity@ pThis, float fSpeed, MovementDir dir)", &APIFuncs::Ent_Move },
 			{ "bool Util_ListSprites(const string& in, FuncFileListing @cb)", &APIFuncs::ListSprites },
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
 			{ "int Util_Random(int start, int end)", &APIFuncs::Random } 

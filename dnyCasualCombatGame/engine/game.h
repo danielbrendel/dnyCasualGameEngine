@@ -226,7 +226,7 @@ namespace Game {
 		bool Initialize(void)
 		{
 			//Initialize game
-			
+
 			if (this->m_bInit) {
 				return true;
 			}
@@ -258,7 +258,8 @@ namespace Game {
 			//Add CVars
 			pGfxResolutionWidth = pConfigMgr->CCVar::Add(L"gfx_resolution_width", ConfigMgr::CCVar::CVAR_TYPE_INT, L"1024");
 			pGfxResolutionHeight = pConfigMgr->CCVar::Add(L"gfx_resolution_height", ConfigMgr::CCVar::CVAR_TYPE_INT, L"768");
-
+			pGfxFullscreen = pConfigMgr->CCVar::Add(L"gfx_fullscreen", ConfigMgr::CCVar::CVAR_TYPE_BOOL, L"1");
+			
 			//Add commands
 			pConfigMgr->CCommand::Add(L"package_name", L"Package name", &Cmd_PackageName);
 			pConfigMgr->CCommand::Add(L"package_version", L"Package version", &Cmd_PackageVersion);
@@ -273,7 +274,7 @@ namespace Game {
 
 			//Execute game config script
 			pConfigMgr->Execute(wszBasePath + L"config.cfg");
-
+			
 			//Instantiate window manager
 			pWindow = new DxWindow::CDxWindow();
 			if (!pWindow) {
@@ -302,7 +303,7 @@ namespace Game {
 			}
 			
 			//Initialize renderer
-			if (!pRenderer->Initialize(pWindow->GetHandle(), true, pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue, 0, 0, 0, 255)) {
+			if (!pRenderer->Initialize(pWindow->GetHandle(), !pGfxFullscreen->bValue, pWindow->GetResolutionX(), pWindow->GetResolutionY(), 0, 0, 0, 255)) {
 				this->Release();
 				return false;
 			}
@@ -382,33 +383,7 @@ namespace Game {
 			return this->LoadPackage(wszPackage);
 		}
 
-		void StopGame(void)
-		{
-			//Stop game and cleanup
-
-			//Unload entity scripts
-			for (size_t i = 0; i < this->m_vEntityScripts.size(); i++) {
-				pScriptingInt->UnloadScript(this->m_vEntityScripts[i].hScript);
-			}
-
-			//Release solid sprites
-			for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
-				this->m_vSolidSprites[i].Release();
-			}
-
-			//Clear lists
-			this->m_vEntityScripts.clear();
-			this->m_vSolidSprites.clear();
-
-			//Free memory
-			if (this->m_pGoalEntity) {
-				delete this->m_pGoalEntity;
-				this->m_pGoalEntity = nullptr;
-			}
-
-			//Reset indicator
-			this->m_bGameStarted = false;
-		}
+		void StopGame(void);
 
 		void Process(void);
 		void Draw(void);
@@ -424,6 +399,23 @@ namespace Game {
 			}
 
 			return SI_INVALID_ID;
+		}
+
+		bool IsVectorFieldInsideWall(const Entity::Vector& vecPos, const Entity::Vector& vecSize)
+		{
+			//Check if vector is inside wall
+
+			for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
+				if (!this->m_vSolidSprites[i].IsWall()) {
+					continue;
+				}
+
+				if (this->m_vSolidSprites[i].IsVectorFieldCollided(vecPos, vecSize)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);

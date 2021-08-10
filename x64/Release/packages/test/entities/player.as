@@ -54,6 +54,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	void OnDrawOnTop()
 	{
 		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
+		
+		Vector vOut;
+		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
+		R_DrawBox(vOut, this.m_vecSize, 1, Color(255, 0, 0, 150));
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -63,7 +67,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	}
 	
 	//Indicate whether this entity is damageable. Damageable entities can collide with other
-	//entities (even with entities from other tools) and recieve and strike damage. 
+	//entities and recieve and strike damage. Damageable entities do also collide with walls.
 	//0 = not damageable, 1 = damage all, 2 = not damaging entities with same name
 	DamageType IsDamageable()
 	{
@@ -88,6 +92,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		return this.m_vecPos;
 	}
 	
+	//Set new position
+	void SetPosition(const Vector &in vecPos)
+	{
+		this.m_vecPos = vecPos;
+	}
+	
 	//This vector is used for getting the overall drawing size
 	Vector& GetSize()
 	{
@@ -97,7 +107,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Return the rotation. This is actually not used by the host application, but might be useful to other entities
 	float GetRotation()
 	{
-		return 0.0;
+		return this.m_fRotation;
+	}
+	
+	//Set new rotation
+	void SetRotation(float fRot)
+	{
 	}
 	
 	//Called for querying the damage value for this entity
@@ -115,15 +130,22 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
+		Print("OnKeyPress: " + formatInt(vKey));
+	
 		if (vKey == 39) {
 			this.m_fRotation += 0.05f;
 		} else if (vKey == 37) {
 			this.m_fRotation -= 0.05f;
 		} 
 		
-		if (vKey == 87) {
-			this.m_vecPos[0] += int(sin(this.m_fRotation + 0.014) * 10);
-			this.m_vecPos[1] -= int(cos(this.m_fRotation + 0.014) * 10);
+		if (vKey == 87 && bDown) {
+			Ent_Move(this, 10, MOVE_FORWARD);
+		} else if (vKey == 83 && bDown) {
+			Ent_Move(this, 10, MOVE_BACKWARD);
+		} else if (vKey == 65 && bDown) {
+			Ent_Move(this, 10, MOVE_LEFT);
+		} else if (vKey == 68 && bDown) {
+			Ent_Move(this, 10, MOVE_RIGHT);
 		}
 	}
 	

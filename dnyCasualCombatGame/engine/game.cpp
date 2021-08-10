@@ -107,6 +107,37 @@ namespace Game {
 		}
 	}
 
+	void CGame::StopGame(void)
+	{
+		//Stop game and cleanup
+
+		//Release solid sprites
+		for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
+			this->m_vSolidSprites[i].Release();
+		}
+
+		//Release scripted entities
+		Entity::oScriptedEntMgr.Release();
+
+		//Unload entity scripts
+		for (size_t i = 0; i < this->m_vEntityScripts.size(); i++) {
+			pScriptingInt->UnloadScript(this->m_vEntityScripts[i].hScript);
+		}
+
+		//Clear lists
+		this->m_vEntityScripts.clear();
+		this->m_vSolidSprites.clear();
+
+		//Free memory
+		if (this->m_pGoalEntity) {
+			delete this->m_pGoalEntity;
+			this->m_pGoalEntity = nullptr;
+		}
+
+		//Reset indicator
+		this->m_bGameStarted = false;
+	}
+
 	void CGame::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		//Called for mouse events
@@ -188,7 +219,9 @@ namespace Game {
 	{
 		//Handler for unknown expressions
 
-		pConsole->AddLine(L"Unknown command: \"" + szCmdName + L"\"");
+		if (pConsole) {
+			pConsole->AddLine(L"Unknown command: \"" + szCmdName + L"\"");
+		}
 	}
 
 	void AS_MessageCallback(const asSMessageInfo* msg, void* param)
@@ -209,7 +242,9 @@ namespace Game {
 
 		std::string szErrMsg = "[AngelScript][" + szMsgType + "] " + std::string(msg->section) + " (" + std::to_string(msg->row) + ":" + std::to_string(msg->col) + "): " + msg->message + "\n";
 
-		pConsole->AddLine(Utils::ConvertToWideString(szErrMsg), sColor);
+		if (pConsole) {
+			pConsole->AddLine(Utils::ConvertToWideString(szErrMsg), sColor);
+		}
 	}
 
 	void Cmd_PackageName(void)
@@ -257,9 +292,10 @@ namespace Game {
 		float rot = (float)_wtof(pConfigMgr->ExpressionItemValue(6).c_str());
 		int repeat = _wtoi(pConfigMgr->ExpressionItemValue(7).c_str());
 		int dir = _wtoi(pConfigMgr->ExpressionItemValue(8).c_str());
+		bool wall = pConfigMgr->ExpressionItemValue(9) == L"true";
 
 		Entity::CSolidSprite oSprite;
-		oSprite.Initialize(x, y, w, h, wszBasePath + L"packages\\" + pGame->m_sPackage.wszPakName + L"\\gfx\\" + wszFile, repeat, dir, rot);
+		oSprite.Initialize(x, y, w, h, wszBasePath + L"packages\\" + pGame->m_sPackage.wszPakName + L"\\gfx\\" + wszFile, repeat, dir, rot, wall);
 
 		pGame->m_vSolidSprites.push_back(oSprite);
 	}

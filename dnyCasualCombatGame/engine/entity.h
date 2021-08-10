@@ -19,6 +19,7 @@
 /* Entity environment */
 namespace Entity {
 	enum DamageType { DAMAGEABLE_NO = 0, DAMAGEABLE_ALL, DAMAGEABLE_NOTSQUAD };
+	enum MovementDir { MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT };
 
 	struct Color {
 		Color() {}
@@ -627,6 +628,20 @@ namespace Entity {
 			return *pResult;
 		}
 
+		void SetPosition(const Vector& vec)
+		{
+			//Set position
+
+			Vector vPos = vec;
+
+			BEGIN_PARAMS(vArgs);
+			PUSH_OBJECT(&vPos);
+
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void SetPosition(const Vector &in)", &vArgs, nullptr, Scripting::FA_VOID);
+
+			END_PARAMS(vArgs);
+		}
+
 		float GetRotation(void)
 		{
 			//Query rotation
@@ -634,8 +649,20 @@ namespace Entity {
 			float flResult;
 
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "float GetRotation()", nullptr, &flResult, Scripting::FA_FLOAT);
-
+			
 			return flResult;
+		}
+
+		void SetRotation(float fRot)
+		{
+			//Set rotation
+
+			BEGIN_PARAMS(vArgs);
+			PUSH_FLOAT(fRot);
+
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void SetRotation(float)", &vArgs, nullptr, Scripting::FA_VOID);
+
+			END_PARAMS(vArgs);
 		}
 
 		bool IsMovable(void)
@@ -649,13 +676,13 @@ namespace Entity {
 			return bResult;
 		}
 
-		Vector GetSelectionSize(void)
+		Vector GetSize(void)
 		{
 			//Query selection size
 
 			Vector* pResult;
 
-			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "Vector& GetSelectionSize()", nullptr, &pResult, Scripting::FA_OBJECT);
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "Vector& GetSize()", nullptr, &pResult, Scripting::FA_OBJECT);
 
 			return *pResult;
 		}
@@ -693,9 +720,9 @@ namespace Entity {
 			return szResult;
 		}
 
-		//Getters
-		inline bool IsReady(void) const { return (this->m_pScriptObject != nullptr); }
-		inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
+//Getters
+inline bool IsReady(void) const { return (this->m_pScriptObject != nullptr); }
+inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
 	};
 
 	/* Scripted entity manager */
@@ -822,7 +849,7 @@ namespace Entity {
 		{
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
 				if (this->m_vEnts[i]->Object() == pEntity)
-					return true;
+					return i;
 			}
 
 			return (size_t)-1;
@@ -929,14 +956,15 @@ namespace Entity {
 		Vector m_vecSize;
 		int m_iDir;
 		float m_fRotation;
+		bool m_bWall;
 	public:
 		CSolidSprite() {}
 		~CSolidSprite() {}
 
-		bool Initialize(int x, int y, int w, int h, const std::wstring& wszFile, int repeat, int dir, float rot)
+		bool Initialize(int x, int y, int w, int h, const std::wstring& wszFile, int repeat, int dir, float rot, bool wall)
 		{
 			//Initialize entity
-
+			
 			//Set default value
 			if (!repeat) {
 				repeat = 1;
@@ -947,10 +975,11 @@ namespace Entity {
 			this->m_vecSize = Vector(w, h);
 			this->m_iDir = dir;
 			this->m_fRotation = rot;
+			this->m_bWall = wall;
 
 			//Load repated sprites if any
 			for (size_t i = 0; i < repeat; i++) {
-				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszFile, 1, w, h, 1, false);
+				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszFile, 1, w, h, 1, true);
 				if (!hSprite) {
 					return false;
 				}
@@ -962,6 +991,31 @@ namespace Entity {
 		}
 
 		void Draw(void);
+		void Process(void);
+
+		bool IsVectorFieldCollided(const Vector& vecPos, const Vector& vecSize)
+		{
+			//Check if vector field is collided with entity
+
+			Vector vecEntireSize;
+
+			//Calculate entire size according to direction
+			if (this->m_iDir == 0) {
+				vecEntireSize[0] = (int)this->m_vSprites.size() * this->m_vecSize[0];
+				vecEntireSize[1] = this->m_vecSize[1];
+			} else {
+				vecEntireSize[0] = this->m_vecSize[0];
+				vecEntireSize[1] = (int)this->m_vSprites.size() * this->m_vecSize[1];
+			}
+
+			//Check collision
+			if (((vecPos[0] > this->m_vecPos[0]) && (vecPos[0] < this->m_vecPos[0] + vecEntireSize[0]) && (vecPos[1] > this->m_vecPos[1]) && (vecPos[1] < this->m_vecPos[1] + vecEntireSize[1]))
+				|| ((vecPos[0] + vecSize[0] > this->m_vecPos[0]) && (vecPos[0] + vecSize[0] < this->m_vecPos[0] + vecEntireSize[0]) && (vecPos[1] + vecSize[1] > this->m_vecPos[1]) && (vecPos[1] + vecSize[1] < this->m_vecPos[1] + vecEntireSize[1]))) {
+				return true;
+			}
+
+			return false;
+		}
 
 		void Release(void)
 		{
@@ -973,8 +1027,12 @@ namespace Entity {
 
 			this->m_vSprites.clear();
 		}
+
+		//Getter
+		const bool IsWall(void) const { return this->m_bWall; }
 	};
 
+	/* Goal entity class */
 	class CGoalEntity {
 	private:
 		DxRenderer::HD3DSPRITE m_hSprite;
@@ -1024,11 +1082,15 @@ namespace Entity {
 		{
 			//Process entity
 
-			Vector* vecPosition;
-			Vector* vecSize;
+			Vector* vecPosition = nullptr;
+			Vector* vecSize = nullptr;
 
 			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetPosition()", nullptr, &vecPosition, Scripting::FA_OBJECT);
 			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetSize()", nullptr, &vecSize, Scripting::FA_OBJECT);
+
+			if ((!vecPosition) || (!vecSize)) {
+				return;
+			}
 
 			//Check if player is collided with goal entity
 			if (((*vecPosition)[0] >= this->m_vecPosition[0]) && ((*vecPosition)[0] <= this->m_vecPosition[0] + this->m_vecSize[0]) && ((*vecPosition)[1] >= this->m_vecPosition[1]) && ((*vecPosition)[1] <= this->m_vecPosition[1] + this->m_vecSize[1])) {

@@ -35,6 +35,7 @@ namespace DxWindow {
 		std::wstring m_szClassName;
 		ATOM m_hClass;
 		HWND m_hWindow;
+		RECT m_sRect;
 		IWindowEvents* m_pEvents;
 
 		friend LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -134,28 +135,6 @@ namespace DxWindow {
 
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
-
-		bool CalcWindowPosition(int w, int h, int& x, int& y)
-		{
-			//Calculate center screen coordinates for window according to its resolution
-
-			//Get handle to desktop window
-			HWND hDesktopWindow = GetDesktopWindow();
-			if (!hDesktopWindow)
-				return false;
-
-			RECT sRect;
-
-			//Get screen size data of window
-			if (!GetWindowRect(hDesktopWindow, &sRect))
-				return false;
-
-			//Calculate position
-			x = sRect.right / 2 - w / 2;
-			y = sRect.bottom / 2 - h / 2;
-
-			return true;
-		}
 	public:
 		CDxWindow() : m_bReady(false), m_pEvents(nullptr) { pDxWindowInstance = this; }
 		CDxWindow(const std::wstring& wszTitle, int w, int h, IWindowEvents* pEvents) : m_bReady(false) { pDxWindowInstance = this; this->Initialize(wszTitle, w, h, pEvents); }
@@ -181,11 +160,6 @@ namespace DxWindow {
 			sWndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 			sWndClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 			sWndClass.lpfnWndProc = &WindowProc;
-
-			//Calculate window position
-			int x, y;
-			if (!this->CalcWindowPosition(w, h, x, y))
-				return false;
 			
 			//Register window class
 			this->m_hClass = RegisterClassEx(&sWndClass);
@@ -193,10 +167,16 @@ namespace DxWindow {
 				return false;
 			
 			//Create the window
-			this->m_hWindow = CreateWindowEx(0, this->m_szClassName.c_str(), wszTitle.c_str(), WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE, x, y, w, h, 0, 0, (HINSTANCE)GetCurrentProcess(), NULL);
+			this->m_hWindow = CreateWindowEx(0, this->m_szClassName.c_str(), wszTitle.c_str(), WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, w, h, 0, 0, (HINSTANCE)GetCurrentProcess(), NULL);
 			if (!this->m_hWindow)
 				return false;
 			
+			//Save window rect data
+			if (!GetWindowRect(this->m_hWindow, &this->m_sRect)) {
+				this->Release();
+				return false;
+			}
+			std::cout << this->GetResolutionX() << "x" << this->GetResolutionY() << std::endl;
 			//Update the window initiallly
 			UpdateWindow(this->m_hWindow);
 
@@ -246,5 +226,7 @@ namespace DxWindow {
 		//Getters
 		inline const bool IsReady(void) const { return this->m_bReady; }
 		inline const HWND GetHandle(void) const { return this->m_hWindow; }
+		int GetResolutionX(void) { return this->m_sRect.right - this->m_sRect.left; }
+		int GetResolutionY(void) { return this->m_sRect.bottom - this->m_sRect.top; }
 	};
 }

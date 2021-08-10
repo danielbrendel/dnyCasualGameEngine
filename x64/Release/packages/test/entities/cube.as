@@ -91,6 +91,12 @@ class CCubeEntity : IScriptedEntity
 		return this.m_vecPos;
 	}
 	
+	//Set new position
+	void SetPosition(const Vector &in vecPos)
+	{
+	
+	}
+	
 	//This vector is used for getting the overall drawing size
 	Vector& GetSize()
 	{
@@ -101,6 +107,11 @@ class CCubeEntity : IScriptedEntity
 	float GetRotation()
 	{
 		return 0.0;
+	}
+	
+	//Set new rotation
+	void SetRotation(float fRot)
+	{
 	}
 	
 	//Called for querying the damage value for this entity

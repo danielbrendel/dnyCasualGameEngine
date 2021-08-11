@@ -361,7 +361,7 @@ namespace Game {
 			}
 			
 			//Initialize console
-			if (!pConsole->Initialize(pRenderer, pGfxResolutionWidth->iValue, 500, 50, Console::ConColor(100, 100, 50))) {
+			if (!pConsole->Initialize(pRenderer, pGfxResolutionWidth->iValue, 500, CON_DEFAULT_MAXHISTORY, Console::ConColor(100, 100, 50))) {
 				this->Release();
 				return false;
 			}
@@ -459,6 +459,7 @@ namespace Game {
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
 		void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
+		void OnMouseWheel(short wDistance, bool bForward);
 
 		void Release(void)
 		{

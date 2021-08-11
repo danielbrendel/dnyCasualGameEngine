@@ -2,6 +2,7 @@
 string g_szPackagePath = "";
 
 #include "weapon_gun.as"
+#include "explosion.as"
 
 class CTankEntity : IScriptedEntity
 {
@@ -17,10 +18,16 @@ class CTankEntity : IScriptedEntity
 	Timer m_tmrAttack;
 	Timer m_tmrMuzzle;
 	SoundHandle m_hFireSound;
+	uint32 m_uiHealth;
+	bool m_bRemove;
+	Timer m_tmrFlicker;
+	uint32 m_uiFlickerCount;
 	
 	CTankEntity()
     {
 		this.m_vecSize = Vector(64, 64);
+		this.m_uiHealth = 100;
+		this.m_bRemove = false;
     }
 	
 	void AimTo(const Vector& in vecPos)
@@ -50,9 +57,13 @@ class CTankEntity : IScriptedEntity
 		//Play fire sound
 		S_PlaySound(this.m_hFireSound, 10);
 		
+		Vector shotPos = Vector(this.m_vecPos[0] + this.m_vecSize[0] / 2, this.m_vecPos[1] + this.m_vecSize[1] / 2);
+		shotPos[0] += int(sin(this.m_fHeadRot + 0.014) * 50);
+		shotPos[1] -= int(cos(this.m_fHeadRot + 0.014) * 50);
+		
 		//Spawn shot
 		CGunEntity@ gun = CGunEntity();
-		Ent_SpawnEntity("weapon_gun", @gun, this.m_vecPos);
+		Ent_SpawnEntity("weapon_gun", @gun, shotPos);
 		gun.SetRotation(this.m_fHeadRot);
 	}
 	
@@ -73,6 +84,9 @@ class CTankEntity : IScriptedEntity
 		this.m_tmrAttack.Reset();
 		this.m_tmrAttack.SetActive(false);
 		this.m_tmrMuzzle.SetActive(false);
+		this.m_tmrFlicker.SetDelay(250);
+		this.m_tmrFlicker.SetActive(false);
+		this.m_uiFlickerCount = 0;
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -83,6 +97,8 @@ class CTankEntity : IScriptedEntity
 	//Called when the entity gets released
 	void OnRelease()
 	{
+		CExplosionEntity @expl = CExplosionEntity();
+		Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
 	}
 	
 	//Process entity stuff
@@ -125,6 +141,20 @@ class CTankEntity : IScriptedEntity
 				this.m_tmrMuzzle.SetActive(false);
 			}
 		}
+		
+		//Process flickering
+		if (this.m_tmrFlicker.IsActive()) {
+			this.m_tmrFlicker.Update();
+			if (this.m_tmrFlicker.IsElapsed()) {
+				this.m_tmrFlicker.Reset();
+				
+				this.m_uiFlickerCount++;
+				if (this.m_uiFlickerCount >= 5) {
+					this.m_uiFlickerCount = 0;
+					this.m_tmrFlicker.SetActive(false);
+				}
+			}
+		}
 	}
 	
 	//Entity can draw everything in default order here
@@ -151,14 +181,20 @@ class CTankEntity : IScriptedEntity
 		Vector vOut;
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
-		R_DrawSprite(this.m_hBody, vOut, 0, 0.0f, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
-		R_DrawSprite(this.m_hHead, Vector(vOut[0] - 11, vOut[1] - 3), 0, this.m_fHeadRot, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		bool bDrawCustomColor = false;
+		if ((this.m_tmrFlicker.IsActive()) && (this.m_uiFlickerCount % 2 == 0)) {
+			bDrawCustomColor = true;
+		}
+		
+		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
+		
+		R_DrawSprite(this.m_hBody, vOut, 0, 0.0f, Vector(-1, -1), 0.0f, 0.0f, bDrawCustomColor, sDrawingColor);
+		R_DrawSprite(this.m_hHead, Vector(vOut[0] - 11, vOut[1] - 3), 0, this.m_fHeadRot, Vector(-1, -1), 0.0, 0.0, bDrawCustomColor, sDrawingColor);
 		
 		if (this.m_tmrMuzzle.IsActive()) {
-			Vector vecCenter = this.GetModel().GetCenter();
-			Vector vecMuzzlePos(this.m_vecPos[0] + vecCenter[0] - 128, this.m_vecPos[1] + vecCenter[1] - 128);
-			vecMuzzlePos[0] += int(sin(this.m_fHeadRot) * (65 + 25));
-			vecMuzzlePos[1] -= int(cos(this.m_fHeadRot) * (65 + 25));
+			Vector vecMuzzlePos = Vector(this.m_vecPos[0] + this.m_vecSize[0] / 2 - 256 / 2, this.m_vecPos[1] + this.m_vecSize[1] / 2 - 256 / 2);
+			vecMuzzlePos[0] += int(sin(this.m_fHeadRot + 0.014) * 90);
+			vecMuzzlePos[1] -= int(cos(this.m_fHeadRot + 0.014) * 90);
 			
 			Vector vMuzzleOut;
 			R_GetDrawingPosition(vecMuzzlePos, this.m_vecSize, vMuzzleOut);
@@ -170,7 +206,7 @@ class CTankEntity : IScriptedEntity
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{
-		return false;
+		return this.m_bRemove;
 	}
 	
 	//Indicate whether this entity is collidable
@@ -182,11 +218,27 @@ class CTankEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
+		if (ref.GetName() == "weapon_laser") {
+			this.OnDamage(10);
+			
+			this.m_tmrFlicker.Reset();
+			this.m_tmrFlicker.SetActive(true);
+			this.m_uiFlickerCount = 0;
+		}
 	}
 	
 	//Called when entity gets damaged
 	void OnDamage(uint32 damageValue)
 	{
+		if (this.m_uiHealth < damageValue) {
+			this.m_uiHealth = 0;
+		} else {
+			this.m_uiHealth -= damageValue;
+		}
+		
+		if (this.m_uiHealth == 0) {
+			this.m_bRemove = true;
+		}
 	}
 	
 	//Called for recieving the model data for this entity. This is only used for
@@ -226,16 +278,10 @@ class CTankEntity : IScriptedEntity
 		this.m_fRotation = fRot;
 	}
 	
-	//Called for querying the damage value for this entity
-	DamageValue GetDamageValue()
-	{
-		return 0;
-	}
-	
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
-		return "plasma_ball";
+		return "tank";
 	}
 }
 

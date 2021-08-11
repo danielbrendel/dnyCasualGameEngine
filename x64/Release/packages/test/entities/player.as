@@ -21,12 +21,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	uint32 m_uiButtons;
 	uint32 m_uiHealth;
 	Timer m_tmrMayDamage;
+	Timer m_tmrAttack;
+	Timer m_tmrFlicker;
+	uint32 m_uiFlickerCount;
 	
 	CPlayerEntity()
     {
 		this.m_uiButtons = 0;
 		this.m_uiHealth = 100;
 		this.m_vecSize = Vector(59, 52);
+		this.m_uiFlickerCount = 0;
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
@@ -38,6 +42,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
 		this.m_tmrMayDamage.SetActive(true);
+		this.m_tmrAttack.SetDelay(500);
+		this.m_tmrAttack.Reset();
+		this.m_tmrAttack.SetActive(true);
+		this.m_tmrFlicker.SetDelay(250);
+		this.m_tmrFlicker.Reset();
+		this.m_tmrFlicker.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -53,6 +63,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		//Process movement
+		
 		if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
 			Ent_Move(this, 10, MOVE_FORWARD);
 		} 
@@ -77,16 +89,40 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 			this.m_fRotation -= 0.05f;
 		} 
 
+		//Process attacking
 		if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
-			CLaserEntity @laser = CLaserEntity();
-			Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
-			laser.SetRotation(this.m_fRotation);
-			Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
-			SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
-			S_PlaySound(hSound, 10);
+			this.m_tmrAttack.Update();
+			if (this.m_tmrAttack.IsElapsed()) {
+				this.m_tmrAttack.Reset();
+				
+				CLaserEntity @laser = CLaserEntity();
+				
+				Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
+				laser.SetRotation(this.m_fRotation);
+				
+				Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
+				
+				SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
+				S_PlaySound(hSound, 10);
+			}
 		}
 		
+		//Update damage permission timer
 		this.m_tmrMayDamage.Update();
+		
+		//Process flickering
+		if (this.m_tmrFlicker.IsActive()) {
+			this.m_tmrFlicker.Update();
+			if (this.m_tmrFlicker.IsElapsed()) {
+				this.m_tmrFlicker.Reset();
+				
+				this.m_uiFlickerCount++;
+				if (this.m_uiFlickerCount >= 6) {
+					this.m_tmrFlicker.SetActive(false);
+					this.m_uiFlickerCount = 0;
+				}
+			}
+		}
 	}
 	
 	//Entity can draw everything in default order here
@@ -97,7 +133,15 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Entity can draw on-top stuff here
 	void OnDrawOnTop()
 	{
-		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
+		bool bDrawCustomColor = false;
+		
+		if ((this.m_tmrFlicker.IsActive()) && (this.m_uiFlickerCount % 2 == 0)) {
+			bDrawCustomColor = true;
+		}
+		
+		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
+		
+		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, bDrawCustomColor, sDrawingColor);
 		R_DrawString(R_GetDefaultFont(), formatInt(this.m_uiHealth), Vector(10, 10), Color(0, 0, 155, 150));
 	}
 	
@@ -116,34 +160,24 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (ref.GetName() == "plasma_ball") {
-			if (this.m_tmrMayDamage.IsElapsed()) {
-				const uint32 PLASMA_BALL_DAMAGE = 25;
-				if (this.m_uiHealth < PLASMA_BALL_DAMAGE) {
-					this.m_uiHealth = 0;
-				} else {
-					this.m_uiHealth -= PLASMA_BALL_DAMAGE;
-				}
-				
-				this.m_tmrMayDamage.Reset();
-			}
-		} /*else if (ref.GetName() == "weapon_gun") {
-			if (this.m_tmrMayDamage.IsElapsed()) {
-				const uint32 GUN_SHOT_DAMAGE = 10;
-				if (this.m_uiHealth < GUN_SHOT_DAMAGE) {
-					this.m_uiHealth = 0;
-				} else {
-					this.m_uiHealth -= GUN_SHOT_DAMAGE;
-				}
-				
-				this.m_tmrMayDamage.Reset();
-			}
-		}*/
 	}
 	
 	//Called when entity gets damaged
 	void OnDamage(uint32 damageValue)
 	{
+		if (this.m_tmrMayDamage.IsElapsed()) {
+			if (this.m_uiHealth < damageValue) {
+				this.m_uiHealth = 0;
+			} else {
+				this.m_uiHealth -= damageValue;
+			}
+			
+			this.m_tmrMayDamage.Reset();
+			
+			this.m_tmrFlicker.Reset();
+			this.m_tmrFlicker.SetActive(true);
+			this.m_uiFlickerCount = 0;
+		}
 	}
 	
 	//Called for recieving the model data for this entity. This is only used for

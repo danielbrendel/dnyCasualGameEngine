@@ -1,3 +1,6 @@
+#include "explosion.as"
+
+const uint32 GUN_SHOT_DAMAGE = 35;
 
 class CGunEntity : IScriptedEntity
 {
@@ -36,6 +39,8 @@ class CGunEntity : IScriptedEntity
 	//Called when the entity gets released
 	void OnRelease()
 	{
+		CExplosionEntity @expl = CExplosionEntity();
+		Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
 	}
 	
 	//Process entity stuff
@@ -87,6 +92,11 @@ class CGunEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
+		if (ref.GetName() == "player") {
+			ref.OnDamage(GUN_SHOT_DAMAGE);
+		}
+		
+		this.m_bRemove = true;
 	}
 	
 	//Called when entity gets damaged
@@ -128,7 +138,7 @@ class CGunEntity : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
-		return "weapon_laser";
+		return "weapon_gun";
 	}
 	
 	//This vector is used for drawing the selection box

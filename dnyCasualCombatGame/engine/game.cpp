@@ -143,7 +143,7 @@ namespace Game {
 		//Called for mouse events
 		
 		//Inform player entity
-		/*if (!iMouseKey) {
+		if (!iMouseKey) {
 			const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
 			Entity::Vector vPos(x, y);
 			BEGIN_PARAMS(vArgs);
@@ -155,10 +155,25 @@ namespace Game {
 			PUSH_DWORD(iMouseKey);
 			PUSH_BYTE(bDown);
 			pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnMousePress(int key, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
-		}*/
+		}
 
 		//Pass to menu
 		this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+	}
+
+	void CGame::OnMouseWheel(short wDistance, bool bForward)
+	{
+		//Handle mouse wheel event
+
+		if (pConsole->IsVisible()) {
+			if (bForward) {
+				pConsole->ScrollUp();
+			} else {
+				pConsole->ScrollDown();
+			}
+
+			return;
+		}
 	}
 
 	void CGame::OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
@@ -202,6 +217,7 @@ namespace Game {
 
 	void CWindowEvents::OnMouseWheel(short wDistance, bool bForward)
 	{
+		pGame->OnMouseWheel(wDistance, bForward);
 	}
 
 	void CWindowEvents::OnDraw(void)

@@ -1,6 +1,6 @@
 
 string g_szPackagePath = "";
-
+const uint32 PLASMA_BALL_DAMAGE = 25;
 
 class CPlasmaBall : IScriptedEntity
 {
@@ -11,6 +11,7 @@ class CPlasmaBall : IScriptedEntity
 	SpriteHandle m_hSprite;
 	int m_iSpriteIndex;
 	Timer m_tmrSpriteChange;
+	Timer m_tmrMayDamage;
 	
 	CPlasmaBall()
     {
@@ -27,6 +28,9 @@ class CPlasmaBall : IScriptedEntity
 		this.m_tmrSpriteChange.SetDelay(50);
 		this.m_tmrSpriteChange.Reset();
 		this.m_tmrSpriteChange.SetActive(true);
+		this.m_tmrMayDamage.SetDelay(2000);
+		this.m_tmrMayDamage.Reset();
+		this.m_tmrMayDamage.SetActive(true);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -97,6 +101,17 @@ class CPlasmaBall : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
+		if (ref.GetName() == "player") {
+			this.m_tmrMayDamage.Update();
+			if (this.m_tmrMayDamage.IsElapsed()) {
+				this.m_tmrMayDamage.Reset();
+				
+				ref.OnDamage(PLASMA_BALL_DAMAGE);
+				
+				SoundHandle hHit = S_QuerySound(GetPackagePath() + "sound\\plasma_hit.wav");
+				S_PlaySound(hHit, 10);
+			}
+		}
 	}
 	
 	//Called when entity gets damaged

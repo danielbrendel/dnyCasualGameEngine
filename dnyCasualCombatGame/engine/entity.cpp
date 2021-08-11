@@ -500,6 +500,7 @@ namespace Entity {
 		ADD_CLASSB(asBEHAVE_CONSTRUCT, "void f()", asMETHOD(Color, Construct), hClasses);
 		ADD_CLASSB(asBEHAVE_DESTRUCT, "void f()", asMETHOD(Color, Destruct), hClasses);
 		ADD_CLASSB(asBEHAVE_CONSTRUCT, "void f(uint8 r, uint8 g, uint8 b, uint8 a)", asMETHOD(Color, Constr_Bytes), hClasses);
+		ADD_CLASSF("void opAssign(const Color &in)", asMETHODPR(Color, operator=, (const Color&), void), hClasses);
 		ADD_CLASSF("uint8 R()", asMETHOD(Color, GetR), hClasses);
 		ADD_CLASSF("uint8 G()", asMETHOD(Color, GetG), hClasses);
 		ADD_CLASSF("uint8 B()", asMETHOD(Color, GetB), hClasses);

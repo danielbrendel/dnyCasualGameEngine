@@ -1,3 +1,4 @@
+#include "explosion.as"
 
 class CLaserEntity : IScriptedEntity
 {
@@ -36,6 +37,8 @@ class CLaserEntity : IScriptedEntity
 	//Called when the entity gets released
 	void OnRelease()
 	{
+		CExplosionEntity @expl = CExplosionEntity();
+		Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
 	}
 	
 	//Process entity stuff
@@ -87,6 +90,9 @@ class CLaserEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
+		if (ref.GetName() != "player") {
+			this.m_bRemove = true;
+		}
 	}
 	
 	//Called when entity gets damaged

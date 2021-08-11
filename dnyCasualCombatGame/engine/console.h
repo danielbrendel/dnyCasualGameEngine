@@ -14,7 +14,7 @@
 #include "shared.h"
 #include "renderer.h"
 
-#define CON_DEFAULT_MAXHISTORY 200
+#define CON_DEFAULT_MAXHISTORY 512
 
 /* Console environment */
 namespace Console {

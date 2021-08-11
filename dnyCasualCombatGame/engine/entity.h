@@ -32,6 +32,8 @@ namespace Entity {
 		byte GetB(void) { return b; }
 		byte GetA(void) { return a; }
 
+		void operator=(const Color& ref) { this->r = ref.r; this->g = ref.g; this->b = ref.b; this->a = ref.a; }
+
 		//AngelScript interface methods
 		void Constr_Bytes(byte cr, byte cg, byte cb, byte ca) { r = cr; g = cg; b = cb; a = ca; }
 		void Construct(void* pMemory) { new (pMemory) Color(); }

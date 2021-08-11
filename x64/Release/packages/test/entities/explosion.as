@@ -1,27 +1,33 @@
-class CExplosion : IScriptedEntity
+#include "decal.as"
+
+class CExplosionEntity : IScriptedEntity
 {
 	Vector m_vecPos;
+	Vector m_vecSize;
 	Model m_oModel;
 	Timer m_oExplosion;
 	int m_iFrameCount;
 	SpriteHandle m_hSprite;
 	SoundHandle m_hSound;
 	
-	CExplosion()
+	CExplosionEntity()
     {
+		this.m_vecSize = Vector(32, 32);
 		this.m_iFrameCount = 0;
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
-		this.m_vecPos = Vector(vec[0] + 50, vec[1] + 50);
-		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\explosion.png", 6, 32, 32, 6, false);
+		this.m_vecPos = vec;
+		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\explosion.png", 6, this.m_vecSize[0], this.m_vecSize[1], 6, false);
 		this.m_oExplosion.SetDelay(100);
 		this.m_oExplosion.Reset();
 		this.m_oExplosion.SetActive(true);
 		this.m_hSound = S_QuerySound(GetPackagePath() + "sound\\explosion.wav");
 		S_PlaySound(this.m_hSound, 10);
+		CDecalEntity @dcl = CDecalEntity();
+		Ent_SpawnEntity("decal", @dcl, this.m_vecPos);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(14, 14), Vector(100, 100));
@@ -52,7 +58,13 @@ class CExplosion : IScriptedEntity
 	//Entity can draw everything on top here
 	void OnDrawOnTop()
 	{
-		R_DrawSprite(this.m_hSprite, this.m_vecPos, this.m_iFrameCount, 0.0, Vector(-1, -1), 2.0, 2.0, false, Color(0, 0, 0, 0));
+		if (!R_ShouldDraw(this.m_vecPos, this.m_vecSize))
+			return;
+			
+		Vector vOut;
+		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
+		
+		R_DrawSprite(this.m_hSprite, vOut, this.m_iFrameCount, 0.0, Vector(-1, -1), 2.0, 2.0, false, Color(0, 0, 0, 0));
 	}
 	
 	//Indicate whether this entity shall be removed by the game

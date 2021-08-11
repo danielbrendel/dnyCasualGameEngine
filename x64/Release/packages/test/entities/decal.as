@@ -1,20 +1,22 @@
 
-class CDecalSprite : IScriptedEntity
+class CDecalEntity : IScriptedEntity
 {
 	Vector m_vecPos;
+	Vector m_vecSize;
 	Model m_oModel;
 	Timer m_oLifeTime;
 	SpriteHandle m_hSprite;
 	
-	CDecalSprite()
+	CDecalEntity()
     {
+		this.m_vecSize = Vector(64, 64);
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\decal.png", 1, 64, 64, 1, false);
+		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\decal.png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, false);
 		this.m_oLifeTime.SetDelay(120000);
 		this.m_oLifeTime.Reset();
 		this.m_oLifeTime.SetActive(true);
@@ -35,7 +37,13 @@ class CDecalSprite : IScriptedEntity
 	//Entity can draw everything in default order here
 	void OnDraw()
 	{
-		R_DrawSprite(this.m_hSprite, this.m_vecPos, 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		if (!R_ShouldDraw(this.m_vecPos, this.m_vecSize))
+			return;
+			
+		Vector vOut;
+		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
+		
+		R_DrawSprite(this.m_hSprite, vOut, 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 	}
 	
 	//Indicate whether this entity shall be removed by the game

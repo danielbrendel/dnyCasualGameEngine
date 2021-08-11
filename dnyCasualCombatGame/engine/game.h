@@ -143,7 +143,7 @@ namespace Game {
 
 		bool LoadMap(const std::wstring& wszMap);
 
-		bool SpawnEntity(const std::wstring& wszName, int x, int y)
+		bool SpawnEntity(const std::wstring& wszName, int x, int y, float rot)
 		{
 			//Spawn entity into world
 
@@ -181,6 +181,7 @@ namespace Game {
 
 			BEGIN_PARAMS(vArgs);
 			PUSH_OBJECT(&vecPos);
+			PUSH_FLOAT(rot);
 			PUSH_OBJECT(&szIdent);
 			PUSH_OBJECT(&szPath);
 			
@@ -288,7 +289,7 @@ namespace Game {
 				this->Release();
 				return false;
 			}
-
+			
 			pConfigMgr->SetUnknownExpressionInformer(&UnknownExpressionHandler);
 
 			//Add CVars
@@ -371,7 +372,7 @@ namespace Game {
 				this->Release();
 				return false;
 			}
-
+			
 			//Initialize entity environment
 			if (!Entity::Initialize()) {
 				this->Release();

@@ -1,16 +1,16 @@
 
-class CLaserEntity : IScriptedEntity
+class CGunEntity : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
-	SpriteHandle m_hLaser;
+	SpriteHandle m_hShot;
 	float m_fRotation;
 	float m_fSpeed;
 	bool m_bRemove;
 	Timer m_tmrAlive;
 	
-	CLaserEntity()
+	CGunEntity()
     {
 		this.m_vecSize = Vector(60, 99);
 		this.m_fSpeed = 35.0;
@@ -21,7 +21,7 @@ class CLaserEntity : IScriptedEntity
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hLaser = R_LoadSprite(GetPackagePath() + "gfx\\laser.png", 1, 60, 99, 1, true);
+		this.m_hShot = R_LoadSprite(GetPackagePath() + "gfx\\gunshot.png", 1, 3, 12, 1, true);
 		this.m_tmrAlive.SetDelay(10000);
 		this.m_tmrAlive.Reset();
 		this.m_tmrAlive.SetActive(true);
@@ -31,7 +31,7 @@ class CLaserEntity : IScriptedEntity
 		bbox.AddBBoxItem(Vector(0, 0), Vector(60, 99));
 		this.m_oModel.Alloc();
 		this.m_oModel.SetCenter(Vector(60 / 2, 99 / 2));
-		this.m_oModel.Initialize2(bbox, this.m_hLaser);
+		this.m_oModel.Initialize2(bbox, this.m_hShot);
 	}
 	
 	//Called when the entity gets released
@@ -64,7 +64,7 @@ class CLaserEntity : IScriptedEntity
 		Vector vOut;
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
-		R_DrawSprite(this.m_hLaser, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		R_DrawSprite(this.m_hShot, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 	}
 	
 	//Called for wall collisions

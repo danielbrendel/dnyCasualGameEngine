@@ -3,18 +3,6 @@ string g_szPackagePath = "";
 
 #include "weapon_laser.as"
 
-/* 
-	Scripted entity 
-	
-	A scripted entity is a dynamic interface class for implementing
-	custom entities such as explosions, decals, etc
-	
-	It is derived from the IScriptedEntity interface and must define
-	all the following interface functions. Also it must have at least
-	one Vector and Model which are returned in certain methods. Tho
-	you don't need to use them. A scripted entity is passed to the 
-	game engine via the SpawnEntity(<object handle>, <spawn position>) function. 
-*/
 const int BTN_FORWARD = (1 << 0);
 const int BTN_BACKWARD = (1 << 1);
 const int BTN_MOVELEFT = (1 << 2);
@@ -31,10 +19,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	SpriteHandle m_hSprite;
 	float m_fRotation;
 	uint32 m_uiButtons;
+	uint32 m_uiHealth;
+	Timer m_tmrMayDamage;
 	
 	CPlayerEntity()
     {
 		this.m_uiButtons = 0;
+		this.m_uiHealth = 100;
 		this.m_vecSize = Vector(59, 52);
     }
 	
@@ -44,7 +35,14 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
 		this.m_hSprite = R_LoadSprite(g_szPackagePath + "gfx\\mech.png", 1, 59, 52, 1, true);
+		this.m_tmrMayDamage.SetDelay(2000);
+		this.m_tmrMayDamage.Reset();
+		this.m_tmrMayDamage.SetActive(true);
+		BoundingBox bbox;
+		bbox.Alloc();
+		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
 		this.m_oModel.Alloc();
+		this.m_oModel.Initialize2(bbox, this.m_hSprite);
 	}
 	
 	//Called when the entity gets released
@@ -83,10 +81,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 			CLaserEntity @laser = CLaserEntity();
 			Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
 			laser.SetRotation(this.m_fRotation);
-			bool r = Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
+			Ent_SpawnEntity("weapon_laser", @laser, this.m_vecPos/*vecLaserPos*/);
 			SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
 			S_PlaySound(hSound, 10);
 		}
+		
+		this.m_tmrMayDamage.Update();
 	}
 	
 	//Entity can draw everything in default order here
@@ -98,24 +98,51 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	void OnDrawOnTop()
 	{
 		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
+		R_DrawString(R_GetDefaultFont(), formatInt(this.m_uiHealth), Vector(10, 10), Color(0, 0, 155, 150));
 	}
 	
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{
-		return false;
+		return this.m_uiHealth == 0;
 	}
 	
-	//Indicate whether this entity is damageable. Damageable entities can collide with other
-	//entities and recieve and strike damage. Damageable entities do also collide with walls.
-	//0 = not damageable, 1 = damage all, 2 = not damaging entities with same name
-	DamageType IsDamageable()
+	//Indicate whether this entity is collidable
+	bool IsCollidable()
 	{
-		return DAMAGEABLE_NOTSQUAD;
+		return true;
 	}
 	
-	//Called when the entity recieves damage
-	void OnDamage(DamageValue dv)
+	//Called when the entity collided with another entity
+	void OnCollided(IScriptedEntity@ ref)
+	{
+		if (ref.GetName() == "plasma_ball") {
+			if (this.m_tmrMayDamage.IsElapsed()) {
+				const uint32 PLASMA_BALL_DAMAGE = 25;
+				if (this.m_uiHealth < PLASMA_BALL_DAMAGE) {
+					this.m_uiHealth = 0;
+				} else {
+					this.m_uiHealth -= PLASMA_BALL_DAMAGE;
+				}
+				
+				this.m_tmrMayDamage.Reset();
+			}
+		} /*else if (ref.GetName() == "weapon_gun") {
+			if (this.m_tmrMayDamage.IsElapsed()) {
+				const uint32 GUN_SHOT_DAMAGE = 10;
+				if (this.m_uiHealth < GUN_SHOT_DAMAGE) {
+					this.m_uiHealth = 0;
+				} else {
+					this.m_uiHealth -= GUN_SHOT_DAMAGE;
+				}
+				
+				this.m_tmrMayDamage.Reset();
+			}
+		}*/
+	}
+	
+	//Called when entity gets damaged
+	void OnDamage(uint32 damageValue)
 	{
 	}
 	
@@ -153,12 +180,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Set new rotation
 	void SetRotation(float fRot)
 	{
-	}
-	
-	//Called for querying the damage value for this entity
-	DamageValue GetDamageValue()
-	{
-		return 0;
+		this.m_fRotation = fRot;
 	}
 	
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
@@ -267,11 +289,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 }
 
 
-void OnSpawn(const Vector &in vecPos, const string &in szIdent, const string &in szPath)
+void OnSpawn(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
 {
 	g_szPackagePath = szPath;
 
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
+	player.SetRotation(fRot);
 }
 

@@ -18,7 +18,6 @@
 
 /* Entity environment */
 namespace Entity {
-	enum DamageType { DAMAGEABLE_NO = 0, DAMAGEABLE_ALL, DAMAGEABLE_NOTSQUAD };
 	enum MovementDir { MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT };
 
 	struct Color {
@@ -590,25 +589,37 @@ namespace Entity {
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnWallCollided()", nullptr, nullptr);
 		}
 
-		byte IsDamageable(void)
+		bool IsCollidable(void)
 		{
-			//Query if entity is damageable (0 = non-damageable, 1 = damage all, 2 = damage only entities with different name)
+			//Query if entity is collidable
 
-			byte ucResult;
+			bool bResult;
 
-			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "DamageType IsDamageable()", nullptr, &ucResult, Scripting::FA_BYTE);
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "bool IsCollidable()", nullptr, &bResult, Scripting::FA_BYTE);
 
-			return ucResult;
+			return bResult;
 		}
 
-		void OnDamage(DamageValue dv)
+		void OnCollided(asIScriptObject* ref)
 		{
-			//Inform of being damaged
-
+			//Inform of being collided
+			
 			BEGIN_PARAMS(vArgs);
-			PUSH_BYTE(dv);
+			PUSH_POINTER(ref);
 
-			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnDamage(DamageValue dv)", &vArgs, nullptr);
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnCollided(IScriptedEntity@)", &vArgs, nullptr);
+
+			END_PARAMS(vArgs);
+		}
+
+		void OnDamage(unsigned int damageValue)
+		{
+			//Inform of being collided
+			
+			BEGIN_PARAMS(vArgs);
+			PUSH_DWORD(damageValue);
+
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnDamage(uint32)", &vArgs, nullptr);
 
 			END_PARAMS(vArgs);
 		}
@@ -672,17 +683,6 @@ namespace Entity {
 			END_PARAMS(vArgs);
 		}
 
-		bool IsMovable(void)
-		{
-			//Query movable indicator
-
-			bool bResult;
-
-			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "bool IsMovable()", nullptr, &bResult, Scripting::FA_BYTE);
-
-			return bResult;
-		}
-
 		Vector GetSize(void)
 		{
 			//Query selection size
@@ -692,17 +692,6 @@ namespace Entity {
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "Vector& GetSize()", nullptr, &pResult, Scripting::FA_OBJECT);
 
 			return *pResult;
-		}
-
-		DamageValue GetDamageValue(void)
-		{
-			//Get damage value
-
-			DamageValue dvResult;
-
-			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "DamageValue GetDamageValue()", nullptr, &dvResult, Scripting::FA_BYTE);
-
-			return dvResult;
 		}
 
 		bool NeedsRemoval(void)
@@ -727,9 +716,9 @@ namespace Entity {
 			return szResult;
 		}
 
-//Getters
-inline bool IsReady(void) const { return (this->m_pScriptObject != nullptr); }
-inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
+		//Getters
+		inline bool IsReady(void) const { return (this->m_pScriptObject != nullptr); }
+		inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
 	};
 
 	/* Scripted entity manager */
@@ -748,51 +737,7 @@ inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
 
 		bool Spawn(const std::wstring& wszIdent, asIScriptObject* pObject, const Vector& vAtPos);
 
-		void Process(void)
-		{
-			//Inform entities
-
-			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
-				//Let entity process
-				this->m_vEnts[i]->OnProcess();
-
-				//Handle damaging
-				byte ucDamageType = this->m_vEnts[i]->IsDamageable(); //Query damage type
-				if (ucDamageType) {
-					//Query model
-					CModel* pModel = this->m_vEnts[i]->GetModel();
-					if (pModel) {
-						//Check for collisions with any other entities
-						for (size_t j = 0; j < this->m_vEnts.size(); j++) {
-							if ((j != i) && (this->m_vEnts[j]->IsDamageable())) {
-								//Check if entity does not damage other entities with the same name and ignore damage handling then
-								if (ucDamageType == DAMAGEABLE_NOTSQUAD) {
-									if (this->m_vEnts[i]->GetName() == this->m_vEnts[j]->GetName())
-										continue;
-								}
-
-								CModel* pRef = this->m_vEnts[j]->GetModel();
-								if (pRef) {
-									//Check if collided
-									if (pModel->IsCollided(this->m_vEnts[i]->GetPosition(), this->m_vEnts[j]->GetPosition(), *pRef)) {
-										//Inform both of being damaged
-										this->m_vEnts[i]->OnDamage(this->m_vEnts[j]->GetDamageValue());
-										this->m_vEnts[j]->OnDamage(this->m_vEnts[i]->GetDamageValue());
-									}
-								}
-							}
-						}
-					}
-				}
-
-				//Check for removal
-				if (this->m_vEnts[i]->NeedsRemoval()) {
-					this->m_vEnts[i]->OnRelease();
-					delete this->m_vEnts[i];
-					this->m_vEnts.erase(this->m_vEnts.begin() + i);
-				}
-			}
-		}
+		void Process(void);
 
 		void Draw(void)
 		{
@@ -901,7 +846,7 @@ inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
 
 			for (size_t i = 0; i < oScriptedEntMgr.GetEntityCount(); i++) { //Loop through all entities
 				CScriptedEntity* pEntity = oScriptedEntMgr.GetEntity(i); //Get entity pointer
-				if ((pEntity) && (pEntity->Object() != pIgnoreEnt) && (pEntity->IsDamageable())) { //Use only valid damageable entities
+				if ((pEntity) && (pEntity->Object() != pIgnoreEnt) && (pEntity->IsCollidable())) { //Use only valid collidable entities
 					//Obtain model pointer
 					CModel* pModel = pEntity->GetModel();
 					if (pModel) {
@@ -1040,28 +985,45 @@ inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
 	};
 
 	/* Goal entity class */
+	const size_t GOAL_ENTITY_MAX_SPRITES = 64;
 	class CGoalEntity {
 	private:
-		DxRenderer::HD3DSPRITE m_hSprite;
+		std::vector<DxRenderer::HD3DSPRITE> m_vSprites;
 		Vector m_vecPosition;
 		Vector m_vecSize;
+		int m_iCurrentFrame;
+		CTimer m_tmrFrameChange;
 		std::wstring m_wszGoal;
 		bool m_bGoalReached;
 	public:
 		CGoalEntity()
 		{
-			//Setup data and load sprite
+			//Initialize entity
 
 			this->m_bGoalReached = false;
-			this->m_vecSize = Vector(64, 64);
-			this->m_hSprite = pRenderer->LoadSprite(wszBasePath + L"media\\goal.png", 1, this->m_vecSize[0], this->m_vecSize[1], 1, false);
+			this->m_vecSize = Vector(128, 128);
+			this->m_iCurrentFrame = 0;
+
+			for (size_t i = 1; i < GOAL_ENTITY_MAX_SPRITES + 1; i++) {
+				std::wstring wszFileName = L"portal" + ((i < 10) ? L"0" + std::to_wstring(i) : std::to_wstring(i)) + L".png";
+				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszBasePath + L"media\\portal\\" + wszFileName, 1, this->m_vecSize[0], this->m_vecSize[1], 1, true);
+				this->m_vSprites.push_back(hSprite);
+			}
+
+			this->m_tmrFrameChange.SetDelay(50);
+			this->m_tmrFrameChange.Reset();
+			this->m_tmrFrameChange.SetActive(true);
 		}
 
 		~CGoalEntity()
 		{
-			//Free sprite
+			//Free sprites and clear list
 
-			pRenderer->FreeSprite(this->m_hSprite);
+			for (size_t i = 0; i < this->m_vSprites.size(); i++) {
+				pRenderer->FreeSprite(this->m_vSprites[i]);
+			}
+
+			this->m_vSprites.clear();
 		}
 
 		void SetPosition(int x, int y)
@@ -1088,6 +1050,16 @@ inline asIScriptObject* Object(void) const { return this->m_pScriptObject; }
 		void Process(void)
 		{
 			//Process entity
+
+			this->m_tmrFrameChange.Update();
+			if (this->m_tmrFrameChange.Elapsed()) {
+				this->m_tmrFrameChange.Reset();
+				
+				this->m_iCurrentFrame++;
+				if (this->m_iCurrentFrame >= GOAL_ENTITY_MAX_SPRITES) {
+					this->m_iCurrentFrame = 0;
+				}
+			}
 
 			Vector* vecPosition = nullptr;
 			Vector* vecSize = nullptr;

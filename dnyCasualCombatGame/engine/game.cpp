@@ -143,7 +143,7 @@ namespace Game {
 		//Called for mouse events
 		
 		//Inform player entity
-		if (!iMouseKey) {
+		/*if (!iMouseKey) {
 			const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
 			Entity::Vector vPos(x, y);
 			BEGIN_PARAMS(vArgs);
@@ -155,7 +155,7 @@ namespace Game {
 			PUSH_DWORD(iMouseKey);
 			PUSH_BYTE(bDown);
 			pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnMousePress(int key, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
-		}
+		}*/
 
 		//Pass to menu
 		this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
@@ -164,7 +164,7 @@ namespace Game {
 	void CGame::OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		//Called for key events
-
+		
 		const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
 
 		BEGIN_PARAMS(vArgs);
@@ -320,8 +320,9 @@ namespace Game {
 		std::wstring wszEntityName = pConfigMgr->ExpressionItemValue(1);
 		int x = _wtoi(pConfigMgr->ExpressionItemValue(2).c_str());
 		int y = _wtoi(pConfigMgr->ExpressionItemValue(3).c_str());
+		float rot = (float)_wtof(pConfigMgr->ExpressionItemValue(4).c_str());
 
-		pGame->SpawnEntity(wszEntityName, x, y);
+		pGame->SpawnEntity(wszEntityName, x, y, rot);
 	}
 
 	void Cmd_EnvGoal(void)

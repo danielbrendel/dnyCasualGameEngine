@@ -1,29 +1,21 @@
 
 string g_szPackagePath = "";
 
-/* 
-	Scripted entity 
-	
-	A scripted entity is a dynamic interface class for implementing
-	custom entities such as explosions, decals, etc
-	
-	It is derived from the IScriptedEntity interface and must define
-	all the following interface functions. Also it must have at least
-	one Vector and Model which are returned in certain methods. Tho
-	you don't need to use them. A scripted entity is passed to the 
-	game engine via the SpawnEntity(<object handle>, <spawn position>) function. 
-*/
-class CCubeEntity : IScriptedEntity
+
+class CPlasmaBall : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
-	Model m_oModel;
 	float m_fRotation;
+	Model m_oModel;
 	SpriteHandle m_hSprite;
+	int m_iSpriteIndex;
+	Timer m_tmrSpriteChange;
 	
-	CCubeEntity()
+	CPlasmaBall()
     {
 		this.m_vecSize = Vector(64, 64);
+		this.m_iSpriteIndex = 0;
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
@@ -31,8 +23,15 @@ class CCubeEntity : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
-		this.m_hSprite = R_LoadSprite(g_szPackagePath + "gfx\\cube.png", 1, 64, 64, 1, false);
+		this.m_hSprite = R_LoadSprite(g_szPackagePath + "gfx\\plasmaball.png", 4, 64, 64, 4, false);
+		this.m_tmrSpriteChange.SetDelay(50);
+		this.m_tmrSpriteChange.Reset();
+		this.m_tmrSpriteChange.SetActive(true);
+		BoundingBox bbox;
+		bbox.Alloc();
+		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
 		this.m_oModel.Alloc();
+		this.m_oModel.Initialize2(bbox, this.m_hSprite);
 	}
 	
 	//Called when the entity gets released
@@ -43,6 +42,17 @@ class CCubeEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		this.m_tmrSpriteChange.Update();
+		if (this.m_tmrSpriteChange.IsElapsed()) {
+			this.m_tmrSpriteChange.Reset();
+			
+			this.m_iSpriteIndex++;
+			if (this.m_iSpriteIndex >= 4) {
+				this.m_iSpriteIndex = 0;
+			}
+			
+			Ent_Move(this, 15, MOVE_FORWARD);
+		}
 	}
 	
 	//Entity can draw everything in default order here
@@ -53,6 +63,11 @@ class CCubeEntity : IScriptedEntity
 	//Called for wall collisions
 	void OnWallCollided()
 	{
+		if (this.m_fRotation == 0.0f) {
+			this.m_fRotation = 3.30f;
+		} else {
+			this.m_fRotation = 0.0f;
+		}
 	}
 	
 	//Entity can draw on-top stuff here
@@ -64,7 +79,7 @@ class CCubeEntity : IScriptedEntity
 		Vector vOut;
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
-		R_DrawSprite(this.m_hSprite, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
+		R_DrawSprite(this.m_hSprite, vOut, this.m_iSpriteIndex, 0.0f, Vector(-1, -1), 0.0f, 0.0f, false, Color(0, 0, 0, 0));
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -73,16 +88,19 @@ class CCubeEntity : IScriptedEntity
 		return false;
 	}
 	
-	//Indicate whether this entity is damageable. Damageable entities can collide with other
-	//entities (even with entities from other tools) and recieve and strike damage. 
-	//0 = not damageable, 1 = damage all, 2 = not damaging entities with same name
-	DamageType IsDamageable()
+	//Indicate whether this entity is collidable
+	bool IsCollidable()
 	{
-		return DAMAGEABLE_NOTSQUAD;
+		return true;
 	}
 	
-	//Called when the entity recieves damage
-	void OnDamage(DamageValue dv)
+	//Called when the entity collided with another entity
+	void OnCollided(IScriptedEntity@ ref)
+	{
+	}
+	
+	//Called when entity gets damaged
+	void OnDamage(uint32 damageValue)
 	{
 	}
 	
@@ -102,7 +120,7 @@ class CCubeEntity : IScriptedEntity
 	//Set new position
 	void SetPosition(const Vector &in vecPos)
 	{
-	
+		this.m_vecPos = vecPos;
 	}
 	
 	//This vector is used for getting the overall drawing size
@@ -114,12 +132,13 @@ class CCubeEntity : IScriptedEntity
 	//Return the rotation. This is actually not used by the host application, but might be useful to other entities
 	float GetRotation()
 	{
-		return 0.0;
+		return this.m_fRotation;
 	}
 	
 	//Set new rotation
 	void SetRotation(float fRot)
 	{
+		this.m_fRotation = fRot;
 	}
 	
 	//Called for querying the damage value for this entity
@@ -131,16 +150,16 @@ class CCubeEntity : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
-		return "cube";
+		return "plasma_ball";
 	}
 }
 
 
-void OnSpawn(const Vector &in vecPos, const string &in szIdent, const string &in szPath)
+void OnSpawn(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
 {
 	g_szPackagePath = szPath;
 
-	CCubeEntity @cube = CCubeEntity();
-	Ent_SpawnEntity(szIdent, @cube, vecPos);
+	CPlasmaBall @ball = CPlasmaBall();
+	Ent_SpawnEntity(szIdent, @ball, vecPos);
 }
 

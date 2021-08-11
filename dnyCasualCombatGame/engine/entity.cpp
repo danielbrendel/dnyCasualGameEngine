@@ -49,6 +49,51 @@ namespace Entity {
 		return true;
 	}
 
+	void CScriptedEntsMgr::Process(void)
+	{
+		//Inform entities
+
+		for (size_t i = 0; i < this->m_vEnts.size(); i++) {
+			//Let entity process
+			this->m_vEnts[i]->OnProcess();
+
+			//Handle collisions
+			bool isCollidable = this->m_vEnts[i]->IsCollidable(); //Query indicator value of entity
+			if (isCollidable) {
+				//Query model
+				CModel* pModel = this->m_vEnts[i]->GetModel();
+				if (pModel) {
+					//Check for collisions with any other entities
+					for (size_t j = 0; j < this->m_vEnts.size(); j++) {
+						if ((j != i) && (this->m_vEnts[j]->IsCollidable())) {
+							CModel* pRef = this->m_vEnts[j]->GetModel();
+							if (pRef) {
+								//Check if collided
+								if (pModel->IsCollided(this->m_vEnts[i]->GetPosition(), this->m_vEnts[j]->GetPosition(), *pRef)) {
+									//Inform both of being collided
+									this->m_vEnts[i]->OnCollided(this->m_vEnts[j]->Object());
+									this->m_vEnts[j]->OnCollided(this->m_vEnts[i]->Object());
+								}
+							}
+						}
+					}
+				}
+			}
+
+			//Check for removal
+			if (this->m_vEnts[i]->NeedsRemoval()) {
+				if (this->m_vEnts[i]->GetName() == "player") {
+					Game::pGame->StopGame();
+					return;
+				}
+
+				this->m_vEnts[i]->OnRelease();
+				delete this->m_vEnts[i];
+				this->m_vEnts.erase(this->m_vEnts.begin() + i);
+			}
+		}
+	}
+
 	CScriptedEntsMgr oScriptedEntMgr;
 
 	namespace APIFuncs { //API functions usable in scripts
@@ -136,6 +181,7 @@ namespace Entity {
 
 			Vector* vecPlayerPos = nullptr;
 			Vector* vecPlayerSize = nullptr;
+			
 			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetPosition()", nullptr, &vecPlayerPos, Scripting::FA_OBJECT);
 			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetSize()", nullptr, &vecPlayerSize, Scripting::FA_OBJECT);
 
@@ -155,7 +201,7 @@ namespace Entity {
 		{
 			//Convert world position to drawing position on screen
 			//Calculate distance of the position and add the center to it for each coordinate
-
+			
 			Vector* vecPlayerPos;
 			Vector* vecPlayerSize;
 			pScriptingInt->CallScriptMethod(oScriptedEntMgr.GetPlayerEntity().hScript, oScriptedEntMgr.GetPlayerEntity().pObject, "Vector& GetPosition()", nullptr, &vecPlayerPos, Scripting::FA_OBJECT);
@@ -249,6 +295,11 @@ namespace Entity {
 		size_t Ent_GetId(asIScriptObject* pEntity)
 		{
 			return oScriptedEntMgr.GetEntityId(pEntity);
+		}
+
+		asIScriptObject* GetPlayerEntity(void)
+		{
+			return oScriptedEntMgr.GetPlayerEntity().pObject;
 		}
 
 		bool ListFilesByExt(const std::string& szBaseDir, asIScriptFunction* pFunction, const char** pFileList, const size_t uiListLen)
@@ -389,7 +440,7 @@ namespace Entity {
 		Vector vecOut;
 		APIFuncs::GetDrawingPosition(this->m_vecPosition, this->m_vecSize, vecOut);
 
-		pRenderer->DrawSprite(this->m_hSprite, vecOut[0], vecOut[1], 0, 0.0f);
+		pRenderer->DrawSprite(this->m_vSprites[this->m_iCurrentFrame], vecOut[0], vecOut[1], 0, 0.0f);
 	}
 
 	bool Initialize(void)
@@ -430,10 +481,6 @@ namespace Entity {
 
 		//Register enum
 		Scripting::HSIENUM hEnum;
-		REG_ENUM("DamageType", hEnum);
-		ADD_ENUM(hEnum, "DAMAGEABLE_NO", DAMAGEABLE_NO);
-		ADD_ENUM(hEnum, "DAMAGEABLE_ALL", DAMAGEABLE_ALL);
-		ADD_ENUM(hEnum, "DAMAGEABLE_NOTSQUAD", DAMAGEABLE_NOTSQUAD);
 		REG_ENUM("MovementDir", hEnum);
 		ADD_ENUM(hEnum, "MOVE_FORWARD", MOVE_FORWARD);
 		ADD_ENUM(hEnum, "MOVE_BACKWARD", MOVE_BACKWARD);
@@ -563,15 +610,15 @@ namespace Entity {
 		REG_IFM("IScriptedEntity", "void OnProcess()");
 		REG_IFM("IScriptedEntity", "void OnDraw()");
 		REG_IFM("IScriptedEntity", "void OnWallCollided()");
-		REG_IFM("IScriptedEntity", "DamageType IsDamageable()");
-		REG_IFM("IScriptedEntity", "void OnDamage(DamageValue dv)");
+		REG_IFM("IScriptedEntity", "bool IsCollidable()");
+		REG_IFM("IScriptedEntity", "void OnCollided(IScriptedEntity@)");
 		REG_IFM("IScriptedEntity", "Model& GetModel()");
 		REG_IFM("IScriptedEntity", "Vector& GetPosition()");
 		REG_IFM("IScriptedEntity", "void SetPosition(const Vector &in)");
 		REG_IFM("IScriptedEntity", "Vector& GetSize()");
 		REG_IFM("IScriptedEntity", "float GetRotation()");
 		REG_IFM("IScriptedEntity", "void SetRotation(float)");
-		REG_IFM("IScriptedEntity", "DamageValue GetDamageValue()");
+		REG_IFM("IScriptedEntity", "void OnDamage(uint32)");
 		REG_IFM("IScriptedEntity", "bool NeedsRemoval()");
 		REG_IFM("IScriptedEntity", "string GetName()");
 
@@ -609,6 +656,7 @@ namespace Entity {
 			{ "bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in, bool bSpawn = true)", &APIFuncs::SpawnScriptedEntity },
 			{ "size_t Ent_GetEntityCount()", &APIFuncs::GetEntityCount },
 			{ "IScriptedEntity@+ Ent_GetEntityHandle(size_t uiEntityId)", &APIFuncs::GetEntityHandle },
+			{ "IScriptedEntity@+ Ent_GetPlayerEntity()", &APIFuncs::GetPlayerEntity },
 			{ "IScriptedEntity@+ Ent_TraceLine(const Vector&in vStart, const Vector&in vEnd, IScriptedEntity@+ pIgnoredEnt)", &APIFuncs::EntityTrace },
 			{ "bool Ent_IsValid(IScriptedEntity@ pEntity)", &APIFuncs::Ent_IsValid },
 			{ "size_t Ent_GetId(IScriptedEntity@ pEntity)", &APIFuncs::Ent_GetId },

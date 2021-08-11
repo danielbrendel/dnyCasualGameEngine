@@ -663,7 +663,7 @@ namespace Entity {
 			{ "void Ent_Move(IScriptedEntity@ pThis, float fSpeed, MovementDir dir)", &APIFuncs::Ent_Move },
 			{ "bool Util_ListSprites(const string& in, FuncFileListing @cb)", &APIFuncs::ListSprites },
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
-			{ "int Util_Random(int start, int end)", &APIFuncs::Random }
+			{ "int Util_Random(int start, int end)", &APIFuncs::Random },
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

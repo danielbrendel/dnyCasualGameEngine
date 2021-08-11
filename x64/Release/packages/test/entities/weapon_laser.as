@@ -25,7 +25,6 @@ class CLaserEntity : IScriptedEntity
 		this.m_tmrAlive.SetDelay(10000);
 		this.m_tmrAlive.Reset();
 		this.m_tmrAlive.SetActive(true);
-		this.m_oModel.Alloc();
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), Vector(60, 99));

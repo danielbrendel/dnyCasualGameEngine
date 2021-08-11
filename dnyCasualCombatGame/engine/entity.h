@@ -607,6 +607,8 @@ namespace Entity {
 			BEGIN_PARAMS(vArgs);
 			PUSH_POINTER(ref);
 
+			ref->AddRef();
+
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnCollided(IScriptedEntity@)", &vArgs, nullptr);
 
 			END_PARAMS(vArgs);

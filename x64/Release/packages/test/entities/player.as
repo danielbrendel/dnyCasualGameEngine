@@ -81,7 +81,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 			CLaserEntity @laser = CLaserEntity();
 			Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
 			laser.SetRotation(this.m_fRotation);
-			Ent_SpawnEntity("weapon_laser", @laser, this.m_vecPos/*vecLaserPos*/);
+			Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
 			SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
 			S_PlaySound(hSound, 10);
 		}

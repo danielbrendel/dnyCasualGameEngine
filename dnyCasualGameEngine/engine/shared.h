@@ -1,7 +1,7 @@
 #pragma once
 
 /*
-	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+	Casual Game Engine (dnyCasualGameEngine) developed by Daniel Brendel
 
 	(C) 2021 by Daniel Brendel
 
@@ -11,7 +11,7 @@
 	Released under the MIT license
 */
 
-#define APP_NAME L"Casual Combat Game"
+#define APP_NAME L"Casual Game Engine"
 #define APP_VERSION L"1.0"
 #define APP_AUTHOR L"Daniel Brendel"
 #define APP_CONTACT L"dbrendel1988<at>gmail<dot>com"

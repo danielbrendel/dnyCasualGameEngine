@@ -1,4 +1,4 @@
-Casual Combat Game is a top down 2D singleplayer shooter with moddable content
+Casual Game Engine is a top down 2D singleplayer shooter with moddable content
 
 the game consists of the core engine and the mod package which is loaded via the menu
 a package is a complete mod as well as a campaign that can consist of:

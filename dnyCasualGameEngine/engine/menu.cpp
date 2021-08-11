@@ -2,7 +2,7 @@
 #include "game.h"
 
 /*
-	Casual Combat Game (dnyCasualCombatGame) developed by Daniel Brendel
+	Casual Game Engine (dnyCasualGameEngine) developed by Daniel Brendel
 
 	(C) 2021 by Daniel Brendel
 

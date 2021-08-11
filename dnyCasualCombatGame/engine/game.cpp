@@ -247,6 +247,14 @@ namespace Game {
 		}
 	}
 
+	void Cmd_Bind(void)
+	{
+		int vCode = _wtoi(pConfigMgr->ExpressionItemValue(1).c_str());
+		std::wstring wszIdent = pConfigMgr->ExpressionItemValue(2);
+
+		pGame->m_oInputMgr.AddKeyBinding(wszIdent, vCode);
+	}
+
 	void Cmd_PackageName(void)
 	{
 		pGame->m_sPackage.wszName = pConfigMgr->ExpressionItemValue(1);

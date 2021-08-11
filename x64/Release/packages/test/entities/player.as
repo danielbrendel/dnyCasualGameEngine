@@ -177,7 +177,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	{
 		Print("OnKeyPress: " + formatInt(vKey));
 	
-		if (vKey == 39) {
+		if (vKey == GetKeyBinding("TURN_LEFT")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT)) {
 					this.m_uiButtons |= BTN_TURNLEFT;
@@ -187,7 +187,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 					this.m_uiButtons &= ~BTN_TURNLEFT;
 				}
 			}
-		} else if (vKey == 37) {
+		} else if (vKey == GetKeyBinding("TURN_RIGHT")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_TURNRIGHT) == BTN_TURNRIGHT)) {
 					this.m_uiButtons |= BTN_TURNRIGHT;
@@ -199,7 +199,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 			}
 		} 
 		
-		if (vKey == 87) {
+		if (vKey == GetKeyBinding("MOVE_FORWARD")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD)) {
 					this.m_uiButtons |= BTN_FORWARD;
@@ -209,7 +209,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 					this.m_uiButtons &= ~BTN_FORWARD;
 				}
 			}
-		} else if (vKey == 83) {
+		} else if (vKey == GetKeyBinding("MOVE_BACKWARD")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD)) {
 					this.m_uiButtons |= BTN_BACKWARD;
@@ -219,7 +219,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 					this.m_uiButtons &= ~BTN_BACKWARD;
 				}
 			}
-		} else if (vKey == 65) {
+		} else if (vKey == GetKeyBinding("MOVE_LEFT")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_MOVELEFT) == BTN_MOVELEFT)) {
 					this.m_uiButtons |= BTN_MOVELEFT;
@@ -229,7 +229,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 					this.m_uiButtons &= ~BTN_MOVELEFT;
 				}
 			}
-		} else if (vKey == 68) {
+		} else if (vKey == GetKeyBinding("MOVE_RIGHT")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_MOVERIGHT) == BTN_MOVERIGHT)) {
 					this.m_uiButtons |= BTN_MOVERIGHT;
@@ -241,7 +241,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 			}
 		}
 		
-		if (vKey == 32) {
+		if (vKey == GetKeyBinding("ATTACK")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK)) {
 					this.m_uiButtons |= BTN_ATTACK;

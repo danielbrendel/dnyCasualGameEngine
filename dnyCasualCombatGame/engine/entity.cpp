@@ -335,6 +335,11 @@ namespace Entity {
 		{
 			return Utils::ConvertToAnsiString(Game::pGame->GetPackagePath());
 		}
+
+		int GetKeyBinding(const std::string& szIdent)
+		{
+			return Game::pGame->GetKeyBinding(Utils::ConvertToWideString(szIdent));
+		}
 	}
 
 	void CSolidSprite::Draw(void)
@@ -584,6 +589,7 @@ namespace Entity {
 			{ "void Print(const string& in)", &APIFuncs::Print },
 			{ "void PrintClr(const string& in, const ConColor &in)", &APIFuncs::Print2 },
 			{ "string GetPackagePath()", &APIFuncs::GetPackagePath },
+			{ "int GetKeyBinding(const string &in)", &APIFuncs::GetKeyBinding },
 			{ "FontHandle R_LoadFont(const string& in, uint8 ucFontSizeW, uint8 ucFontSizeH)", &APIFuncs::LoadFont },
 			{ "bool R_GetSpriteInfo(const string &in, SpriteInfo &out)", &APIFuncs::GetSpriteInfo },
 			{ "SpriteHandle R_LoadSprite(const string& in szFile, int iFrameCount, int iFrameWidth, int iFrameHeight, int iFramesPerLine, bool bForceCustomSize)", &APIFuncs::LoadSprite },

@@ -17,6 +17,7 @@
 #include "vars.h"
 #include "entity.h"
 #include "menu.h"
+#include "input.h"
 
 /* Game specific environment */
 namespace Game {
@@ -48,6 +49,7 @@ namespace Game {
 	void Cmd_EntRequire(void);
 	void Cmd_EntSpawn(void);
 	void Cmd_EnvGoal(void);
+	void Cmd_Bind(void);
 
 	class CGame {
 	private:
@@ -84,6 +86,7 @@ namespace Game {
 		std::vector<Entity::CSolidSprite> m_vSolidSprites;
 		std::vector<entityscript_s> m_vEntityScripts;
 		Entity::CGoalEntity* m_pGoalEntity;
+		Input::CInputMgr m_oInputMgr;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -96,6 +99,7 @@ namespace Game {
 		friend void Cmd_EntSpawn(void);
 		friend void Cmd_EntRequire(void);
 		friend void Cmd_EnvGoal(void);
+		friend void Cmd_Bind(void);
 
 		bool LoadPackage(const std::wstring& wszPackage)
 		{
@@ -293,6 +297,7 @@ namespace Game {
 			pGfxFullscreen = pConfigMgr->CCVar::Add(L"gfx_fullscreen", ConfigMgr::CCVar::CVAR_TYPE_BOOL, L"1");
 			
 			//Add commands
+			pConfigMgr->CCommand::Add(L"bind", L"Bind command to key", &Cmd_Bind);
 			pConfigMgr->CCommand::Add(L"package_name", L"Package name", &Cmd_PackageName);
 			pConfigMgr->CCommand::Add(L"package_version", L"Package version", &Cmd_PackageVersion);
 			pConfigMgr->CCommand::Add(L"package_author", L"Package author", &Cmd_PackageAuthor);
@@ -476,5 +481,7 @@ namespace Game {
 
 		//Return package path
 		std::wstring GetPackagePath(void) { return wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\"; }
+		//Return key binding
+		int GetKeyBinding(const std::wstring& wszIdent) { return this->m_oInputMgr.GetKeyBindingCode(wszIdent); }
 	};
 }

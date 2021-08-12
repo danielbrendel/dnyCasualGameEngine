@@ -24,7 +24,8 @@ namespace Utils {
 	bool FileExists(const std::wstring& wszFileName);
 	bool DirExists(const std::wstring& wszDirName);
 	inline void CharReplace(std::string& szStr, const char old, const char _new);
-	byte* ReadEntireFile(const std::string& szFile, size_t& uiSizeOut, bool bTreatAsString = false);
+	byte* ReadEntireFile(const std::wstring& wszFile, size_t& uiSizeOut, bool bTreatAsString = false);
+	std::vector<std::wstring> ReadFileLines(const std::wstring& wszFile);
 	std::vector<std::string> Split(const std::string& szInput, const std::string& szSplit);
 	std::vector<std::wstring> SplitW(const std::wstring& wszInput, const std::wstring& wszSplit);
 	std::vector<std::wstring> ListFilesByExt(const std::wstring& wszBaseDir, const wchar_t** pFileList, const size_t uiListLen);

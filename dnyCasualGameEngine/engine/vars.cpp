@@ -24,3 +24,4 @@ ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxFullscreen = nullptr;
 
 DxRenderer::d3dfont_s* pDefaultFont = nullptr;
+int iDefaultFontSize[2];

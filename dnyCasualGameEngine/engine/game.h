@@ -399,7 +399,7 @@ namespace Game {
 
 			this->m_bInit = true;
 			this->m_bGameStarted = false;
-			this->StartGame(L"test");
+			
 			return this->m_bInit;
 		}
 
@@ -420,6 +420,8 @@ namespace Game {
 			}
 
 			this->m_bGamePause = false;
+
+			this->m_oMenu.SetOpenStatus(false);
 
 			//Load package
 			return this->LoadPackage(wszPackage);

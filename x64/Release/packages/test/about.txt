@@ -1,0 +1,3 @@
+This is the about content of the sample game package.
+Please read the documentation in order to create your own game package.
+Have fun with the game engine!

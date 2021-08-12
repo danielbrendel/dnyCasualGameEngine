@@ -448,7 +448,9 @@ namespace Entity {
 		//Initialize entity scripting
 
 		//Create default font
-		pDefaultFont = pRenderer->LoadFont(L"Verdana", 7, 15);
+		iDefaultFontSize[0] = 7;
+		iDefaultFontSize[1] = 15;
+		pDefaultFont = pRenderer->LoadFont(L"Verdana", iDefaultFontSize[0], iDefaultFontSize[1]);
 		if (!pDefaultFont)
 			return false;
 

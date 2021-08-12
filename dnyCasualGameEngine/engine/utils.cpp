@@ -127,15 +127,15 @@ namespace Utils {
 		std::replace(szStr.begin(), szStr.end(), old, _new);
 	}
 
-	byte* ReadEntireFile(const std::string& szFile, size_t& uiSizeOut, bool bTreatAsString)
+	byte* ReadEntireFile(const std::wstring& wszFile, size_t& uiSizeOut, bool bTreatAsString)
 	{
 		//Read entire file content into stream
 
-		if (!szFile.length())
+		if (!wszFile.length())
 			return nullptr;
 
 		//Open existing file in read-mode
-		HANDLE hFile = CreateFileA(szFile.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		HANDLE hFile = CreateFile(wszFile.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 		if (hFile == INVALID_HANDLE_VALUE)
 			return nullptr;
 
@@ -147,7 +147,7 @@ namespace Utils {
 		}
 
 		//Allocate buffer with file-size in bytes
-		byte* pBuffer = (byte*)malloc(dwFileSize + ((bTreatAsString) ? sizeof(char) : 0));
+		byte* pBuffer = (byte*)malloc(dwFileSize + ((bTreatAsString) ? sizeof(wchar_t) : 0));
 		if (!pBuffer) {
 			CloseHandle(hFile);
 			return nullptr;
@@ -169,6 +169,28 @@ namespace Utils {
 		if (bTreatAsString) pBuffer[dwFileSize] = 0;
 
 		return pBuffer;
+	}
+
+	std::vector<std::wstring> ReadFileLines(const std::wstring& wszFile)
+	{
+		//Read all lines of a file
+
+		std::vector<std::wstring> vResult;
+
+		std::wifstream hFile(wszFile);
+		if (hFile.is_open()) {
+			wchar_t wszLine[2048] = { 0 };
+
+			while (!hFile.eof()) {
+				hFile.getline(wszLine, sizeof(wszLine), '\n');
+
+				vResult.push_back(wszLine);
+			}
+
+			hFile.close();
+		}
+
+		return vResult;
 	}
 
 	std::vector<std::string> Split(const std::string& szInput, const std::string& szSplit)

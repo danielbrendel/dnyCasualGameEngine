@@ -32,3 +32,4 @@ extern ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight;
 extern ConfigMgr::CCVar::cvar_s* pGfxFullscreen;
 
 extern DxRenderer::d3dfont_s* pDefaultFont;
+extern int iDefaultFontSize[2];

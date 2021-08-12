@@ -141,6 +141,7 @@ namespace Game {
 
 		//Inform menu
 		this->m_oMenu.OnStopGame();
+		this->m_oMenu.SetOpenStatus(true);
 	}
 
 	void CGame::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

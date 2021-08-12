@@ -16,10 +16,12 @@
 
 /* Menu component */
 namespace Menu {
-	void MainMenu_onOpenNews(void);
-	void MainMenu_onOpenPackages(void);
-	void MainMenu_onOpenSettings(void);
-	void MainMenu_onQuitGame(void);
+	void MainMenu_OnResumeGame(void);
+	void MainMenu_OnStopGame(void);
+	void MainMenu_OnOpenNews(void);
+	void MainMenu_OnOpenPackages(void);
+	void MainMenu_OnOpenSettings(void);
+	void MainMenu_OnQuitGame(void);
 
 	class IMenu {
 	protected:
@@ -29,10 +31,11 @@ namespace Menu {
 	public:
 		IMenu() : m_bActive(false) {}
 
-		virtual bool Initialize(int w, int h) = 0;
+		virtual bool Initialize(int w, int h, bool* pGameStarted) = 0;
 		virtual void Draw(void) = 0;
 		virtual void Release(void) = 0;
 
+		//Called for mouse events
 		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 		{
 			if (!iMouseKey) {
@@ -63,44 +66,66 @@ namespace Menu {
 			std::wstring wszText;
 			TOnClick onClick;
 			bool bHover;
+			bool bShow;
 		};
 
 		std::vector<menuentry_s> m_vEntries;
 		DxRenderer::d3dfont_s* m_pFont;
+		bool* m_pGameStarted;
 	public:
 		CMainMenu() {}
 		~CMainMenu() {}
 
-		virtual bool Initialize(int w, int h)
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
 		{
 			//Initialize main menu
 			
 			const int iStartPos = 50;
 
+			menuentry_s sResumeGame;
+			sResumeGame.wszText = L"Resume game";
+			sResumeGame.onClick = &MainMenu_OnResumeGame;
+			sResumeGame.x = 10;
+			sResumeGame.y = h - iStartPos - 50 * 6;
+			sResumeGame.bShow = false;
+
+			menuentry_s sStopGame;
+			sStopGame.wszText = L"Stop game";
+			sStopGame.onClick = &MainMenu_OnStopGame;
+			sStopGame.x = 10;
+			sStopGame.y = h - iStartPos - 50 * 5;
+			sStopGame.bShow = false;
+
 			menuentry_s sNews;
 			sNews.wszText = L"News";
-			sNews.onClick = &MainMenu_onOpenNews;
+			sNews.onClick = &MainMenu_OnOpenNews;
 			sNews.x = 10;
 			sNews.y = h - iStartPos - 50 * 3;
+			sNews.bShow = true;
 
 			menuentry_s sPackages;
 			sPackages.wszText = L"Packages";
-			sPackages.onClick = &MainMenu_onOpenPackages;
+			sPackages.onClick = &MainMenu_OnOpenPackages;
 			sPackages.x = 10;
 			sPackages.y = h - iStartPos - 50 * 2;
+			sPackages.bShow = true;
 
 			menuentry_s sSettings;
 			sSettings.wszText = L"Settings";
-			sSettings.onClick = &MainMenu_onOpenSettings;
+			sSettings.onClick = &MainMenu_OnOpenSettings;
 			sSettings.x = 10;
 			sSettings.y = h - iStartPos - 50;
+			sSettings.bShow = true;
 
 			menuentry_s sQuit;
 			sQuit.wszText = L"Quit";
-			sQuit.onClick = &MainMenu_onQuitGame;
+			sQuit.onClick = &MainMenu_OnQuitGame;
 			sQuit.x = 10;
 			sQuit.y = h - iStartPos;
+			sQuit.bShow = true;
 
+			this->m_vEntries.push_back(sResumeGame);
+			this->m_vEntries.push_back(sStopGame);
 			this->m_vEntries.push_back(sNews);
 			this->m_vEntries.push_back(sPackages);
 			this->m_vEntries.push_back(sSettings);
@@ -111,43 +136,59 @@ namespace Menu {
 				return false;
 			}
 
+			this->m_pGameStarted = pGameStarted;
+
 			return true;
 		}
 
 		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 		{
+			//Handle mouse events
+
 			IMenu::OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 
 			for (size_t i = 0; i < this->m_vEntries.size(); i++) {
-				if ((this->m_iMouseX >= this->m_vEntries[i].x) && (this->m_iMouseX <= this->m_vEntries[i].x + MAINMENU_FONTSIZE_W * this->m_vEntries[i].wszText.length()) && (this->m_iMouseY >= this->m_vEntries[i].y) && (this->m_iMouseY <= this->m_vEntries[i].y + MAINMENU_FONTSIZE_H)) {
-					this->m_vEntries[i].bHover = true;
+				if (this->m_vEntries[i].bShow) {
+					if ((this->m_iMouseX >= this->m_vEntries[i].x) && (this->m_iMouseX <= this->m_vEntries[i].x + MAINMENU_FONTSIZE_W * this->m_vEntries[i].wszText.length()) && (this->m_iMouseY >= this->m_vEntries[i].y) && (this->m_iMouseY <= this->m_vEntries[i].y + MAINMENU_FONTSIZE_H)) {
+						this->m_vEntries[i].bHover = true;
 
-					if ((iMouseKey == 1) && (!bDown)) {
-						this->m_vEntries[i].onClick();
+						if ((iMouseKey == 1) && (!bDown)) {
+							this->m_vEntries[i].onClick();
+						}
+					} else {
+						this->m_vEntries[i].bHover = false;
 					}
-				} else {
-					this->m_vEntries[i].bHover = false;
 				}
 			}
 		}
 
 		virtual void Draw(void)
 		{
+			//Draw menu
+
 			for (size_t i = 0; i < this->m_vEntries.size(); i++) {
-				if (this->m_vEntries[i].bHover) {
-					pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 230, 230, 230, 150);
-				} else {
-					pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 200, 200, 200, 150);
+				if (this->m_vEntries[i].bShow) {
+					if (this->m_vEntries[i].bHover) {
+						pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 230, 230, 230, 150);
+					}
+					else {
+						pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 200, 200, 200, 150);
+					}
 				}
 			}
 		}
 
 		virtual void Release(void)
 		{
-			
+			//Release component
 		}
 
+		virtual void OnToggleGameActiveMenuItems(void)
+		{
+			//Toggle game-active menu specific items
 
+			this->m_vEntries[0].bShow = this->m_vEntries[1].bShow = *this->m_pGameStarted;
+		}
 	};
 
 	class CMenu {
@@ -161,14 +202,16 @@ namespace Menu {
 		CMenu() : m_bOpen(false) {}
 		~CMenu() {}
 
-		bool Initialize(int w, int h)
+		bool Initialize(int w, int h, bool* pGameStarted)
 		{
+			//Initialize menu
+
 			this->m_hCursor = pRenderer->LoadSprite(wszBasePath + L"media\\menucursor.png", 1, 16, 16, 1, false);
 			if (this->m_hCursor == GFX_INVALID_SPRITE_ID) {
 				return false;
 			}
 
-			if (!oMainMenu.Initialize(w, h)) {
+			if (!oMainMenu.Initialize(w, h, pGameStarted)) {
 				return false;
 			}
 
@@ -179,6 +222,8 @@ namespace Menu {
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 		{
+			//Handle mouse events
+
 			if (!this->m_bOpen)
 				return;
 
@@ -190,8 +235,20 @@ namespace Menu {
 			oMainMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
 
+		void OnMouseWheel(short wDistance, bool bForward)
+		{
+			//Handle mouse wheel event
+		}
+
+		void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handke key events
+		}
+
 		void Draw(void)
 		{
+			//Draw menu
+
 			if (!this->m_bOpen)
 				return;
 			
@@ -204,12 +261,23 @@ namespace Menu {
 
 		void Release(void)
 		{
+			//Release menu
+
 			oMainMenu.Release();
 		}
 
 		void SetOpenStatus(bool status)
 		{
 			this->m_bOpen = status;
+
+			if (status) {
+				oMainMenu.OnToggleGameActiveMenuItems();
+			}
+		}
+
+		void OnStopGame(void)
+		{
+			oMainMenu.OnToggleGameActiveMenuItems();
 		}
 
 		bool IsOpen(void)

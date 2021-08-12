@@ -13,22 +13,32 @@
 */
 
 namespace Menu {
-	void MainMenu_onOpenNews(void)
+	void MainMenu_OnResumeGame(void)
+	{
+		Game::pGame->ResumeGame();
+	}
+
+	void MainMenu_OnStopGame(void)
+	{
+		Game::pGame->StopGame();
+	}
+
+	void MainMenu_OnOpenNews(void)
 	{
 		pConsole->AddLine(L"MainMenu_onOpenNews");
 	}
 
-	void MainMenu_onOpenPackages(void)
+	void MainMenu_OnOpenPackages(void)
 	{
 		pConsole->AddLine(L"MainMenu_onOpenPackages");
 	}
 
-	void MainMenu_onOpenSettings(void)
+	void MainMenu_OnOpenSettings(void)
 	{
 		pConsole->AddLine(L"MainMenu_onOpenSettings");
 	}
 
-	void MainMenu_onQuitGame(void)
+	void MainMenu_OnQuitGame(void)
 	{
 		Game::pGame->Release();
 	}

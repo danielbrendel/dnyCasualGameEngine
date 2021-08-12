@@ -49,7 +49,7 @@ namespace Game {
 			//Perform window processing
 			pWindow->Process();
 
-			if (this->m_bGameStarted) {
+			if ((this->m_bGameStarted) && (!this->m_bGamePause)) {
 				//Process scripted entities
 				Entity::oScriptedEntMgr.Process();
 
@@ -75,19 +75,21 @@ namespace Game {
 
 	void CGame::Draw(void)
 	{
-		//Draw solid sprites
-		for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
-			this->m_vSolidSprites[i].Draw();
-		}
-
 		if (this->m_bGameStarted) {
-			//Draw scripted entities
-			Entity::oScriptedEntMgr.Draw();
-			Entity::oScriptedEntMgr.DrawOnTop();
+			if (!this->m_oMenu.IsOpen()) {
+				//Draw solid sprites
+				for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
+					this->m_vSolidSprites[i].Draw();
+				}
 
-			//Draw goal entity
-			if (this->m_pGoalEntity) {
-				this->m_pGoalEntity->Draw();
+				//Draw scripted entities
+				Entity::oScriptedEntMgr.Draw();
+				Entity::oScriptedEntMgr.DrawOnTop();
+
+				//Draw goal entity
+				if (this->m_pGoalEntity) {
+					this->m_pGoalEntity->Draw();
+				}
 			}
 		}
 
@@ -136,29 +138,35 @@ namespace Game {
 
 		//Reset indicator
 		this->m_bGameStarted = false;
+
+		//Inform menu
+		this->m_oMenu.OnStopGame();
 	}
 
 	void CGame::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		//Called for mouse events
 		
-		//Inform player entity
-		if (!iMouseKey) {
-			const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
-			Entity::Vector vPos(x, y);
-			BEGIN_PARAMS(vArgs);
-			PUSH_OBJECT(&vPos);
-			pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnUpdateCursor(const Vector &in pos)", &vArgs, nullptr, Scripting::FA_VOID);
+		if (!this->m_oMenu.IsOpen()) {
+			//Inform player entity
+			if (!iMouseKey) {
+				const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
+				Entity::Vector vPos(x, y);
+				BEGIN_PARAMS(vArgs);
+				PUSH_OBJECT(&vPos);
+				pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnUpdateCursor(const Vector &in pos)", &vArgs, nullptr, Scripting::FA_VOID);
+			}
+			else {
+				const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
+				BEGIN_PARAMS(vArgs);
+				PUSH_DWORD(iMouseKey);
+				PUSH_BYTE(bDown);
+				pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnMousePress(int key, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
+			}
 		} else {
-			const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
-			BEGIN_PARAMS(vArgs);
-			PUSH_DWORD(iMouseKey);
-			PUSH_BYTE(bDown);
-			pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnMousePress(int key, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
+			//Pass to menu
+			this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
-
-		//Pass to menu
-		this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 	}
 
 	void CGame::OnMouseWheel(short wDistance, bool bForward)
@@ -174,19 +182,37 @@ namespace Game {
 
 			return;
 		}
+
+		if (this->m_oMenu.IsOpen()) {
+			//this->m_oMenu.OnMouseWheel(wDistance, bForward);
+		}
 	}
 
 	void CGame::OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		//Called for key events
 		
-		const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
+		if (vKey == this->m_oInputMgr.GetKeyBindingCode(L"MENU")) {
+			if (!bDown) {
+				this->m_oMenu.SetOpenStatus(!this->m_oMenu.IsOpen());
 
-		BEGIN_PARAMS(vArgs);
-		PUSH_DWORD(vKey);
-		PUSH_BYTE(bDown);
-		
-		pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnKeyPress(int vKey, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
+				this->m_bGamePause = this->m_oMenu.IsOpen();
+
+				return;
+			}
+		}
+
+		if (!this->m_oMenu.IsOpen()) {
+			const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
+
+			BEGIN_PARAMS(vArgs);
+			PUSH_DWORD(vKey);
+			PUSH_BYTE(bDown);
+
+			pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnKeyPress(int vKey, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
+		} else {
+			this->m_oMenu.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
 	}
 
 	void CWindowEvents::OnCreated(HWND hWnd)

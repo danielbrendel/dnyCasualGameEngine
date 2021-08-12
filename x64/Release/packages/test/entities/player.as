@@ -231,8 +231,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
-		Print("OnKeyPress: " + formatInt(vKey));
-	
 		if (vKey == GetKeyBinding("TURN_LEFT")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT)) {
@@ -318,7 +316,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Called for getting current cursor position
 	void OnUpdateCursor(const Vector &in pos)
 	{
-	
 	}
 }
 

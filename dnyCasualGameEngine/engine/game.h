@@ -87,6 +87,7 @@ namespace Game {
 		std::vector<entityscript_s> m_vEntityScripts;
 		Entity::CGoalEntity* m_pGoalEntity;
 		Input::CInputMgr m_oInputMgr;
+		bool m_bGamePause;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -257,7 +258,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -380,7 +381,7 @@ namespace Game {
 			}
 			
 			//Initialize menu
-			if (!m_oMenu.Initialize(pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue)) {
+			if (!m_oMenu.Initialize(pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue, &this->m_bGameStarted)) {
 				this->Release();
 				return false;
 			}
@@ -417,6 +418,8 @@ namespace Game {
 			if (!this->m_bInit) {
 				return false;
 			}
+
+			this->m_bGamePause = false;
 
 			//Load package
 			return this->LoadPackage(wszPackage);
@@ -460,6 +463,18 @@ namespace Game {
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
 		void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
 		void OnMouseWheel(short wDistance, bool bForward);
+
+		void ResumeGame(void)
+		{
+			//Resume game
+
+			if (!this->m_bGameStarted) {
+				return;
+			}
+
+			this->m_oMenu.SetOpenStatus(false);
+			this->m_bGamePause = false;
+		}
 
 		void Release(void)
 		{

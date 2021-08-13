@@ -424,7 +424,13 @@ namespace Game {
 			this->m_oMenu.SetOpenStatus(false);
 
 			//Load package
-			return this->LoadPackage(wszPackage);
+			bool bResult = this->LoadPackage(wszPackage);
+			if (!bResult) {
+				this->m_oMenu.SetOpenStatus(true);
+				return false;
+			}
+
+			return true;
 		}
 
 		void StopGame(void);

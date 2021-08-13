@@ -73,7 +73,7 @@ namespace Menu {
 		bool m_bHover;
 		Entity::Vector m_vecMousePos;
 	public:
-		CButton() : m_bHover(false) {}
+		CButton() : m_bHover(false), m_pOwner(nullptr) {}
 		~CButton() {}
 
 		void Draw(void)
@@ -119,6 +119,131 @@ namespace Menu {
 		void SetFrameColor(const Entity::Color& color) { this->m_sFrameColor = color; }
 		void SetFillColor(const Entity::Color& color) { this->m_sFillColor = color; }
 		void SetHoverColor(const Entity::Color& color) { this->m_sHoverColor = color; }
+	};
+
+	class IImageListViewSelector {
+	public:
+		virtual void OnImageSelected(class CImageListView* pImageListView, size_t uiItemId) = 0;
+	};
+	class CImageListView {
+	public:
+		struct viewitem_s {
+			DxRenderer::HD3DSPRITE hSprite;
+			std::wstring wszIdent;
+		};
+	private:
+		IImageListViewSelector* m_pOwner;
+		Entity::Vector m_vecPos;
+		Entity::Vector m_vecSize;
+		Entity::Vector m_vecImageSize;
+		Entity::Color m_sHoverColor;
+		Entity::Color m_sSelectColor;
+		bool m_bHover;
+		Entity::Vector m_vecMousePos;
+		std::vector<viewitem_s> m_vItems;
+		size_t m_uiItemDisplayCountX;
+		size_t m_uiItemDisplayCountY;
+		int m_iImageGap;
+		size_t m_uiDrawingIndex;
+		size_t m_uiSelectedItem;
+		size_t m_uiHoverItem;
+	public:
+		CImageListView() : m_bHover(false), m_pOwner(nullptr), m_uiDrawingIndex(0), m_uiSelectedItem(0) {}
+		~CImageListView() {}
+
+		void AddItem(DxRenderer::HD3DSPRITE hSprite, const std::wstring& wszIdent)
+		{
+			//Add item to list
+
+			viewitem_s sItem;
+			sItem.hSprite = hSprite;
+			sItem.wszIdent = wszIdent;
+
+			this->m_vItems.push_back(sItem);
+		}
+
+		void Draw(void)
+		{
+			//Draw list view
+			
+			this->m_uiHoverItem = std::string::npos;
+
+			size_t uiLoopMax = (this->m_uiDrawingIndex < this->m_vItems.size() - this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY) ? this->m_uiDrawingIndex + this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY : this->m_vItems.size();
+
+			for (size_t i = this->m_uiDrawingIndex; i < uiLoopMax; i++) {
+				int countx = (int)((i - this->m_uiDrawingIndex) % this->m_uiItemDisplayCountX);
+				int county = (int)((i - this->m_uiDrawingIndex) / this->m_uiItemDisplayCountY);
+				int xpos = this->m_vecPos[0] + (countx * (this->m_iImageGap * 2 + this->m_vecImageSize[0]));
+				int ypos = this->m_vecPos[1] + (county * (this->m_iImageGap * 2 + this->m_vecImageSize[1]));
+
+				this->m_bHover = false;
+				if ((this->m_vecMousePos[0] > xpos) && (this->m_vecMousePos[0] < xpos + this->m_vecImageSize[0]) && (this->m_vecMousePos[1] > ypos) && (this->m_vecMousePos[1] < ypos + this->m_vecImageSize[1])) {
+					this->m_bHover = true;
+					this->m_uiHoverItem = i;
+				}
+
+				if (this->m_bHover) {
+					pRenderer->DrawBox(xpos - 1, ypos - 1, this->m_vecImageSize[0] + 1, this->m_vecImageSize[1] + 1, 1, this->m_sHoverColor.r, this->m_sHoverColor.g, this->m_sHoverColor.b, this->m_sHoverColor.a);
+				}
+
+				if (this->m_uiSelectedItem == i) {
+					pRenderer->DrawBox(xpos - 1, ypos - 1, this->m_vecImageSize[0] + 1, this->m_vecImageSize[1] + 1, 1, this->m_sSelectColor.r, this->m_sSelectColor.g, this->m_sSelectColor.b, this->m_sSelectColor.a);
+				}
+
+
+				pRenderer->DrawSprite(this->m_vItems[i].hSprite, xpos, ypos, 0, 0.0f);
+			}
+		}
+
+		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			if (!iMouseKey) {
+				this->m_vecMousePos = Entity::Vector(x, y);
+			} else {
+				if ((iMouseKey == 1) && (!bDown) && (this->m_uiHoverItem != std::string::npos)) {
+					this->m_uiSelectedItem = this->m_uiHoverItem;
+					this->m_pOwner->OnImageSelected(this, this->m_uiSelectedItem);
+				}
+			}
+		}
+
+		void OnMouseWheelEvent(short wDistance, bool bForward)
+		{
+			//Handle mouse wheel event
+			
+			if (!bForward) {
+				if (this->m_uiDrawingIndex < this->m_vItems.size() - this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY) {
+					this->m_uiDrawingIndex++;
+				}
+			} else {
+				if (this->m_uiDrawingIndex > 0) {
+					this->m_uiDrawingIndex--;
+				}
+			}
+		}
+
+		void UpdateDimensions(void)
+		{
+			//Update drawing dimension information
+
+			this->m_uiItemDisplayCountX = this->m_vecSize[0] / (this->m_vecImageSize[0] + this->m_iImageGap * 2);
+			this->m_uiItemDisplayCountY = this->m_vecSize[1] / (this->m_vecImageSize[1] + this->m_iImageGap * 2);
+		}
+
+		//Setters
+		void SetOwner(IImageListViewSelector* pOwner) { this->m_pOwner = pOwner; }
+		void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
+		void SetSize(const Entity::Vector& vec) { this->m_vecSize = vec;  }
+		void SetImageSize(const Entity::Vector& vec) { this->m_vecImageSize = vec; }
+		void SetImageGap(int val) { this->m_iImageGap = val; }
+		void SetHoverColor(const Entity::Color& color) { this->m_sHoverColor = color; }
+		void SetSelectColor(const Entity::Color& color) { this->m_sSelectColor = color; }
+
+		//Getters
+		const size_t GetSelection(void) { return this->m_uiSelectedItem; }
+		const viewitem_s& GetItem(const size_t uiIdent) const { static viewitem_s sDummy;  if (uiIdent < this->m_vItems.size()) return this->m_vItems[uiIdent]; else return sDummy; }
 	};
 
 	#define MAINMENU_FONTSIZE_W 15
@@ -265,7 +390,7 @@ namespace Menu {
 		}
 	};
 
-	class CPackageMenu : public IMenu, public IButtonClickHandler {
+	class CPackageMenu : public IMenu, public IButtonClickHandler, IImageListViewSelector {
 	private:
 		struct package_s {
 			std::wstring wszIdent;
@@ -275,10 +400,10 @@ namespace Menu {
 
 		std::vector<package_s> m_vPackages;
 		size_t m_uiSelectedPackage;
-		bool m_bPlayButtonHover;
 		CButton m_oButton;
+		CImageListView m_oImageListView;
 	public:
-		CPackageMenu() : m_uiSelectedPackage(std::string::npos), m_bPlayButtonHover(false) {}
+		CPackageMenu() : m_uiSelectedPackage(std::string::npos) {}
 		~CPackageMenu() {}
 
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
@@ -303,6 +428,8 @@ namespace Menu {
 						sPackage.hPreview = pRenderer->LoadSprite(wszBasePath + L"packages\\" + sPackage.wszIdent + L"\\preview.png", 1, 195, 90, 1, true);
 						
 						this->m_vPackages.push_back(sPackage);
+
+						this->m_oImageListView.AddItem(sPackage.hPreview, sPackage.wszIdent);
 					}
 				}
 
@@ -322,6 +449,15 @@ namespace Menu {
 			this->m_oButton.SetFrameColor(Entity::Color(0, 0, 0, 150));
 			this->m_oButton.SetFillColor(Entity::Color(103, 225, 123, 150));
 			this->m_oButton.SetHoverColor(Entity::Color(143, 235, 155, 150));
+
+			this->m_oImageListView.SetOwner(this);
+			this->m_oImageListView.SetPosition(Entity::Vector(250, 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
+			this->m_oImageListView.SetSize(Entity::Vector(700, 400));
+			this->m_oImageListView.SetImageGap(10);
+			this->m_oImageListView.SetImageSize(Entity::Vector(195, 90));
+			this->m_oImageListView.SetHoverColor(Entity::Color(0, 150, 0, 150));
+			this->m_oImageListView.SetSelectColor(Entity::Color(0, 200, 0, 150));
+			this->m_oImageListView.UpdateDimensions();
 			
 			return true;
 		}
@@ -335,8 +471,6 @@ namespace Menu {
 
 			const int iStartPosX = 250;
 			const int iStartPosY = 200;
-			const int iButtonWidth = 130;
-			const int iButtonHeight = 35;
 
 			//Draw selected package preview
 			if ((this->m_uiSelectedPackage != std::string::npos) && (this->m_uiSelectedPackage < this->m_vPackages.size())) {
@@ -345,20 +479,8 @@ namespace Menu {
 					pRenderer->DrawString(pDefaultFont, this->m_vPackages[this->m_uiSelectedPackage].vAboutContent[i], iStartPosX, iStartPosY + (int)i * iDefaultFontSize[1], 200, 200, 200, 150);
 				}
 
-				this->m_bPlayButtonHover = false;
-				if ((this->m_iMouseX > iStartPosX + 1) && (this->m_iMouseX < iStartPosX + 1 + iButtonWidth) && (this->m_iMouseY > iStartPosY + 1 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]) && (this->m_iMouseY < iStartPosY + 1 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + iButtonHeight)) {
-					this->m_bPlayButtonHover = true;
-				}
-
-				//Draw play button
-				/*pRenderer->DrawBox(iStartPosX, iStartPosY + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], iButtonWidth, iButtonHeight, 2, 0, 0, 0, 150);
-				if (this->m_bPlayButtonHover) {
-					pRenderer->DrawFilledBox(iStartPosX + 1, iStartPosY + 1 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], iButtonWidth, iButtonHeight - 1, 143, 235, 155, 150);
-				} else {
-					pRenderer->DrawFilledBox(iStartPosX + 1, iStartPosY + 1 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], iButtonWidth, iButtonHeight - 1, 103, 225, 123, 150);
-				}
-				pRenderer->DrawString(pDefaultFont, L"Play!", iStartPosX + iButtonWidth / 2 - iDefaultFontSize[0] * 5 / 2, iStartPosY + iButtonHeight / 2 - iDefaultFontSize[1] / 2 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], 250, 250, 250, 150);*/
 				this->m_oButton.Draw();
+				this->m_oImageListView.Draw();
 			}
 		}
 
@@ -376,8 +498,17 @@ namespace Menu {
 		//Called for mouse events
 		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
 
+		//Called for mouse wheel events
+		virtual void OnMouseWheelEvent(short wDistance, bool bForward)
+		{
+			this->m_oImageListView.OnMouseWheelEvent(wDistance, bForward);
+		}
+
 		//Called for button click events
 		virtual void OnButtonClick(class CButton* pButton);
+
+		//Called for image list view selection events
+		virtual void OnImageSelected(CImageListView* pImageListView, size_t uiItemId);
 
 		virtual void SetActiveStatus(bool status)
 		{
@@ -449,6 +580,10 @@ namespace Menu {
 		void OnMouseWheel(short wDistance, bool bForward)
 		{
 			//Handle mouse wheel event
+			
+			if (this->m_oPackageMenu.IsActive()) {
+				this->m_oPackageMenu.OnMouseWheelEvent(wDistance, bForward);
+			}
 		}
 
 		void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

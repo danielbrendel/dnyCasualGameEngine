@@ -185,7 +185,7 @@ namespace Game {
 		}
 
 		if (this->m_oMenu.IsOpen()) {
-			//this->m_oMenu.OnMouseWheel(wDistance, bForward);
+			this->m_oMenu.OnMouseWheel(wDistance, bForward);
 		}
 	}
 
@@ -195,7 +195,9 @@ namespace Game {
 		
 		if (vKey == this->m_oInputMgr.GetKeyBindingCode(L"MENU")) {
 			if (!bDown) {
-				this->m_oMenu.SetOpenStatus(!this->m_oMenu.IsOpen());
+				if (this->m_bGameStarted) {
+					this->m_oMenu.SetOpenStatus(!this->m_oMenu.IsOpen());
+				}
 
 				this->m_bGamePause = this->m_oMenu.IsOpen();
 

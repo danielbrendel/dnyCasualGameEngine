@@ -15,14 +15,13 @@
 namespace Menu {
 	void CPackageMenu::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
-		if (!iMouseKey) {
-			this->m_iMouseX = x;
-			this->m_iMouseY = y;
-		}
-		else {
-			if ((iMouseKey == 1) && (this->m_bPlayButtonHover)) {
-				Game::pGame->StartGame(this->m_vPackages[this->m_uiSelectedPackage].wszIdent);
-			}
+		this->m_oButton.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+	}
+
+	void CPackageMenu::OnButtonClick(class CButton* pButton)
+	{
+		if (pButton == &this->m_oButton) {
+			Game::pGame->StartGame(this->m_vPackages[this->m_uiSelectedPackage].wszIdent);
 		}
 	}
 

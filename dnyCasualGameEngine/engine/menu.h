@@ -13,6 +13,7 @@
 
 #include "shared.h"
 #include "vars.h"
+#include "entity.h"
 
 /* Menu component */
 namespace Menu {
@@ -53,6 +54,71 @@ namespace Menu {
 		{
 			return this->m_bActive;
 		}
+	};
+
+	class IButtonClickHandler {
+	public:
+		virtual void OnButtonClick(class CButton* pButton) = 0;
+	};
+	class CButton {
+	private:
+		IButtonClickHandler* m_pOwner;
+		std::wstring m_wszText;
+		Entity::Color m_sTextColor;
+		Entity::Color m_sFrameColor;
+		Entity::Color m_sFillColor;
+		Entity::Color m_sHoverColor;
+		Entity::Vector m_vecPos;
+		Entity::Vector m_vecSize;
+		bool m_bHover;
+		Entity::Vector m_vecMousePos;
+	public:
+		CButton() : m_bHover(false) {}
+		~CButton() {}
+
+		void Draw(void)
+		{
+			//Draw button
+
+			this->m_bHover = false;
+			if ((this->m_vecMousePos[0] > this->m_vecPos[0]) && (this->m_vecMousePos[0] < this->m_vecPos[0] + this->m_vecSize[0]) && (this->m_vecMousePos[1] > this->m_vecPos[1]) && (this->m_vecMousePos[1] < this->m_vecPos[1] + this->m_vecSize[1])) {
+				this->m_bHover = true;
+			}
+
+			pRenderer->DrawBox(this->m_vecPos[0], this->m_vecPos[1], this->m_vecSize[0], this->m_vecSize[1], 2, this->m_sFrameColor.r, this->m_sFrameColor.g, this->m_sFrameColor.b, this->m_sFrameColor.a);
+
+			if (this->m_bHover) {
+				pRenderer->DrawFilledBox(this->m_vecPos[0] + 1, this->m_vecPos[1] + 1, this->m_vecSize[0], this->m_vecSize[1] - 1, this->m_sHoverColor.r, this->m_sHoverColor.g, this->m_sHoverColor.b, this->m_sHoverColor.a);
+			}
+			else {
+				pRenderer->DrawFilledBox(this->m_vecPos[0] + 1, this->m_vecPos[1] + 1, this->m_vecSize[0], this->m_vecSize[1] - 1, this->m_sFillColor.r, this->m_sFillColor.g, this->m_sFillColor.b, this->m_sFillColor.a);
+			}
+
+			pRenderer->DrawString(pDefaultFont, this->m_wszText, this->m_vecPos[0] + this->m_vecSize[0] / 2 - (iDefaultFontSize[0] * (int)this->m_wszText.length()) / 2, this->m_vecPos[1] + this->m_vecSize[1] / 2 - iDefaultFontSize[1] / 2, this->m_sTextColor.r, this->m_sTextColor.g, this->m_sTextColor.b, this->m_sTextColor.a);
+		}
+
+		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			if (!iMouseKey) {
+				this->m_vecMousePos = Entity::Vector(x, y);
+			} else {
+				if ((iMouseKey == 1) && (!bDown) && (this->m_bHover)) {
+					this->m_pOwner->OnButtonClick(this);
+				}
+			}
+		}
+
+		//Setters
+		void SetOwner(IButtonClickHandler* pOwner) { this->m_pOwner = pOwner; }
+		void SetText(const std::wstring& wszText) { this->m_wszText = wszText; }
+		void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
+		void SetSize(const Entity::Vector& vec) { this->m_vecSize = vec; }
+		void SetTextColor(const Entity::Color& color) { this->m_sTextColor = color; }
+		void SetFrameColor(const Entity::Color& color) { this->m_sFrameColor = color; }
+		void SetFillColor(const Entity::Color& color) { this->m_sFillColor = color; }
+		void SetHoverColor(const Entity::Color& color) { this->m_sHoverColor = color; }
 	};
 
 	#define MAINMENU_FONTSIZE_W 15
@@ -199,7 +265,7 @@ namespace Menu {
 		}
 	};
 
-	class CPackageMenu : public IMenu {
+	class CPackageMenu : public IMenu, public IButtonClickHandler {
 	private:
 		struct package_s {
 			std::wstring wszIdent;
@@ -210,6 +276,7 @@ namespace Menu {
 		std::vector<package_s> m_vPackages;
 		size_t m_uiSelectedPackage;
 		bool m_bPlayButtonHover;
+		CButton m_oButton;
 	public:
 		CPackageMenu() : m_uiSelectedPackage(std::string::npos), m_bPlayButtonHover(false) {}
 		~CPackageMenu() {}
@@ -246,6 +313,15 @@ namespace Menu {
 			if (this->m_vPackages.size() > 0) {
 				this->m_uiSelectedPackage = 0;
 			}
+
+			this->m_oButton.SetText(L"Play!");
+			this->m_oButton.SetPosition(Entity::Vector(250, 200 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
+			this->m_oButton.SetSize(Entity::Vector(130, 35));
+			this->m_oButton.SetOwner(this);
+			this->m_oButton.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oButton.SetFrameColor(Entity::Color(0, 0, 0, 150));
+			this->m_oButton.SetFillColor(Entity::Color(103, 225, 123, 150));
+			this->m_oButton.SetHoverColor(Entity::Color(143, 235, 155, 150));
 			
 			return true;
 		}
@@ -275,13 +351,14 @@ namespace Menu {
 				}
 
 				//Draw play button
-				pRenderer->DrawBox(iStartPosX, iStartPosY + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], iButtonWidth, iButtonHeight, 2, 0, 0, 0, 150);
+				/*pRenderer->DrawBox(iStartPosX, iStartPosY + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], iButtonWidth, iButtonHeight, 2, 0, 0, 0, 150);
 				if (this->m_bPlayButtonHover) {
 					pRenderer->DrawFilledBox(iStartPosX + 1, iStartPosY + 1 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], iButtonWidth, iButtonHeight - 1, 143, 235, 155, 150);
 				} else {
 					pRenderer->DrawFilledBox(iStartPosX + 1, iStartPosY + 1 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], iButtonWidth, iButtonHeight - 1, 103, 225, 123, 150);
 				}
-				pRenderer->DrawString(pDefaultFont, L"Play!", iStartPosX + iButtonWidth / 2 - iDefaultFontSize[0] * 5 / 2, iStartPosY + iButtonHeight / 2 - iDefaultFontSize[1] / 2 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], 250, 250, 250, 150);
+				pRenderer->DrawString(pDefaultFont, L"Play!", iStartPosX + iButtonWidth / 2 - iDefaultFontSize[0] * 5 / 2, iStartPosY + iButtonHeight / 2 - iDefaultFontSize[1] / 2 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1], 250, 250, 250, 150);*/
+				this->m_oButton.Draw();
 			}
 		}
 
@@ -298,6 +375,9 @@ namespace Menu {
 
 		//Called for mouse events
 		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
+
+		//Called for button click events
+		virtual void OnButtonClick(class CButton* pButton);
 
 		virtual void SetActiveStatus(bool status)
 		{

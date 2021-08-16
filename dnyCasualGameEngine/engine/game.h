@@ -174,7 +174,7 @@ namespace Game {
 				hScript = this->m_vEntityScripts[uiScriptListId].hScript;
 			}
 
-			//Call OnSpawn() script function to let the entity be created
+			//Call CreateEntity() script function to let the entity be created
 
 			Entity::Vector vecPos(x, y);
 			std::string szIdent = Utils::ConvertToAnsiString(wszName);
@@ -186,12 +186,12 @@ namespace Game {
 			PUSH_OBJECT(&szIdent);
 			PUSH_OBJECT(&szPath);
 			
-			bool bResult = pScriptingInt->CallScriptFunction(hScript, true, "OnSpawn", &vArgs, nullptr, Scripting::FA_VOID);
+			bool bResult = pScriptingInt->CallScriptFunction(hScript, true, "CreateEntity", &vArgs, nullptr, Scripting::FA_VOID);
 
 			END_PARAMS(vArgs);
 
 			if (!bResult) {
-				pConsole->AddLine(L"Failed to call OnSpawn() in script", Console::ConColor(255, 0, 0));
+				pConsole->AddLine(L"Failed to call CreateEntity() in script", Console::ConColor(255, 0, 0));
 				pScriptingInt->UnloadScript(hScript);
 				this->m_vEntityScripts.erase(this->m_vEntityScripts.begin() + uiScriptListId);
 				return false;

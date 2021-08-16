@@ -286,7 +286,7 @@ class CTankEntity : IScriptedEntity
 }
 
 
-void OnSpawn(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
 {
 	g_szPackagePath = szPath;
 

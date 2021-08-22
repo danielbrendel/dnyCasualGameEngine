@@ -60,7 +60,7 @@ namespace Menu {
 
 	void MainMenu_OnOpenSettings(class CMenu* pMenu)
 	{
-		pConsole->AddLine(L"MainMenu_OnOpenSettings");
+		pMenu->OpenSettingsMenu();
 	}
 
 	void MainMenu_OnQuitGame(class CMenu* pMenu)

@@ -45,6 +45,11 @@ namespace Menu {
 			}
 		}
 
+		//Called for key events
+		virtual void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+		}
+
 		virtual void SetActiveStatus(bool status)
 		{
 			this->m_bActive = status;
@@ -521,10 +526,245 @@ namespace Menu {
 		}
 	};
 
+	class CTabMenu : public IMenu {
+	private:
+		struct menu_item_s {
+			std::wstring wszTitle;
+			IMenu* pMenu;
+		};
+
+		std::vector<menu_item_s> m_vItems;
+		size_t m_uiSelectedTab;
+		Entity::Color m_sColorText;
+		Entity::Color m_sColorHover;
+		Entity::Color m_sColorSelected;
+		Entity::Vector m_vecPos;
+		int m_iTabSpace;
+		Entity::Vector m_vecMousePos;
+		size_t m_uiHoverItem;
+	public:
+		CTabMenu() : m_uiSelectedTab(std::string::npos), m_uiHoverItem(std::string::npos), m_iTabSpace(20) {}
+		~CTabMenu() {}
+
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			return true;
+		}
+
+		virtual void Release(void)
+		{
+		}
+
+		virtual void AddItem(const std::wstring& wszTitle, IMenu* pMenu)
+		{
+			//Add menu item
+
+			menu_item_s sItem;
+			sItem.wszTitle = wszTitle;
+			sItem.pMenu = pMenu;
+
+			this->m_vItems.push_back(sItem);
+		}
+
+		virtual void Draw(void)
+		{
+			//Draw tab menu
+			
+			this->m_uiHoverItem = std::string::npos;
+
+			for (size_t i = 0; i < this->m_vItems.size(); i++) {
+				int xpos = this->m_vecPos[0] + ((int)i * ((iDefaultFontSize[0] * (int)this->m_vItems[i].wszTitle.length()) + this->m_iTabSpace));
+				int ypos = this->m_vecPos[1];
+				
+				if (this->m_uiSelectedTab == i) {
+					pRenderer->DrawFilledBox(xpos - 10, ypos - 10, (int)this->m_vItems[i].wszTitle.length() * iDefaultFontSize[0] + 20, iDefaultFontSize[1] + 20, this->m_sColorSelected.r, this->m_sColorSelected.g, this->m_sColorSelected.b, this->m_sColorSelected.a);
+				}
+
+				if ((this->m_vecMousePos[0] > xpos) && (this->m_vecMousePos[0] < xpos + (int)this->m_vItems[i].wszTitle.length() * iDefaultFontSize[0]) && (this->m_vecMousePos[1] > ypos) && (this->m_vecMousePos[1] < ypos + iDefaultFontSize[1])) {
+					this->m_uiHoverItem = i;
+
+					pRenderer->DrawBox(xpos - 10, ypos - 10, (int)this->m_vItems[i].wszTitle.length() * iDefaultFontSize[0] + 20, iDefaultFontSize[1] + 20, 2, this->m_sColorHover.r, this->m_sColorHover.g, this->m_sColorHover.b, this->m_sColorHover.a);
+				}
+
+				pRenderer->DrawString(pDefaultFont, this->m_vItems[i].wszTitle, xpos, ypos, this->m_sColorText.r, this->m_sColorText.g, this->m_sColorText.b, this->m_sColorText.a);
+			}
+
+			if (this->m_uiSelectedTab != std::string::npos) {
+				this->m_vItems[this->m_uiSelectedTab].pMenu->Draw();
+			}
+		}
+
+		virtual void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle key events
+
+			if (this->m_uiSelectedTab != std::string::npos) {
+				this->m_vItems[this->m_uiSelectedTab].pMenu->OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			}
+		}
+
+		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			if (!iMouseKey) {
+				this->m_vecMousePos = Entity::Vector(x, y);
+			} else {
+				if ((iMouseKey == 1) && (!bDown) && (this->m_uiHoverItem != std::string::npos)) {
+					this->m_uiSelectedTab = this->m_uiHoverItem;
+				}
+			}
+
+			if (this->m_uiSelectedTab != std::string::npos) {
+				this->m_vItems[this->m_uiSelectedTab].pMenu->OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			}
+		}
+
+		//Setters
+		virtual void SetTextColor(const Entity::Color& color) { this->m_sColorText = color; }
+		virtual void SetHoverColor(const Entity::Color& color) { this->m_sColorHover = color; }
+		virtual void SetSelectedColor(const Entity::Color& color) { this->m_sColorSelected = color; }
+		virtual void SetPosition(const Entity::Vector& pos) { this->m_vecPos = pos; }
+		virtual void SetTabSpacing(int value) { this->m_iTabSpace = value; }
+	};
+
+	class CSettingsKeys : public IMenu {
+	private:
+		Entity::Vector m_vecPos;
+	public:
+		CSettingsKeys() {}
+		~CSettingsKeys() {}
+
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			return true;
+		}
+
+		virtual void Draw(void)
+		{
+			pRenderer->DrawString(pDefaultFont, L"CSettingsKeys", this->m_vecPos[0], this->m_vecPos[1], 200, 200, 200, 150);
+		}
+
+		virtual void Release(void)
+		{
+
+		}
+
+		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
+	};
+
+	class CSettingsGfx : public IMenu {
+	private:
+		Entity::Vector m_vecPos;
+	public:
+		CSettingsGfx() {}
+		~CSettingsGfx() {}
+
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			return true;
+		}
+
+		virtual void Draw(void)
+		{
+			pRenderer->DrawString(pDefaultFont, L"CSettingsGfx", this->m_vecPos[0], this->m_vecPos[1], 200, 200, 200, 150);
+		}
+
+		virtual void Release(void)
+		{
+
+		}
+
+		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
+	};
+
+	class CSettingsSnd : public IMenu {
+	private:
+		Entity::Vector m_vecPos;
+	public:
+		CSettingsSnd() {}
+		~CSettingsSnd() {}
+
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			return true;
+		}
+
+		virtual void Draw(void)
+		{
+			pRenderer->DrawString(pDefaultFont, L"CSettingsSnd", this->m_vecPos[0], this->m_vecPos[1], 200, 200, 200, 150);
+		}
+
+		virtual void Release(void)
+		{
+
+		}
+
+		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
+	};
+
+	class CSettingsMenu : public IMenu {
+	private:
+		CSettingsKeys m_oMenuKeys;
+		CSettingsGfx m_oMenuGfx;
+		CSettingsSnd m_oMenuSnd;
+		CTabMenu m_oTabMenu;
+	public:
+		CSettingsMenu() {}
+		~CSettingsMenu() {}
+
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			//Initialize settings menu
+
+			this->m_oMenuKeys.SetPosition(Entity::Vector(250, 250));
+			this->m_oMenuGfx.SetPosition(Entity::Vector(250, 250));
+			this->m_oMenuSnd.SetPosition(Entity::Vector(250, 250));
+
+			this->m_oTabMenu.AddItem(L"Bindings", &this->m_oMenuKeys);
+			this->m_oTabMenu.AddItem(L"Graphics", &this->m_oMenuGfx);
+			this->m_oTabMenu.AddItem(L"Sound   ", &this->m_oMenuSnd);
+
+			this->m_oTabMenu.SetPosition(Entity::Vector(250, 200));
+			this->m_oTabMenu.SetTabSpacing(20);
+			this->m_oTabMenu.SetTextColor(Entity::Color(200, 200, 200, 150));
+			this->m_oTabMenu.SetHoverColor(Entity::Color(50, 200, 0, 150));
+			this->m_oTabMenu.SetSelectedColor(Entity::Color(10, 150, 0, 150));
+
+			return true;
+		}
+
+		virtual void Draw(void)
+		{
+			//Draw menu
+
+			this->m_oTabMenu.Draw();
+		}
+
+		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			this->m_oTabMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		virtual void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle key events
+
+			this->m_oTabMenu.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		virtual void Release(void)
+		{
+		}
+	};
+
 	class CMenu {
 	private:
 		CMainMenu m_oMainMenu;
 		CPackageMenu m_oPackageMenu;
+		CSettingsMenu m_oSettingsMenu;
 		bool m_bOpen;
 		DxRenderer::HD3DSPRITE m_hCursor;
 		int m_iMouseX;
@@ -547,6 +787,10 @@ namespace Menu {
 			}
 
 			if (!this->m_oPackageMenu.Initialize(w, h, pGameStarted)) {
+				return false;
+			}
+
+			if (!this->m_oSettingsMenu.Initialize(w, h, pGameStarted)) {
 				return false;
 			}
 
@@ -575,6 +819,10 @@ namespace Menu {
 			if (this->m_oPackageMenu.IsActive()) {
 				this->m_oPackageMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			}
+
+			if (this->m_oSettingsMenu.IsActive()) {
+				this->m_oSettingsMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			}
 		}
 
 		void OnMouseWheel(short wDistance, bool bForward)
@@ -589,6 +837,10 @@ namespace Menu {
 		void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 		{
 			//Handke key events
+
+			if (this->m_oSettingsMenu.IsActive()) {
+				this->m_oSettingsMenu.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			}
 		}
 
 		void Draw(void)
@@ -603,6 +855,8 @@ namespace Menu {
 
 				if (this->m_oPackageMenu.IsActive()) {
 					this->m_oPackageMenu.Draw();
+				} else if (this->m_oSettingsMenu.IsActive()) {
+					this->m_oSettingsMenu.Draw();
 				}
 			}
 
@@ -628,6 +882,13 @@ namespace Menu {
 		void OpenPackageMenu(void)
 		{
 			this->m_oPackageMenu.SetActiveStatus(true);
+			this->m_oSettingsMenu.SetActiveStatus(false);
+		}
+
+		void OpenSettingsMenu(void)
+		{
+			this->m_oSettingsMenu.SetActiveStatus(true);
+			this->m_oPackageMenu.SetActiveStatus(false);
 		}
 
 		void OnStopGame(void)

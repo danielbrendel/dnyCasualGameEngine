@@ -22,7 +22,10 @@ namespace Menu {
 	void CPackageMenu::OnButtonClick(class CButton* pButton)
 	{
 		if (pButton == &this->m_oButton) {
-			Game::pGame->StartGame(this->m_vPackages[this->m_uiSelectedPackage].wszIdent);
+			if ((this->m_uiSelectedPackage >= 0) && (this->m_uiSelectedPackage < this->m_vPackages.size())) {
+				Game::pGame->StartGame(this->m_vPackages[this->m_uiSelectedPackage].wszIdent);
+				this->m_uiSelectedPackage = std::string::npos;
+			}
 		}
 	}
 
@@ -66,5 +69,17 @@ namespace Menu {
 	void MainMenu_OnQuitGame(class CMenu* pMenu)
 	{
 		Game::pGame->Release();
+	}
+
+	void CIntermissionMenu::OnButtonClick(class CButton* pButton)
+	{
+		Game::pGame->GetCursor()->SetActiveStatus(false);
+		
+		if (this->m_bGameFinished) {
+			pConsole->AddLine(L"Game has finished!");
+			Game::pGame->StopGame();
+		} else {
+			Game::pGame->LoadMap(Game::pGame->GetGoalEntity()->GetGoal() + L".cfg");
+		}
 	}
 }

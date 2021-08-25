@@ -126,6 +126,47 @@ namespace Menu {
 		void SetHoverColor(const Entity::Color& color) { this->m_sHoverColor = color; }
 	};
 
+	class CForm : public IMenu {
+	private:
+		Entity::Vector m_vecPos;
+		Entity::Vector m_vecSize;
+		std::wstring m_wszTitle;
+		Entity::Color m_sColBorder;
+		Entity::Color m_sColTitleBar;
+		Entity::Color m_sColTitleBg;
+		Entity::Color m_sColBody;
+		Entity::Color m_sColTitleText;
+	public:
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			return true;
+		}
+
+		virtual void Release(void)
+		{
+		}
+
+		void Draw(void)
+		{
+			//Draw form
+
+			pRenderer->DrawBox(this->m_vecPos[0], this->m_vecPos[1], this->m_vecSize[0], iDefaultFontSize[1] * 2, 1, this->m_sColBorder.r, this->m_sColBorder.g, this->m_sColBorder.b, this->m_sColBorder.a);
+			pRenderer->DrawFilledBox(this->m_vecPos[0] + 1, this->m_vecPos[1] + 1, this->m_vecSize[0] - 2, iDefaultFontSize[1] * 2 - 2, this->m_sColTitleBar.r, this->m_sColTitleBar.g, this->m_sColTitleBar.b, this->m_sColTitleBar.a);
+			pRenderer->DrawString(pDefaultFont, this->m_wszTitle, this->m_vecPos[0] + 10, this->m_vecPos[1] + iDefaultFontSize[1] / 2, this->m_sColTitleText.r, this->m_sColTitleText.g, this->m_sColTitleText.b, this->m_sColTitleText.a);
+			pRenderer->DrawBox(this->m_vecPos[0], this->m_vecPos[1] + iDefaultFontSize[1] * 2, this->m_vecSize[0], this->m_vecSize[1] - iDefaultFontSize[1] * 2, 1, this->m_sColBorder.r, this->m_sColBorder.g, this->m_sColBorder.b, this->m_sColBorder.a);
+			pRenderer->DrawFilledBox(this->m_vecPos[0] + 1, this->m_vecPos[1] + iDefaultFontSize[1] * 2 + 2, this->m_vecSize[0] - 2, this->m_vecSize[1] - iDefaultFontSize[1] * 2 - 1, this->m_sColBody.r, this->m_sColBody.g, this->m_sColBody.b, this->m_sColBody.a);
+		}
+
+		//Setters
+		void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
+		void SetSize(const Entity::Vector& vec) { this->m_vecSize = vec; }
+		void SetTitle(const std::wstring& wszTitle) { this->m_wszTitle = wszTitle; }
+		void SetBorderColor(const Entity::Color& col) { this->m_sColBorder = col; }
+		void SetTitleBarColor(const Entity::Color& col) { this->m_sColTitleBar = col; }
+		void SetBodyColor(const Entity::Color& col) { this->m_sColBody = col; }
+		void SetTitleTextColor(const Entity::Color& col) { this->m_sColTitleText = col; }
+	};
+
 	class IImageListViewSelector {
 	public:
 		virtual void OnImageSelected(class CImageListView* pImageListView, size_t uiItemId) = 0;
@@ -485,8 +526,9 @@ namespace Menu {
 				}
 
 				this->m_oButton.Draw();
-				this->m_oImageListView.Draw();
 			}
+
+			this->m_oImageListView.Draw();
 		}
 
 		virtual void Release(void)
@@ -760,13 +802,65 @@ namespace Menu {
 		}
 	};
 
+	class CCursor {
+	private:
+		DxRenderer::HD3DSPRITE m_hCursor;
+		Entity::Vector m_vecPos;
+		bool m_bActive;
+	public:
+		CCursor() : m_bActive(false) {}
+		~CCursor() {}
+
+		bool Initialize(void)
+		{
+			//Initialize cursor
+
+			this->m_hCursor = pRenderer->LoadSprite(wszBasePath + L"media\\menucursor.png", 1, 16, 16, 1, false);
+			if (this->m_hCursor == GFX_INVALID_SPRITE_ID) {
+				return false;
+			}
+
+			return true;
+		}
+
+		void Release(void)
+		{
+			//Release resource
+
+			pRenderer->FreeSprite(this->m_hCursor);
+		}
+
+		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			if (!iMouseKey) {
+				this->m_vecPos = Entity::Vector(x, y);
+			}
+		}
+
+		void Draw(void)
+		{
+			//Draw cursor
+
+			if (!this->m_bActive) {
+				return;
+			}
+
+			pRenderer->DrawSprite(this->m_hCursor, this->m_vecPos[0], this->m_vecPos[1], 0, 0.0f);
+		}
+
+		//Getter and setter
+		bool IsActive(void) { return this->m_bActive; }
+		void SetActiveStatus(bool value) { this->m_bActive = value; }
+	};
+
 	class CMenu {
 	private:
 		CMainMenu m_oMainMenu;
 		CPackageMenu m_oPackageMenu;
 		CSettingsMenu m_oSettingsMenu;
 		bool m_bOpen;
-		DxRenderer::HD3DSPRITE m_hCursor;
 		int m_iMouseX;
 		int m_iMouseY;
 	public:
@@ -776,11 +870,6 @@ namespace Menu {
 		bool Initialize(int w, int h, bool* pGameStarted)
 		{
 			//Initialize menu
-
-			this->m_hCursor = pRenderer->LoadSprite(wszBasePath + L"media\\menucursor.png", 1, 16, 16, 1, false);
-			if (this->m_hCursor == GFX_INVALID_SPRITE_ID) {
-				return false;
-			}
 
 			if (!this->m_oMainMenu.Initialize(w, h, pGameStarted)) {
 				return false;
@@ -859,8 +948,6 @@ namespace Menu {
 					this->m_oSettingsMenu.Draw();
 				}
 			}
-
-			pRenderer->DrawSprite(this->m_hCursor, this->m_iMouseX, this->m_iMouseY, 0, 0.0f);
 		}
 
 		void Release(void)
@@ -891,6 +978,12 @@ namespace Menu {
 			this->m_oPackageMenu.SetActiveStatus(false);
 		}
 
+		void OnCloseAll(void)
+		{
+			this->m_oPackageMenu.SetActiveStatus(false);
+			this->m_oSettingsMenu.SetActiveStatus(false);
+		}
+
 		void OnStopGame(void)
 		{
 			this->m_oMainMenu.OnToggleGameActiveMenuItems();
@@ -900,5 +993,96 @@ namespace Menu {
 		{
 			return this->m_bOpen;
 		}
+	};
+
+	class CIntermissionMenu : public IButtonClickHandler {
+	private:
+		CForm m_oForm;
+		CButton m_oButton;
+		int m_iScore;
+		std::wstring m_wszTitle;
+		bool m_bGameFinished;
+		Entity::Vector m_vecPos;
+		Entity::Vector m_vecSize;
+	public:
+		CIntermissionMenu() : m_bGameFinished(false) {}
+		~CIntermissionMenu() {}
+
+		bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			//Initialize dialog
+
+			this->m_vecSize = Entity::Vector(w, h);
+
+			if (!this->m_oForm.Initialize(w, h, pGameStarted)) {
+				return false;
+			}
+
+			this->m_oForm.SetSize(this->m_vecSize);
+			this->m_oForm.SetBodyColor(Entity::Color(150, 150, 150, 150));
+			this->m_oForm.SetBorderColor(Entity::Color(200, 200, 200, 150));
+			this->m_oForm.SetTitleBarColor(Entity::Color(50, 125, 0, 150));
+			this->m_oForm.SetTitleTextColor(Entity::Color(250, 250, 250, 150));
+
+			this->m_oButton.SetFrameColor(Entity::Color(200, 200, 200, 150));
+			this->m_oButton.SetFillColor(Entity::Color(50, 150, 50, 150));
+			this->m_oButton.SetHoverColor(Entity::Color(70, 180, 70, 150));
+			this->m_oButton.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oButton.SetSize(Entity::Vector(300, 35));
+			this->m_oButton.SetOwner(this);
+
+			return true;
+		}
+
+		void SetGameFinishState(bool value) 
+		{ 
+			//Set game state value
+
+			this->m_bGameFinished = value; 
+
+			if (value) {
+				this->m_oButton.SetText(L"Return to main menu");
+				this->m_oForm.SetTitle(L"Game completed!");
+			} else {
+				this->m_oButton.SetText(L"Proceed with next map");
+				this->m_oForm.SetTitle(L"Map completed!");
+			}
+		}
+
+		void SetGameScore(int value)
+		{
+			//Set game score value
+
+			this->m_iScore = value;
+		}
+
+		void SetPosition(const Entity::Vector& vec)
+		{
+			//Set position
+
+			this->m_vecPos = vec;
+
+			this->m_oForm.SetPosition(vec);
+			this->m_oButton.SetPosition(Entity::Vector(vec[0] + 10, vec[1] + this->m_vecSize[1] - 45));
+		}
+
+		void Draw(void)
+		{
+			//Draw menu
+
+			this->m_oForm.Draw();
+			this->m_oButton.Draw();
+
+			pRenderer->DrawString(pDefaultFont, L"Your achieved score: " + std::to_wstring(this->m_iScore), this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, 200, 200, 200, 150);
+		}
+
+		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			this->m_oButton.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		virtual void OnButtonClick(class CButton* pButton);
 	};
 }

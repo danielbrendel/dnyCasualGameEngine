@@ -628,7 +628,8 @@ namespace Entity {
 		REG_IF("IPlayerEntity");
 		REG_IFM("IPlayerEntity", "void OnKeyPress(int vKey, bool bDown)");
 		REG_IFM("IPlayerEntity", "void OnMousePress(int key, bool bDown)");
-		REG_IFM("IPlayerEntity", "void OnUpdateCursor(const Vector &in pos)")
+		REG_IFM("IPlayerEntity", "void OnUpdateCursor(const Vector &in pos)");
+		REG_IFM("IPlayerEntity", "int GetPlayerScore()");
 
 		//Register scripting API
 

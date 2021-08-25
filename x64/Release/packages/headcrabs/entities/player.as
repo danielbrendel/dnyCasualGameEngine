@@ -339,6 +339,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	void OnUpdateCursor(const Vector &in pos)
 	{
 	}
+	
+	//Called for returning the current score
+	int GetPlayerScore()
+	{
+		return 100;
+	}
 }
 
 

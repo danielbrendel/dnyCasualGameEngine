@@ -21,6 +21,8 @@ namespace Game {
 
 		pConsole->AddLine(L"Loading map: " + wszMap);
 
+		this->m_bShowIntermission = false;
+
 		//Free old resources
 
 		for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
@@ -60,11 +62,15 @@ namespace Game {
 					//Handle if game goal reached
 					if (this->m_pGoalEntity->IsGoalReached()) {
 						if (this->m_pGoalEntity->GetGoal() == L"#finished") { //Package game has finished
-							pConsole->AddLine(L"Game has finished!");
-							this->StopGame();
-						} else { //Load next map
-							this->LoadMap(this->m_pGoalEntity->GetGoal() + L".cfg");
+							this->m_oIntermissionMenu.SetGameFinishState(true);
+						} else { //Current map has finished and a next map is following
+							this->m_oIntermissionMenu.SetGameFinishState(false);
 						}
+
+						this->m_oIntermissionMenu.SetGameScore(this->GetLocalPlayerScore());
+						this->m_bShowIntermission = true;
+						this->m_bGamePause = true;
+						this->m_oCursor.SetActiveStatus(true);
 					}
 				}
 			}
@@ -90,6 +96,11 @@ namespace Game {
 				if (this->m_pGoalEntity) {
 					this->m_pGoalEntity->Draw();
 				}
+
+				//Draw intermission menu if active
+				if (this->m_bShowIntermission) {
+					this->m_oIntermissionMenu.Draw();
+				}
 			}
 		}
 
@@ -107,6 +118,9 @@ namespace Game {
 		if (pConsole) {
 			pConsole->Draw();
 		}
+
+		//Draw cursor
+		this->m_oCursor.Draw();
 	}
 
 	void CGame::StopGame(void)
@@ -137,17 +151,28 @@ namespace Game {
 		}
 
 		//Reset indicator
+		this->m_bShowIntermission = false;
 		this->m_bGameStarted = false;
 
 		//Inform menu
 		this->m_oMenu.OnStopGame();
+		this->m_oMenu.OnCloseAll();
 		this->m_oMenu.SetOpenStatus(true);
+
+		//Show cursor
+		this->m_oCursor.SetActiveStatus(true);
 	}
 
 	void CGame::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		//Called for mouse events
 		
+		this->m_oCursor.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+
+		if (this->m_bShowIntermission) { //Inform intermission menu
+			this->m_oIntermissionMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
 		if (!this->m_oMenu.IsOpen()) {
 			//Inform player entity
 			if (!iMouseKey) {
@@ -156,8 +181,7 @@ namespace Game {
 				BEGIN_PARAMS(vArgs);
 				PUSH_OBJECT(&vPos);
 				pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnUpdateCursor(const Vector &in pos)", &vArgs, nullptr, Scripting::FA_VOID);
-			}
-			else {
+			} else {
 				const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
 				BEGIN_PARAMS(vArgs);
 				PUSH_DWORD(iMouseKey);
@@ -197,6 +221,7 @@ namespace Game {
 			if (!bDown) {
 				if (this->m_bGameStarted) {
 					this->m_oMenu.SetOpenStatus(!this->m_oMenu.IsOpen());
+					this->m_oCursor.SetActiveStatus(this->m_oMenu.IsOpen());
 				}
 
 				this->m_bGamePause = this->m_oMenu.IsOpen();

@@ -88,6 +88,9 @@ namespace Game {
 		Entity::CGoalEntity* m_pGoalEntity;
 		Input::CInputMgr m_oInputMgr;
 		bool m_bGamePause;
+		bool m_bShowIntermission;
+		Menu::CIntermissionMenu m_oIntermissionMenu;
+		Menu::CCursor m_oCursor;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -141,8 +144,6 @@ namespace Game {
 
 			return this->m_bGameStarted;
 		}
-
-		bool LoadMap(const std::wstring& wszMap);
 
 		bool SpawnEntity(const std::wstring& wszName, int x, int y, float rot)
 		{
@@ -258,7 +259,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -393,6 +394,14 @@ namespace Game {
 			pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");
 			this->m_oMenu.SetOpenStatus(true);
 
+			//Initialize intermission menu
+			this->m_oIntermissionMenu.Initialize(400, 250, &this->m_bGameStarted);
+			this->m_oIntermissionMenu.SetPosition(Entity::Vector(pWindow->GetResolutionX() / 2 - 200, pWindow->GetResolutionY() / 2 - 125));
+
+			//Initialize and activate cursor
+			this->m_oCursor.Initialize();
+			this->m_oCursor.SetActiveStatus(true);
+
 			//Add info text
 			pConsole->AddLine(APP_NAME L" v" APP_VERSION L" developed by " APP_AUTHOR L" (" APP_CONTACT L")", Console::ConColor(100, 215, 255));
 			pConsole->AddLine(L"");
@@ -422,6 +431,7 @@ namespace Game {
 			this->m_bGamePause = false;
 
 			this->m_oMenu.SetOpenStatus(false);
+			this->m_oCursor.SetActiveStatus(false);
 
 			//Load package
 			bool bResult = this->LoadPackage(wszPackage);
@@ -432,6 +442,8 @@ namespace Game {
 
 			return true;
 		}
+
+		bool LoadMap(const std::wstring& wszMap);
 
 		void StopGame(void);
 
@@ -468,6 +480,19 @@ namespace Game {
 			return false;
 		}
 
+		int GetLocalPlayerScore(void)
+		{
+			//Get local player score
+
+			const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
+
+			int iScore;
+
+			pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "int GetPlayerScore()", nullptr, &iScore, Scripting::FA_DWORD);
+
+			return iScore;
+		}
+
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
 		void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld);
 		void OnMouseWheel(short wDistance, bool bForward);
@@ -491,6 +516,9 @@ namespace Game {
 			//Stop current game
 			this->StopGame();
 
+			//Free cursor
+			this->m_oCursor.Release();
+
 			//Free memory
 			FREE(pConsole);
 			FREE(pSound);
@@ -508,5 +536,9 @@ namespace Game {
 		std::wstring GetPackagePath(void) { return wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\"; }
 		//Return key binding
 		int GetKeyBinding(const std::wstring& wszIdent) { return this->m_oInputMgr.GetKeyBindingCode(wszIdent); }
+		//Get goal entity
+		Entity::CGoalEntity* GetGoalEntity(void) { return this->m_pGoalEntity; }
+		//Get cursor
+		Menu::CCursor* GetCursor(void) { return &this->m_oCursor; }
 	};
 }

@@ -1,0 +1,7 @@
+packagename headcrabs
+title Headcrabs
+description Survive against the headcrabs!
+visibility true
+tags none
+preview $FROM_PATH
+changenote 1.1 change

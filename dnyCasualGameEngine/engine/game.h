@@ -11,6 +11,8 @@
 	Released under the MIT license
 */
 
+#pragma warning(disable : 4996)
+
 #include "renderer.h"
 #include "sound.h"
 #include "window.h"
@@ -18,6 +20,8 @@
 #include "entity.h"
 #include "menu.h"
 #include "input.h"
+#include <steam_api.h>
+#include "workshop.h"
 
 /* Game specific environment */
 namespace Game {
@@ -51,10 +55,14 @@ namespace Game {
 	void Cmd_EnvGoal(void);
 	void Cmd_Bind(void);
 
+	void OnHandleWorkshopItem(const std::wstring& wszItem);
+	void HandlePackageUpload(const std::wstring& wszArgs);
+
 	class CGame {
 	private:
 		struct package_s {
 			std::wstring wszPakName;
+			std::wstring wszPakPath;
 			std::wstring wszName;
 			std::wstring wszVersion;
 			std::wstring wszAuthor;
@@ -91,6 +99,7 @@ namespace Game {
 		bool m_bShowIntermission;
 		Menu::CIntermissionMenu m_oIntermissionMenu;
 		Menu::CCursor m_oCursor;
+		Workshop::CSteamDownload* pSteamDownloader;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -105,26 +114,29 @@ namespace Game {
 		friend void Cmd_EnvGoal(void);
 		friend void Cmd_Bind(void);
 
-		bool LoadPackage(const std::wstring& wszPackage)
+		bool LoadPackage(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
 		{
 			//Load package game
 
+			std::wstring wszPackagePath = (!wszFromPath.length()) ? wszBasePath + L"packages\\" + wszPackage : wszFromPath;
+
 			this->m_sPackage.wszPakName = wszPackage;
+			this->m_sPackage.wszPakPath = wszPackagePath;
 			
 			//Check if package folder exists
-			if (!Utils::DirExists(wszBasePath + L"packages\\" + wszPackage)) {
+			if (!Utils::DirExists(wszPackagePath)) {
 				pConsole->AddLine(L"Package not found: " + wszPackage, Console::ConColor(255, 0, 0));
 				return false;
 			}
 			
 			//Check if package index config exists
-			if (!Utils::FileExists(wszBasePath + L"packages\\" + wszPackage + L"\\" + wszPackage + L".cfg")) {
+			if (!Utils::FileExists(wszPackagePath + L"\\" + wszPackage + L".cfg")) {
 				pConsole->AddLine(L"Package configuration script not found", Console::ConColor(255, 0, 0));
 				return false;
 			}
 
 			//Execute package index config
-			if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + wszPackage + L"\\" + wszPackage + L".cfg")) {
+			if (!pConfigMgr->Execute(wszPackagePath + L"\\" + wszPackage + L".cfg")) {
 				pConsole->AddLine(L"Failed to execute package configuration script", Console::ConColor(255, 0, 0));
 				return false;
 			}
@@ -132,13 +144,13 @@ namespace Game {
 			pConsole->AddLine(L"Package " + this->m_sPackage.wszName + L" v" + this->m_sPackage.wszVersion + L" by " + this->m_sPackage.wszAuthor + L" (" + this->m_sPackage.wszContact + L")");
 
 			//Execute package index map file
-			if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + wszPackage + L"\\maps\\" + this->m_sPackage.wszMapIndex)) {
+			if (!pConfigMgr->Execute(wszPackagePath + L"\\maps\\" + this->m_sPackage.wszMapIndex)) {
 				pConsole->AddLine(L"Failed to execute package index map script", Console::ConColor(255, 0, 0));
 				return false;
 			}
 
 			//Set map background
-			pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + wszPackage + L"\\gfx\\" + this->m_sMap.wszBackground);
+			pRenderer->SetBackgroundPicture(wszPackagePath + L"\\gfx\\" + this->m_sMap.wszBackground);
 
 			this->m_bGameStarted = true;
 
@@ -150,7 +162,7 @@ namespace Game {
 			//Spawn entity into world
 
 			//Check if entity script exists
-			if (!Utils::FileExists(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as")) {
+			if (!Utils::FileExists(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as")) {
 				pConsole->AddLine(L"Entity script does not exist", Console::ConColor(255, 0, 0));
 				return false;
 			}
@@ -159,9 +171,9 @@ namespace Game {
 			Scripting::HSISCRIPT hScript;
 			size_t uiScriptListId = this->FindScript(wszName);
 			if (uiScriptListId == std::string::npos) {
-				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as"));
+				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as"));
 				if (hScript == SI_INVALID_ID) {
-					pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
+					pConsole->AddLine(L"Failed to load entity script: " + this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
 					return false;
 				}
 
@@ -179,7 +191,7 @@ namespace Game {
 
 			Entity::Vector vecPos(x, y);
 			std::string szIdent = Utils::ConvertToAnsiString(wszName);
-			std::string szPath = Utils::ConvertToAnsiString(wszBasePath) + "packages\\" + Utils::ConvertToAnsiString(this->m_sPackage.wszPakName) + "\\";
+			std::string szPath = Utils::ConvertToAnsiString(this->m_sPackage.wszPakPath + L"\\");
 
 			BEGIN_PARAMS(vArgs);
 			PUSH_OBJECT(&vecPos);
@@ -206,7 +218,7 @@ namespace Game {
 			//Load entity script
 			// 
 			//Check if entity script exists
-			if (!Utils::FileExists(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as")) {
+			if (!Utils::FileExists(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as")) {
 				pConsole->AddLine(L"Entity script does not exist", Console::ConColor(255, 0, 0));
 				return false;
 			}
@@ -215,9 +227,9 @@ namespace Game {
 			Scripting::HSISCRIPT hScript;
 			size_t uiScriptListId = this->FindScript(wszName);
 			if (uiScriptListId == std::string::npos) {
-				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as"));
+				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as"));
 				if (hScript == SI_INVALID_ID) {
-					pConsole->AddLine(L"Failed to load entity script: " + wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
+					pConsole->AddLine(L"Failed to load entity script: " + this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
 					return false;
 				}
 
@@ -259,7 +271,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -284,6 +296,18 @@ namespace Game {
 			
 			wszBasePath = wszAppPath;
 			
+			//Link with Steam
+
+			if (SteamAPI_RestartAppIfNecessary(APP_STEAMID)) {
+				this->Release();
+				return true;
+			}
+
+			if (!SteamAPI_Init()) {
+				this->Release();
+				return false;
+			}
+
 			//Initialize config manager
 
 			pConfigMgr = new ConfigMgr::CConfigInt();
@@ -387,6 +411,19 @@ namespace Game {
 				return false;
 			}
 
+			//Instantiate Steam Workshop downloader object
+			pSteamDownloader = new Workshop::CSteamDownload(&OnHandleWorkshopItem);
+			if (!pSteamDownloader) {
+				this->Release();
+				return false;
+			}
+
+			//Process subscribed Workshop items
+			if (!pSteamDownloader->ProcessSubscribedItems()) {
+				this->Release();
+				return false;
+			}
+
 			//Load banner
 			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\banner.png", 1, 768, 150, 1, false);
 			
@@ -412,11 +449,15 @@ namespace Game {
 			return this->m_bInit;
 		}
 
-		bool StartGame(const std::wstring& wszPackage)
+		bool StartGame(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
 		{
 			//Start a new game from package
 
 			pConsole->AddLine(L"Starting new game using package \"" + wszPackage + L"\"...");
+
+			if (wszFromPath.length() > 0) {
+				pConsole->AddLine(L"Loading game from path: " + wszFromPath);
+			}
 
 			//Stop current game if running any
 			if (this->m_bGameStarted) {
@@ -434,7 +475,7 @@ namespace Game {
 			this->m_oCursor.SetActiveStatus(false);
 
 			//Load package
-			bool bResult = this->LoadPackage(wszPackage);
+			bool bResult = this->LoadPackage(wszPackage, wszFromPath);
 			if (!bResult) {
 				this->m_oMenu.SetOpenStatus(true);
 				return false;
@@ -516,6 +557,9 @@ namespace Game {
 			//Stop current game
 			this->StopGame();
 
+			//Unlink from Steam
+			SteamAPI_Shutdown();
+
 			//Free cursor
 			this->m_oCursor.Release();
 
@@ -526,14 +570,20 @@ namespace Game {
 			FREE(pWindow);
 			FREE(pScriptingInt);
 			FREE(pConfigMgr);
+			FREE(pSteamDownloader);
 
 			//Clear indicators
 			this->m_bGameStarted = false;
 			this->m_bInit = false;
 		}
 
+		void AddPackage(const std::wstring& wszName, const std::wstring& wszPath)
+		{
+			this->m_oMenu.AddPackage(wszName, wszPath);
+		}
+
 		//Return package path
-		std::wstring GetPackagePath(void) { return wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\"; }
+		std::wstring GetPackagePath(void) { return (!this->m_sPackage.wszPakPath.length()) ? wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\" : this->m_sPackage.wszPakPath + L"\\"; }
 		//Return key binding
 		int GetKeyBinding(const std::wstring& wszIdent) { return this->m_oInputMgr.GetKeyBindingCode(wszIdent); }
 		//Get goal entity

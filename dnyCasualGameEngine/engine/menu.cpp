@@ -23,7 +23,7 @@ namespace Menu {
 	{
 		if (pButton == &this->m_oButton) {
 			if ((this->m_uiSelectedPackage >= 0) && (this->m_uiSelectedPackage < this->m_vPackages.size())) {
-				Game::pGame->StartGame(this->m_vPackages[this->m_uiSelectedPackage].wszIdent);
+				Game::pGame->StartGame(this->m_vPackages[this->m_uiSelectedPackage].wszIdent, this->m_vPackages[this->m_uiSelectedPackage].wszPath);
 				this->m_uiSelectedPackage = std::string::npos;
 			}
 		}

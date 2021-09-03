@@ -440,6 +440,7 @@ namespace Menu {
 	private:
 		struct package_s {
 			std::wstring wszIdent;
+			std::wstring wszPath;
 			DxRenderer::HD3DSPRITE hPreview;
 			std::vector<std::wstring> vAboutContent;
 		};
@@ -451,6 +452,27 @@ namespace Menu {
 	public:
 		CPackageMenu() : m_uiSelectedPackage(std::string::npos) {}
 		~CPackageMenu() {}
+
+		virtual void AddPackage(const std::wstring& wszPackageName, const std::wstring& wszPackagePath)
+		{
+			//Load specific package
+
+			package_s sPackage;
+
+			sPackage.wszIdent = wszPackageName;
+			sPackage.wszPath = wszPackagePath;
+			sPackage.vAboutContent = Utils::ReadFileLines(wszPackagePath + L"\\about.txt");
+
+			if (Utils::FileExists(wszPackagePath + L"\\preview.png")) {
+				sPackage.hPreview = pRenderer->LoadSprite(wszPackagePath + L"\\preview.png", 1, 195, 90, 1, true);
+			} else {
+				sPackage.hPreview = pRenderer->LoadSprite(wszPackagePath + L"\\preview.jpg", 1, 195, 90, 1, true);
+			}
+
+			this->m_vPackages.push_back(sPackage);
+
+			this->m_oImageListView.AddItem(sPackage.hPreview, sPackage.wszIdent);
+		}
 
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
 		{
@@ -470,6 +492,7 @@ namespace Menu {
 						package_s sPackage;
 
 						sPackage.wszIdent = sFindData.cFileName;
+						sPackage.wszPath = L"";
 						sPackage.vAboutContent = Utils::ReadFileLines(wszBasePath + L"packages\\" + sPackage.wszIdent + L"\\about.txt");
 						sPackage.hPreview = pRenderer->LoadSprite(wszBasePath + L"packages\\" + sPackage.wszIdent + L"\\preview.png", 1, 195, 90, 1, true);
 						
@@ -955,6 +978,13 @@ namespace Menu {
 			//Release menu
 
 			this->m_oMainMenu.Release();
+		}
+
+		void AddPackage(const std::wstring& wszName, const std::wstring& wszPath)
+		{
+			//Pass to package menu
+
+			this->m_oPackageMenu.AddPackage(wszName, wszPath);
 		}
 
 		void SetOpenStatus(bool status)

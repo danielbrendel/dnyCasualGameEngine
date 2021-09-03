@@ -51,6 +51,9 @@ namespace Game {
 			//Perform window processing
 			pWindow->Process();
 
+			//Process Steam callbacks
+			SteamAPI_RunCallbacks();
+
 			if ((this->m_bGameStarted) && (!this->m_bGamePause)) {
 				//Process scripted entities
 				Entity::oScriptedEntMgr.Process();
@@ -285,6 +288,44 @@ namespace Game {
 	{
 	}
 
+	void OnHandleWorkshopItem(const std::wstring& wszItem)
+	{
+		//Fired for handling Workshop items
+
+		Workshop::workshop_item_info_s sInfo;
+		
+		if (Workshop::LoadWorkshopInfoData(wszItem, sInfo)) {
+			Game::pGame->AddPackage(sInfo.wszPackageName, wszItem);
+		}
+	}
+
+	void HandlePackageUpload(const std::wstring& wszArgs)
+	{
+		//Handle package upload process
+
+		std::wstring wszItem = wszArgs.substr(wszArgs.find(L"-workshop_item_update") + wcslen(L"-workshop_item_update") + 1);
+
+		if (MessageBox(0, (L"Attempting to upload game package: " + wszItem + L"\n\nNote: This might take a while. You will be informed when the process has finished.\n\nDo you want to continue?").c_str(), APP_NAME, MB_ICONINFORMATION | MB_YESNO) == IDNO)
+			return;
+
+		SteamAPI_Init();
+
+		Workshop::CSteamUpload* pWorkShop = new Workshop::CSteamUpload();
+
+		pWorkShop->InitWorkshopUpdate(wszItem);
+
+		while (!pWorkShop->IsFinished()) {
+			SteamAPI_RunCallbacks();
+			Sleep(1);
+		}
+
+		(pWorkShop->GetResult()) ? MessageBox(0, L"Your Workshop item has been stored!", APP_NAME, MB_ICONINFORMATION) : MessageBox(0, L"Failed to store Workshop item", APP_NAME, MB_ICONEXCLAMATION);
+
+		delete pWorkShop;
+
+		SteamAPI_Shutdown();
+	}
+
 	void UnknownExpressionHandler(const std::wstring& szCmdName)
 	{
 		//Handler for unknown expressions
@@ -373,7 +414,7 @@ namespace Game {
 		bool wall = pConfigMgr->ExpressionItemValue(9) == L"true";
 
 		Entity::CSolidSprite oSprite;
-		oSprite.Initialize(x, y, w, h, wszBasePath + L"packages\\" + pGame->m_sPackage.wszPakName + L"\\gfx\\" + wszFile, repeat, dir, rot, wall);
+		oSprite.Initialize(x, y, w, h, pGame->m_sPackage.wszPakPath + L"\\gfx\\" + wszFile, repeat, dir, rot, wall);
 
 		pGame->m_vSolidSprites.push_back(oSprite);
 	}

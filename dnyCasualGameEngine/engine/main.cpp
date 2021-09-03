@@ -16,6 +16,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 {
 	Game::CGame* pGame = new Game::CGame();
 
+	std::wstring wszArgs = Utils::ConvertToWideString(lpCmdLine);
+	if (wszArgs.find(L"-workshop_item_update") != -1) {
+		Game::HandlePackageUpload(wszArgs);
+
+		return 0;
+	}
+
 	pGame->Initialize();
 	pGame->Process();
 	pGame->Release();

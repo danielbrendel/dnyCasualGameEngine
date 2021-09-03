@@ -15,6 +15,7 @@
 #define APP_VERSION L"1.0"
 #define APP_AUTHOR L"Daniel Brendel"
 #define APP_CONTACT L"dbrendel1988<at>gmail<dot>com"
+#define APP_STEAMID 1725731
 
 #include <cstdlib>
 #include <cstdio>

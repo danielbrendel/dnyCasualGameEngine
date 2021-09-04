@@ -54,6 +54,15 @@ namespace Game {
 			//Process Steam callbacks
 			SteamAPI_RunCallbacks();
 
+			//Perform game loading if indicated
+			if (this->m_bInGameLoadingProgress) {
+				if (!this->StartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath)) {
+					pConsole->AddLine(L"Failed to start new game", Console::ConColor(250, 0, 0));
+				}
+
+				this->m_bInGameLoadingProgress = false;
+			}
+
 			if ((this->m_bGameStarted) && (!this->m_bGamePause)) {
 				//Process scripted entities
 				Entity::oScriptedEntMgr.Process();
@@ -115,6 +124,10 @@ namespace Game {
 		//Draw menu if opened
 		if (this->m_oMenu.IsOpen()) {
 			this->m_oMenu.Draw();
+		}
+
+		if (this->m_bInGameLoadingProgress) {
+			pRenderer->DrawSprite(this->m_hLoadingScreen, 0, 0, 0, 0.0f);
 		}
 
 		//Draw console if opened

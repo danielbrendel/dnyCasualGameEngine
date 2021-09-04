@@ -100,6 +100,10 @@ namespace Game {
 		Menu::CIntermissionMenu m_oIntermissionMenu;
 		Menu::CCursor m_oCursor;
 		Workshop::CSteamDownload* pSteamDownloader;
+		DxRenderer::HD3DSPRITE m_hLoadingScreen;
+		bool m_bInGameLoadingProgress;
+		std::wstring m_wszCurrentLoadingPackage;
+		std::wstring m_wszCurrentLoadingFromPath;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -271,7 +275,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -439,12 +443,20 @@ namespace Game {
 			this->m_oCursor.Initialize();
 			this->m_oCursor.SetActiveStatus(true);
 
+			//Load loading screen image
+			this->m_hLoadingScreen = pRenderer->LoadSprite(wszBasePath + L"media\\game_loading.png", 1, pWindow->GetResolutionX(), pWindow->GetResolutionY(), 1, true);
+			if (this->m_hLoadingScreen == GFX_INVALID_SPRITE_ID) {
+				this->Release();
+				return false;
+			}
+
 			//Add info text
 			pConsole->AddLine(APP_NAME L" v" APP_VERSION L" developed by " APP_AUTHOR L" (" APP_CONTACT L")", Console::ConColor(100, 215, 255));
 			pConsole->AddLine(L"");
 
 			this->m_bInit = true;
 			this->m_bGameStarted = false;
+			this->m_bInGameLoadingProgress = false;
 			
 			return this->m_bInit;
 		}
@@ -469,6 +481,7 @@ namespace Game {
 				return false;
 			}
 
+			this->m_bInGameLoadingProgress = true;
 			this->m_bGamePause = false;
 
 			this->m_oMenu.SetOpenStatus(false);
@@ -481,7 +494,18 @@ namespace Game {
 				return false;
 			}
 
+			this->m_bInGameLoadingProgress = false;
+
 			return true;
+		}
+
+		void InitStartGame(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
+		{
+			//Init game start
+
+			this->m_bInGameLoadingProgress = true;
+			this->m_wszCurrentLoadingPackage = wszPackage;
+			this->m_wszCurrentLoadingFromPath = wszFromPath;
 		}
 
 		bool LoadMap(const std::wstring& wszMap);

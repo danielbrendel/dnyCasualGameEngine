@@ -51,7 +51,7 @@ namespace Workshop {
 
 				hFile.getline(wcWsId, sizeof(wcWsId));
 				
-				return _wtoi(wcWsId);
+				return _wcstoui64(wcWsId, nullptr, 10);
 			}
 
 			return 0;
@@ -174,7 +174,7 @@ namespace Workshop {
 		bool StartItemUpdate(PublishedFileId_t workshopId)
 		{
 			//Start update of item
-
+			
 			UGCUpdateHandle_t hUpdate = this->m_pSteamUGC->StartItemUpdate(SteamUtils()->GetAppID(), workshopId); //Start item update
 			if (hUpdate) {
 				workshop_item_info_s sData;

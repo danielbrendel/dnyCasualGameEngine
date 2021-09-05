@@ -83,7 +83,7 @@ namespace Entity {
 			//Check for removal
 			if (this->m_vEnts[i]->NeedsRemoval()) {
 				if (this->m_vEnts[i]->GetName() == "player") {
-					Game::pGame->StopGame();
+					Game::pGame->ShowGameOver();
 					return;
 				}
 

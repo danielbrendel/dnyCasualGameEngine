@@ -98,12 +98,14 @@ namespace Game {
 		bool m_bGamePause;
 		bool m_bShowIntermission;
 		Menu::CIntermissionMenu m_oIntermissionMenu;
+		Menu::CGameOverMenu m_oGameOverMenu;
 		Menu::CCursor m_oCursor;
 		Workshop::CSteamDownload* pSteamDownloader;
 		DxRenderer::HD3DSPRITE m_hLoadingScreen;
 		bool m_bInGameLoadingProgress;
 		std::wstring m_wszCurrentLoadingPackage;
 		std::wstring m_wszCurrentLoadingFromPath;
+		bool m_bGameOver;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -275,7 +277,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -439,6 +441,10 @@ namespace Game {
 			this->m_oIntermissionMenu.Initialize(400, 250, &this->m_bGameStarted);
 			this->m_oIntermissionMenu.SetPosition(Entity::Vector(pWindow->GetResolutionX() / 2 - 200, pWindow->GetResolutionY() / 2 - 125));
 
+			//Initialize game over menu
+			this->m_oGameOverMenu.Initialize(400, 250, &this->m_bGameStarted);
+			this->m_oGameOverMenu.SetPosition(Entity::Vector(pWindow->GetResolutionX() / 2 - 200, pWindow->GetResolutionY() / 2 - 125));
+
 			//Initialize and activate cursor
 			this->m_oCursor.Initialize();
 			this->m_oCursor.SetActiveStatus(true);
@@ -483,6 +489,7 @@ namespace Game {
 
 			this->m_bInGameLoadingProgress = true;
 			this->m_bGamePause = false;
+			this->m_bGameOver = false;
 
 			this->m_oMenu.SetOpenStatus(false);
 			this->m_oCursor.SetActiveStatus(false);
@@ -506,6 +513,27 @@ namespace Game {
 			this->m_bInGameLoadingProgress = true;
 			this->m_wszCurrentLoadingPackage = wszPackage;
 			this->m_wszCurrentLoadingFromPath = wszFromPath;
+		}
+
+		void InitRestartGame(void)
+		{
+			//Init restart game
+
+			if (this->m_bGameStarted) {
+				this->StopGame();
+			}
+
+			this->InitStartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath);
+		}
+
+		void ShowGameOver(void)
+		{
+			//Activate game over menu
+
+			this->m_bGameOver = true;
+			this->m_bGamePause = true;
+
+			this->m_oCursor.SetActiveStatus(true);
 		}
 
 		bool LoadMap(const std::wstring& wszMap);

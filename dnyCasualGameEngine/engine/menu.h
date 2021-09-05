@@ -1115,4 +1115,86 @@ namespace Menu {
 
 		virtual void OnButtonClick(class CButton* pButton);
 	};
+
+	class CGameOverMenu : public IButtonClickHandler {
+	private:
+		CForm m_oForm;
+		CButton m_oBtnRestart;
+		CButton m_oBtnReturnToMainMenu;
+		std::wstring m_wszTitle;
+		Entity::Vector m_vecPos;
+		Entity::Vector m_vecSize;
+	public:
+		CGameOverMenu() {}
+		~CGameOverMenu() {}
+
+		bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			//Initialize dialog
+
+			this->m_vecSize = Entity::Vector(w, h);
+
+			if (!this->m_oForm.Initialize(w, h, pGameStarted)) {
+				return false;
+			}
+
+			this->m_oForm.SetSize(this->m_vecSize);
+			this->m_oForm.SetBodyColor(Entity::Color(150, 150, 150, 150));
+			this->m_oForm.SetBorderColor(Entity::Color(200, 200, 200, 150));
+			this->m_oForm.SetTitleBarColor(Entity::Color(50, 125, 0, 150));
+			this->m_oForm.SetTitleTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oForm.SetTitle(L"Game over!");
+
+			this->m_oBtnRestart.SetFrameColor(Entity::Color(200, 200, 200, 150));
+			this->m_oBtnRestart.SetFillColor(Entity::Color(50, 150, 50, 150));
+			this->m_oBtnRestart.SetHoverColor(Entity::Color(70, 180, 70, 150));
+			this->m_oBtnRestart.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBtnRestart.SetSize(Entity::Vector(200, 35));
+			this->m_oBtnRestart.SetOwner(this);
+			this->m_oBtnRestart.SetText(L"Try again");
+
+			this->m_oBtnReturnToMainMenu.SetFrameColor(Entity::Color(200, 200, 200, 150));
+			this->m_oBtnReturnToMainMenu.SetFillColor(Entity::Color(50, 150, 50, 150));
+			this->m_oBtnReturnToMainMenu.SetHoverColor(Entity::Color(70, 180, 70, 150));
+			this->m_oBtnReturnToMainMenu.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBtnReturnToMainMenu.SetSize(Entity::Vector(300, 35));
+			this->m_oBtnReturnToMainMenu.SetOwner(this);
+			this->m_oBtnReturnToMainMenu.SetText(L"Return to main menu");
+
+			return true;
+		}
+
+		void SetPosition(const Entity::Vector& vec)
+		{
+			//Set position
+
+			this->m_vecPos = vec;
+
+			this->m_oForm.SetPosition(vec);
+			this->m_oBtnRestart.SetPosition(Entity::Vector(vec[0] + 10, vec[1] + this->m_vecSize[1] - 85));
+			this->m_oBtnReturnToMainMenu.SetPosition(Entity::Vector(vec[0] + 10, vec[1] + this->m_vecSize[1] - 45));
+		}
+
+		void Draw(void)
+		{
+			//Draw menu
+
+			this->m_oForm.Draw();
+			this->m_oBtnRestart.Draw();
+			this->m_oBtnReturnToMainMenu.Draw();
+
+			pRenderer->DrawString(pDefaultFont, L"Your game is over.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 79, 250, 250, 250, 150);
+			pRenderer->DrawString(pDefaultFont, L"You can try again or return to main menu.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, 250, 250, 250, 150);
+		}
+
+		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			this->m_oBtnRestart.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oBtnReturnToMainMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		virtual void OnButtonClick(class CButton* pButton);
+	};
 }

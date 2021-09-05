@@ -82,4 +82,15 @@ namespace Menu {
 			Game::pGame->LoadMap(Game::pGame->GetGoalEntity()->GetGoal() + L".cfg");
 		}
 	}
+
+	void CGameOverMenu::OnButtonClick(class CButton* pButton)
+	{
+		Game::pGame->GetCursor()->SetActiveStatus(false);
+
+		if (pButton == &this->m_oBtnRestart) {
+			Game::pGame->InitRestartGame();
+		} else if (pButton == &this->m_oBtnReturnToMainMenu) {
+			Game::pGame->StopGame();
+		}
+	}
 }

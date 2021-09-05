@@ -113,6 +113,11 @@ namespace Game {
 				if (this->m_bShowIntermission) {
 					this->m_oIntermissionMenu.Draw();
 				}
+
+				//Draw game over menu if active
+				if (this->m_bGameOver) {
+					this->m_oGameOverMenu.Draw();
+				}
 			}
 		}
 
@@ -169,6 +174,7 @@ namespace Game {
 		//Reset indicator
 		this->m_bShowIntermission = false;
 		this->m_bGameStarted = false;
+		this->m_bGameOver = false;
 
 		//Inform menu
 		this->m_oMenu.OnStopGame();
@@ -177,6 +183,9 @@ namespace Game {
 
 		//Show cursor
 		this->m_oCursor.SetActiveStatus(true);
+
+		//Restore background image
+		pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");
 	}
 
 	void CGame::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
@@ -187,6 +196,10 @@ namespace Game {
 
 		if (this->m_bShowIntermission) { //Inform intermission menu
 			this->m_oIntermissionMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		if (this->m_bGameOver) { //Inform game over menu
+			this->m_oGameOverMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
 
 		if (!this->m_oMenu.IsOpen()) {

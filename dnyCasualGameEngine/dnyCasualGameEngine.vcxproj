@@ -165,6 +165,7 @@
     <ClInclude Include="engine\input.h" />
     <ClInclude Include="engine\menu.h" />
     <ClInclude Include="engine\renderer.h" />
+    <ClInclude Include="engine\resource.h" />
     <ClInclude Include="engine\scriptint.h" />
     <ClInclude Include="engine\shared.h" />
     <ClInclude Include="engine\sound.h" />
@@ -172,6 +173,9 @@
     <ClInclude Include="engine\vars.h" />
     <ClInclude Include="engine\window.h" />
     <ClInclude Include="engine\workshop.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="engine\app.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

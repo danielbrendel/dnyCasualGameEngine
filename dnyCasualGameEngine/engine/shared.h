@@ -26,5 +26,6 @@
 #include <codecvt>
 #include <algorithm>
 #include <Windows.h>
+#include "resource.h"
 
 #define FREE(p) if (p) { delete p; p = nullptr; }

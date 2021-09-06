@@ -104,5 +104,13 @@
     <ClInclude Include="engine\workshop.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="engine\resource.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="engine\app.rc">
+      <Filter>Ressourcendateien</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

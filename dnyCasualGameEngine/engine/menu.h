@@ -693,26 +693,154 @@ namespace Menu {
 		virtual void SetTabSpacing(int value) { this->m_iTabSpace = value; }
 	};
 
+	const int BK_OBJECT_WIDTH = 150;
+	const int BK_OBJECT_HEIGHT = 35;
+	class CKeyBinding : public IMenu {
+	private:
+		std::wstring m_wszCommand;
+		int m_vKey;
+		std::wstring m_wszVKeyName;
+		bool m_bInSet;
+		Entity::Vector m_vecPos;
+		Entity::Vector m_vecMousePos;
+
+		void UpdateKeyValue(int vKey)
+		{
+			//Update current key value
+
+			wchar_t wCharacter = MapVirtualKey(vKey, MAPVK_VK_TO_CHAR);
+
+			this->m_wszVKeyName = wCharacter;
+			this->m_vKey = vKey;
+		}
+	public:
+		CKeyBinding() : m_bInSet(false) {}
+		~CKeyBinding() {}
+
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			//Initialize object
+
+			return true;
+		}
+
+		virtual void Draw(void)
+		{
+			//Draw menu
+			pConsole->AddLine(std::to_wstring(this->m_vecPos[0]) + L"x" + std::to_wstring(this->m_vecPos[1]));
+			pRenderer->DrawBox(this->m_vecPos[0], this->m_vecPos[1], BK_OBJECT_WIDTH, BK_OBJECT_HEIGHT, 1, 50, 50, 50, 150);
+
+			if (!this->m_bInSet) {
+				pRenderer->DrawFilledBox(this->m_vecPos[0] + BK_OBJECT_WIDTH / 2, this->m_vecPos[1] + 1, BK_OBJECT_WIDTH / 2, BK_OBJECT_HEIGHT - 1, 34, 175, 76, 150);
+			} else {
+				pRenderer->DrawFilledBox(this->m_vecPos[0] + BK_OBJECT_WIDTH / 2, this->m_vecPos[1] + 1, BK_OBJECT_WIDTH / 2, BK_OBJECT_HEIGHT - 1, 130, 232, 160, 150);
+			}
+
+			pRenderer->DrawString(pDefaultFont, this->m_wszCommand, this->m_vecPos[0] + 5, this->m_vecPos[1] + BK_OBJECT_HEIGHT / 2 - iDefaultFontSize[1] / 2, 250, 250, 250, 150);
+			pRenderer->DrawString(pDefaultFont, this->m_wszVKeyName, this->m_vecPos[0] + BK_OBJECT_WIDTH - BK_OBJECT_WIDTH / 4 - ((int)this->m_wszVKeyName.length() / 2 * iDefaultFontSize[0]), this->m_vecPos[1] + BK_OBJECT_HEIGHT / 2 - iDefaultFontSize[1] / 2, 250, 250, 250, 150);
+		}
+
+		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			if (!iMouseKey) {
+				this->m_vecMousePos = Entity::Vector(x, y);
+			} else {
+				if ((iMouseKey == 1) && (!bDown)) {
+					if ((this->m_vecMousePos[0] > this->m_vecPos[0]) && (this->m_vecMousePos[0] < this->m_vecMousePos[0] + BK_OBJECT_WIDTH) && (this->m_vecMousePos[1] > this->m_vecPos[1]) && (this->m_vecMousePos[1] < this->m_vecPos[1] + BK_OBJECT_HEIGHT)) {
+						this->m_bInSet = !this->m_bInSet;
+					}
+				}
+			}
+		}
+
+		virtual void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle key events
+
+			if ((this->m_bInSet) && (!bDown)) {
+				this->UpdateKeyValue(vKey);
+
+				this->m_bInSet = false;
+			}
+		}
+
+		virtual void Release(void)
+		{
+		}
+
+		void SetCommand(const std::wstring& wszCommand)
+		{
+			//Set command
+
+			this->m_wszCommand = wszCommand;
+		}
+
+		void SetVkey(int vKey)
+		{
+			//Set vkey
+
+			this->UpdateKeyValue(vKey);
+		}
+
+		void SetPosition(const Entity::Vector& vecPos)
+		{
+			//Set position
+
+			this->m_vecPos = vecPos;
+		}
+
+		//Getters
+		const std::wstring& GetCommand(void) const { return this->m_wszCommand; }
+		int GetVkey(void) const { return this->m_vKey; }
+	};
+
 	class CSettingsKeys : public IMenu {
 	private:
 		Entity::Vector m_vecPos;
+		CKeyBinding m_oTestBinding;
 	public:
 		CSettingsKeys() {}
 		~CSettingsKeys() {}
 
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
 		{
+			//Initialize component
+
+			this->m_oTestBinding.Initialize(0, 0, nullptr);
+			this->m_oTestBinding.SetCommand(L"MOVE");
+			this->m_oTestBinding.SetVkey(38);
+			this->m_oTestBinding.SetPosition(Entity::Vector(400, 300));
+
 			return true;
 		}
 
 		virtual void Draw(void)
 		{
+			//Draw component
+
 			pRenderer->DrawString(pDefaultFont, L"CSettingsKeys", this->m_vecPos[0], this->m_vecPos[1], 200, 200, 200, 150);
+
+			this->m_oTestBinding.Draw();
+		}
+
+		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			this->m_oTestBinding.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		virtual void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle key events
+
+			this->m_oTestBinding.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
 
 		virtual void Release(void)
 		{
-
 		}
 
 		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
@@ -782,6 +910,9 @@ namespace Menu {
 		{
 			//Initialize settings menu
 
+			this->m_oMenuKeys.Initialize(0, 0, nullptr);
+			this->m_oMenuGfx.Initialize(0, 0, nullptr);
+			this->m_oMenuSnd.Initialize(0, 0, nullptr);
 			this->m_oMenuKeys.SetPosition(Entity::Vector(250, 250));
 			this->m_oMenuGfx.SetPosition(Entity::Vector(250, 250));
 			this->m_oMenuSnd.SetPosition(Entity::Vector(250, 250));

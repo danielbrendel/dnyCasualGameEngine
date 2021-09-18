@@ -41,6 +41,15 @@ namespace Menu {
 		}
 	}
 
+	void CSettingsKeys::OnButtonClick(class CButton* pButton)
+	{
+		if (pButton == &this->m_btnSave) {
+
+		} else if (pButton == &this->m_btnRestoreDefaults) {
+
+		}
+	}
+
 	void MainMenu_OnResumeGame(class CMenu* pMenu)
 	{
 		Game::pGame->ResumeGame();

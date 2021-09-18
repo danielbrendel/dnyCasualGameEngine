@@ -246,7 +246,7 @@ namespace Game {
 	{
 		//Called for key events
 		
-		if (vKey == this->m_oInputMgr.GetKeyBindingCode(L"MENU")) {
+		if (vKey == g_oInputMgr.GetKeyBindingCode(L"MENU")) {
 			if (!bDown) {
 				if (this->m_bGameStarted) {
 					this->m_oMenu.SetOpenStatus(!this->m_oMenu.IsOpen());
@@ -312,6 +312,7 @@ namespace Game {
 
 	void CWindowEvents::OnRelease(void)
 	{
+		pGame->Release();
 	}
 
 	void OnHandleWorkshopItem(const std::wstring& wszItem)
@@ -389,7 +390,7 @@ namespace Game {
 		int vCode = _wtoi(pConfigMgr->ExpressionItemValue(1).c_str());
 		std::wstring wszIdent = pConfigMgr->ExpressionItemValue(2);
 
-		pGame->m_oInputMgr.AddKeyBinding(wszIdent, vCode);
+		g_oInputMgr.AddKeyBinding(wszIdent, vCode);
 	}
 
 	void Cmd_PackageName(void)

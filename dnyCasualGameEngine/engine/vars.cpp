@@ -22,6 +22,9 @@ Console::CConsole* pConsole = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxFullscreen = nullptr;
+ConfigMgr::CCVar::cvar_s* pSndVolume = nullptr;
+
+Input::CInputMgr g_oInputMgr;
 
 DxRenderer::d3dfont_s* pDefaultFont = nullptr;
 int iDefaultFontSize[2];

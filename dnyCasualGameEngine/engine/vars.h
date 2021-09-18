@@ -18,6 +18,7 @@
 #include "scriptint.h"
 #include "configmgr.h"
 #include "console.h"
+#include "input.h"
 
 extern DxWindow::CDxWindow* pWindow;
 extern DxRenderer::CDxRenderer* pRenderer;
@@ -30,6 +31,9 @@ extern Console::CConsole* pConsole;
 extern ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth;
 extern ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight;
 extern ConfigMgr::CCVar::cvar_s* pGfxFullscreen;
+extern ConfigMgr::CCVar::cvar_s* pSndVolume;
+
+extern Input::CInputMgr g_oInputMgr;
 
 extern DxRenderer::d3dfont_s* pDefaultFont;
 extern int iDefaultFontSize[2];

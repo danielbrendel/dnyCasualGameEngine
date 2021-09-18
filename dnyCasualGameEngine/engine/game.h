@@ -94,7 +94,6 @@ namespace Game {
 		std::vector<Entity::CSolidSprite> m_vSolidSprites;
 		std::vector<entityscript_s> m_vEntityScripts;
 		Entity::CGoalEntity* m_pGoalEntity;
-		Input::CInputMgr m_oInputMgr;
 		bool m_bGamePause;
 		bool m_bShowIntermission;
 		Menu::CIntermissionMenu m_oIntermissionMenu;
@@ -328,6 +327,7 @@ namespace Game {
 			pGfxResolutionWidth = pConfigMgr->CCVar::Add(L"gfx_resolution_width", ConfigMgr::CCVar::CVAR_TYPE_INT, L"1024");
 			pGfxResolutionHeight = pConfigMgr->CCVar::Add(L"gfx_resolution_height", ConfigMgr::CCVar::CVAR_TYPE_INT, L"768");
 			pGfxFullscreen = pConfigMgr->CCVar::Add(L"gfx_fullscreen", ConfigMgr::CCVar::CVAR_TYPE_BOOL, L"1");
+			pSndVolume = pConfigMgr->CCVar::Add(L"snd_volume", ConfigMgr::CCVar::CVAR_TYPE_INT, L"100");
 			
 			//Add commands
 			pConfigMgr->CCommand::Add(L"bind", L"Bind command to key", &Cmd_Bind);
@@ -637,7 +637,7 @@ namespace Game {
 		//Return package path
 		std::wstring GetPackagePath(void) { return (!this->m_sPackage.wszPakPath.length()) ? wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\" : this->m_sPackage.wszPakPath + L"\\"; }
 		//Return key binding
-		int GetKeyBinding(const std::wstring& wszIdent) { return this->m_oInputMgr.GetKeyBindingCode(wszIdent); }
+		int GetKeyBinding(const std::wstring& wszIdent) { return g_oInputMgr.GetKeyBindingCode(wszIdent); }
 		//Get goal entity
 		Entity::CGoalEntity* GetGoalEntity(void) { return this->m_pGoalEntity; }
 		//Get cursor

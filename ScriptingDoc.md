@@ -213,6 +213,12 @@ void OnUpdateCursor(const Vector &in pos)
 int GetPlayerScore()
 ```
 
+## Script callbacks
+```angelscript
+//Used to spawn the entity from within a map definition file. The entity needs to get spawned there via Ent_SpawnEntity
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+```
+
 ## Available API functions:
 ```angelscript
 //Print a text to the console

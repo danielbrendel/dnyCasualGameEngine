@@ -28,6 +28,12 @@ extern std::wstring wszBasePath;
 extern ConfigMgr::CConfigInt* pConfigMgr;
 extern Console::CConsole* pConsole;
 
+extern ConfigMgr::CCVar::cvar_s* pAppName;
+extern ConfigMgr::CCVar::cvar_s* pAppVersion;
+extern ConfigMgr::CCVar::cvar_s* pAppAuthor;
+extern ConfigMgr::CCVar::cvar_s* pAppContact;
+extern ConfigMgr::CCVar::cvar_s* pAppSteamID;
+
 extern ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth;
 extern ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight;
 extern ConfigMgr::CCVar::cvar_s* pGfxFullscreen;

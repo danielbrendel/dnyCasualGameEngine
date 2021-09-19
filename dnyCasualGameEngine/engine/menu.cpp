@@ -17,6 +17,7 @@ namespace Menu {
 	{
 		this->m_oButton.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		this->m_oImageListView.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		this->m_oBrowse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 	}
 
 	void CPackageMenu::OnButtonClick(class CButton* pButton)
@@ -26,6 +27,8 @@ namespace Menu {
 				Game::pGame->InitStartGame(this->m_vPackages[this->m_uiSelectedPackage].wszIdent, this->m_vPackages[this->m_uiSelectedPackage].wszPath);
 				this->m_uiSelectedPackage = std::string::npos;
 			}
+		} else if (pButton == &this->m_oBrowse) {
+			SteamFriends()->ActivateGameOverlayToWebPage(std::string("https://steamcommunity.com/app/" + std::to_string(pAppSteamID->iValue - 1) + "/workshop/").c_str());
 		}
 	}
 
@@ -60,9 +63,9 @@ namespace Menu {
 		Game::pGame->StopGame();
 	}
 
-	void MainMenu_OnOpenNews(class CMenu* pMenu)
+	void MainMenu_OnOpenPlay(class CMenu* pMenu)
 	{
-		pConsole->AddLine(L"MainMenu_OnOpenNews");
+		pMenu->OpenPlayMenu();
 	}
 
 	void MainMenu_OnOpenPackages(class CMenu* pMenu)

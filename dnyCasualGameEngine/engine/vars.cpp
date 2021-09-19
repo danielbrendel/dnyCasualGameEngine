@@ -19,6 +19,12 @@ std::wstring wszBasePath = L"";
 ConfigMgr::CConfigInt* pConfigMgr = nullptr;
 Console::CConsole* pConsole = nullptr;
 
+ConfigMgr::CCVar::cvar_s* pAppName = nullptr;
+ConfigMgr::CCVar::cvar_s* pAppVersion = nullptr;
+ConfigMgr::CCVar::cvar_s* pAppAuthor = nullptr;
+ConfigMgr::CCVar::cvar_s* pAppContact = nullptr;
+ConfigMgr::CCVar::cvar_s* pAppSteamID = nullptr;
+
 ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxFullscreen = nullptr;

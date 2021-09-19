@@ -19,7 +19,7 @@
 namespace Menu {
 	void MainMenu_OnResumeGame(class CMenu* pMenu);
 	void MainMenu_OnStopGame(class CMenu* pMenu);
-	void MainMenu_OnOpenNews(class CMenu* pMenu);
+	void MainMenu_OnOpenPlay(class CMenu* pMenu);
 	void MainMenu_OnOpenPackages(class CMenu* pMenu);
 	void MainMenu_OnOpenSettings(class CMenu* pMenu);
 	void MainMenu_OnQuitGame(class CMenu* pMenu);
@@ -625,15 +625,15 @@ namespace Menu {
 			sStopGame.y = h - iStartPos - 50 * 5;
 			sStopGame.bShow = false;
 
-			menuentry_s sNews;
-			sNews.wszText = L"News";
-			sNews.onClick = &MainMenu_OnOpenNews;
-			sNews.x = 10;
-			sNews.y = h - iStartPos - 50 * 3;
-			sNews.bShow = true;
+			menuentry_s sPlay;
+			sPlay.wszText = L"Play";
+			sPlay.onClick = &MainMenu_OnOpenPlay;
+			sPlay.x = 10;
+			sPlay.y = h - iStartPos - 50 * 3;
+			sPlay.bShow = true;
 
 			menuentry_s sPackages;
-			sPackages.wszText = L"Packages";
+			sPackages.wszText = L"Mods";
 			sPackages.onClick = &MainMenu_OnOpenPackages;
 			sPackages.x = 10;
 			sPackages.y = h - iStartPos - 50 * 2;
@@ -655,7 +655,7 @@ namespace Menu {
 
 			this->m_vEntries.push_back(sResumeGame);
 			this->m_vEntries.push_back(sStopGame);
-			this->m_vEntries.push_back(sNews);
+			this->m_vEntries.push_back(sPlay);
 			this->m_vEntries.push_back(sPackages);
 			this->m_vEntries.push_back(sSettings);
 			this->m_vEntries.push_back(sQuit);
@@ -693,18 +693,18 @@ namespace Menu {
 
 		virtual void Draw(void)
 		{
-			//Draw menu
+		//Draw menu
 
-			for (size_t i = 0; i < this->m_vEntries.size(); i++) {
-				if (this->m_vEntries[i].bShow) {
-					if (this->m_vEntries[i].bHover) {
-						pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 230, 230, 230, 150);
-					}
-					else {
-						pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 200, 200, 200, 150);
-					}
+		for (size_t i = 0; i < this->m_vEntries.size(); i++) {
+			if (this->m_vEntries[i].bShow) {
+				if (this->m_vEntries[i].bHover) {
+					pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 230, 230, 230, 150);
+				}
+				else {
+					pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 200, 200, 200, 150);
 				}
 			}
+		}
 		}
 
 		virtual void Release(void)
@@ -727,6 +727,35 @@ namespace Menu {
 		}
 	};
 
+	class CPlayMenu : public IMenu, IButtonClickHandler {
+	private:
+		CButton m_oPlay;
+	public:
+		CPlayMenu() {}
+		~CPlayMenu() {}
+
+		virtual bool Initialize(int w, int h, bool* pGameStarted)
+		{
+			return true;
+		}
+
+		virtual void Draw(void)
+		{
+		}
+
+		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+		}
+
+		virtual void OnButtonClick(class CButton* pButton)
+		{
+		}
+
+		virtual void Release(void)
+		{
+		}
+	};
+
 	class CPackageMenu : public IMenu, public IButtonClickHandler, IImageListViewSelector {
 	private:
 		struct package_s {
@@ -740,6 +769,7 @@ namespace Menu {
 		size_t m_uiSelectedPackage;
 		CButton m_oButton;
 		CImageListView m_oImageListView;
+		CButton m_oBrowse;
 	public:
 		CPackageMenu() : m_uiSelectedPackage(std::string::npos) {}
 		~CPackageMenu() {}
@@ -756,7 +786,8 @@ namespace Menu {
 
 			if (Utils::FileExists(wszPackagePath + L"\\preview.png")) {
 				sPackage.hPreview = pRenderer->LoadSprite(wszPackagePath + L"\\preview.png", 1, 195, 90, 1, true);
-			} else {
+			}
+			else {
 				sPackage.hPreview = pRenderer->LoadSprite(wszPackagePath + L"\\preview.jpg", 1, 195, 90, 1, true);
 			}
 
@@ -782,14 +813,16 @@ namespace Menu {
 					if ((sFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) {
 						package_s sPackage;
 
-						sPackage.wszIdent = sFindData.cFileName;
-						sPackage.wszPath = L"";
-						sPackage.vAboutContent = Utils::ReadFileLines(wszBasePath + L"packages\\" + sPackage.wszIdent + L"\\about.txt");
-						sPackage.hPreview = pRenderer->LoadSprite(wszBasePath + L"packages\\" + sPackage.wszIdent + L"\\preview.png", 1, 195, 90, 1, true);
-						
-						this->m_vPackages.push_back(sPackage);
+						if ((std::wstring(sFindData.cFileName) != L".common") && (std::wstring(sFindData.cFileName) != L"game")) { //Filter common include folder and actual main game folder from mods list
+							sPackage.wszIdent = sFindData.cFileName;
+							sPackage.wszPath = L"";
+							sPackage.vAboutContent = Utils::ReadFileLines(wszBasePath + L"packages\\" + sPackage.wszIdent + L"\\about.txt");
+							sPackage.hPreview = pRenderer->LoadSprite(wszBasePath + L"packages\\" + sPackage.wszIdent + L"\\preview.png", 1, 195, 90, 1, true);
 
-						this->m_oImageListView.AddItem(sPackage.hPreview, sPackage.wszIdent);
+							this->m_vPackages.push_back(sPackage);
+
+							this->m_oImageListView.AddItem(sPackage.hPreview, sPackage.wszIdent);
+						}
 					}
 				}
 
@@ -818,6 +851,15 @@ namespace Menu {
 			this->m_oImageListView.SetHoverColor(Entity::Color(0, 150, 0, 150));
 			this->m_oImageListView.SetSelectColor(Entity::Color(0, 200, 0, 150));
 			this->m_oImageListView.UpdateDimensions();
+
+			this->m_oBrowse.SetText(L"Browse Workshop");
+			this->m_oBrowse.SetPosition(Entity::Vector(450, 200 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
+			this->m_oBrowse.SetSize(Entity::Vector(150, 35));
+			this->m_oBrowse.SetOwner(this);
+			this->m_oBrowse.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBrowse.SetFrameColor(Entity::Color(255, 255, 255, 150));
+			this->m_oBrowse.SetFillColor(Entity::Color(50, 50, 50, 150));
+			this->m_oBrowse.SetHoverColor(Entity::Color(150, 150, 150, 150));
 			
 			return true;
 		}
@@ -843,6 +885,8 @@ namespace Menu {
 			}
 
 			this->m_oImageListView.Draw();
+
+			this->m_oBrowse.Draw();
 		}
 
 		virtual void Release(void)
@@ -1518,6 +1562,7 @@ namespace Menu {
 	class CMenu {
 	private:
 		CMainMenu m_oMainMenu;
+		CPlayMenu m_oPlayMenu;
 		CPackageMenu m_oPackageMenu;
 		CSettingsMenu m_oSettingsMenu;
 		bool m_bOpen;
@@ -1532,6 +1577,10 @@ namespace Menu {
 			//Initialize menu
 
 			if (!this->m_oMainMenu.Initialize(w, h, pGameStarted)) {
+				return false;
+			}
+
+			if (!this->m_oPlayMenu.Initialize(w, h, pGameStarted)) {
 				return false;
 			}
 
@@ -1563,6 +1612,10 @@ namespace Menu {
 
 			if (this->m_oMainMenu.IsActive()) {
 				this->m_oMainMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			}
+
+			if (this->m_oPlayMenu.IsActive()) {
+				this->m_oPlayMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			}
 
 			if (this->m_oPackageMenu.IsActive()) {
@@ -1602,7 +1655,9 @@ namespace Menu {
 			if (this->m_oMainMenu.IsActive()) {
 				this->m_oMainMenu.Draw();
 
-				if (this->m_oPackageMenu.IsActive()) {
+				if (this->m_oPlayMenu.IsActive()) {
+					this->m_oPlayMenu.Draw();
+				} else if (this->m_oPackageMenu.IsActive()) {
 					this->m_oPackageMenu.Draw();
 				} else if (this->m_oSettingsMenu.IsActive()) {
 					this->m_oSettingsMenu.Draw();
@@ -1633,9 +1688,17 @@ namespace Menu {
 			}
 		}
 
+		void OpenPlayMenu(void)
+		{
+			this->m_oPlayMenu.SetActiveStatus(true);
+			this->m_oPackageMenu.SetActiveStatus(false);
+			this->m_oSettingsMenu.SetActiveStatus(false);
+		}
+
 		void OpenPackageMenu(void)
 		{
 			this->m_oPackageMenu.SetActiveStatus(true);
+			this->m_oPlayMenu.SetActiveStatus(false);
 			this->m_oSettingsMenu.SetActiveStatus(false);
 		}
 
@@ -1643,10 +1706,12 @@ namespace Menu {
 		{
 			this->m_oSettingsMenu.SetActiveStatus(true);
 			this->m_oPackageMenu.SetActiveStatus(false);
+			this->m_oPlayMenu.SetActiveStatus(false);
 		}
 
 		void OnCloseAll(void)
 		{
+			this->m_oPlayMenu.SetActiveStatus(false);
 			this->m_oPackageMenu.SetActiveStatus(false);
 			this->m_oSettingsMenu.SetActiveStatus(false);
 		}

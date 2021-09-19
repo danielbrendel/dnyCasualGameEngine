@@ -46,6 +46,11 @@ class CDecalEntity : IScriptedEntity
 		R_DrawSprite(this.m_hSprite, vOut, 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 	}
 	
+	//Draw on top
+	void OnDrawOnTop()
+	{
+	}
+	
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{

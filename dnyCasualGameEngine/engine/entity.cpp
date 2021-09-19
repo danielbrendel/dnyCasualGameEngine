@@ -612,6 +612,7 @@ namespace Entity {
 		REG_IFM("IScriptedEntity", "void OnRelease()");
 		REG_IFM("IScriptedEntity", "void OnProcess()");
 		REG_IFM("IScriptedEntity", "void OnDraw()");
+		REG_IFM("IScriptedEntity", "void OnDrawOnTop()");
 		REG_IFM("IScriptedEntity", "void OnWallCollided()");
 		REG_IFM("IScriptedEntity", "bool IsCollidable()");
 		REG_IFM("IScriptedEntity", "void OnCollided(IScriptedEntity@)");

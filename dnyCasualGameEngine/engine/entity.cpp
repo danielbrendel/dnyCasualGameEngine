@@ -604,6 +604,22 @@ namespace Entity {
 		ADD_CLASSF("void Write(const string &in)", asMETHOD(CFileWriter, Write), hClasses);
 		ADD_CLASSF("void WriteLine(const string &in)", asMETHOD(CFileWriter, WriteLine), hClasses);
 		ADD_CLASSF("void Close()", asMETHOD(CFileWriter, Close), hClasses);
+		REG_CLASSV("SaveGameWriter", sizeof(CSaveGameWriter), hClasses);
+		ADD_CLASSB(asBEHAVE_CONSTRUCT, "void f()", asMETHOD(CSaveGameWriter, Construct), hClasses);
+		ADD_CLASSB(asBEHAVE_DESTRUCT, "void f()", asMETHOD(CSaveGameWriter, Destruct), hClasses);
+		ADD_CLASSF("bool BeginSaveGame()", asMETHOD(CSaveGameWriter, BeginSaveGame), hClasses);
+		ADD_CLASSF("bool WritePackage(const string &in szPackage)", asMETHOD(CSaveGameWriter, WritePackage), hClasses);
+		ADD_CLASSF("bool WriteMap(const string &in szMap)", asMETHOD(CSaveGameWriter, WriteMap), hClasses);
+		ADD_CLASSF("bool WritePlayerLocation(const Vector &in vecPos)", asMETHOD(CSaveGameWriter, WritePlayerLocation), hClasses);
+		ADD_CLASSF("bool WriteAttribute(const string &in szName, const string &in szValue)", asMETHOD(CSaveGameWriter, WriteAttribute), hClasses);
+		ADD_CLASSF("void EndSaveGame()", asMETHOD(CSaveGameWriter, EndSaveGame), hClasses);
+		REG_CLASSV("SaveGameReader", sizeof(CSaveGameReader), hClasses);
+		ADD_CLASSB(asBEHAVE_CONSTRUCT, "void f()", asMETHOD(CSaveGameReader, Construct), hClasses);
+		ADD_CLASSB(asBEHAVE_DESTRUCT, "void f()", asMETHOD(CSaveGameReader, Destruct), hClasses);
+		ADD_CLASSF("bool OpenSaveGameFile(const string &in szFile)", asMETHOD(CSaveGameReader, OpenSaveGameFile), hClasses);
+		ADD_CLASSF("void AcquireSaveGameData()", asMETHOD(CSaveGameReader, AcquireSaveGameData), hClasses);
+		ADD_CLASSF("string GetDataItem(const string &in szIdent)", asMETHOD(CSaveGameReader, GetDataItem), hClasses);
+		ADD_CLASSF("void Close()", asMETHOD(CSaveGameReader, Close), hClasses);
 
 		//Register interfaces
 

@@ -105,6 +105,8 @@ namespace Game {
 		std::wstring m_wszCurrentLoadingPackage;
 		std::wstring m_wszCurrentLoadingFromPath;
 		bool m_bGameOver;
+		Entity::CSaveGameReader m_oSaveGameReader;
+		bool m_bLoadSavedGame;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -276,7 +278,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -546,6 +548,21 @@ namespace Game {
 		bool LoadMap(const std::wstring& wszMap);
 
 		void StopGame(void);
+
+		void LoadSavedGameState(const std::wstring& wszFile)
+		{
+			//Load saved game state from disk
+
+			this->m_bLoadSavedGame = true;
+
+			this->m_oSaveGameReader.OpenSaveGameFile(Utils::ConvertToAnsiString(wszFile));
+			this->m_oSaveGameReader.AcquireSaveGameData();
+
+			std::string szPackage = this->m_oSaveGameReader.GetDataItem("package");
+			std::string szFromPath = this->m_oSaveGameReader.GetDataItem("frompath");
+
+			this->InitStartGame(Utils::ConvertToWideString(szPackage), Utils::ConvertToWideString(szFromPath));
+		}
 
 		void Process(void);
 		void Draw(void);

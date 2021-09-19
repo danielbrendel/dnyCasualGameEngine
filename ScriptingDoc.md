@@ -156,6 +156,24 @@ void Write(const string &in) //Write a string to the file
 void WriteLine(const string &in) //Write a line to the file
 void Close() //Close the file
 ```
+### SaveGameWriter (used to write saved game states to disk)
+```angelscript
+SaveGameWriter() //Default constructor
+bool BeginSaveGame() //Begin writing to save game file
+bool WritePackage(const string &in szPackage) //Write package name to file
+bool WriteMap(const string &in szMap) //Write map to file
+bool WritePlayerLocation(const Vector &in vecPos) //Write player location to file
+bool WriteAttribute(const string &in szName, const string &in szValue) //Write any data key-pair value that belongs to a state to be saved
+void EndSaveGame() //Finish file writing
+```
+### SaveGameReader (used to read saved game states from disk)
+```angelscript
+SaveGameReader() //Default constructor
+bool OpenSaveGameFile(const string &in szFile) //Open a saved game file
+void AcquireSaveGameData() //Read all key-pair values from saved game file
+string GetDataItem(const string &in szIdent) //Query a key-pair value by identifier
+void Close() //Finish file reading
+```
 
 ## Interfaces:
 ### IScriptedEntity:
@@ -217,6 +235,8 @@ int GetPlayerScore()
 ```angelscript
 //Used to spawn the entity from within a map definition file. The entity needs to get spawned there via Ent_SpawnEntity
 void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+//Used to restore a game state. This is used in the context of loading a saved game
+void RestoreState(const string &in szIdent, const string &in szValue)
 ```
 
 ## Available API functions:

@@ -60,6 +60,29 @@ namespace Game {
 					pConsole->AddLine(L"Failed to start new game", Console::ConColor(250, 0, 0));
 				}
 
+				if (this->m_bLoadSavedGame) { //Handle load saved game state case
+					this->LoadMap(Utils::ConvertToWideString(this->m_oSaveGameReader.GetDataItem("map")));
+
+					const std::vector<Entity::CSaveGameReader::save_game_entry_s>& vList = this->m_oSaveGameReader.GetDataVector();
+					for (size_t i = 0; i < vList.size(); i++) {
+						Scripting::HSISCRIPT hScript = this->FindScript(L"player");
+
+						std::string szIdent = vList[i].szIdent;
+						std::string szValue = vList[i].szValue;
+
+						BEGIN_PARAMS(vArgs);
+						PUSH_OBJECT(&szIdent);
+						PUSH_OBJECT(&szValue);
+
+						bool bResult = pScriptingInt->CallScriptFunction(hScript, true, "RestoreState", &vArgs, nullptr, Scripting::FA_VOID);
+
+						END_PARAMS(vArgs);
+					}
+
+					this->m_oSaveGameReader.Close();
+					this->m_bLoadSavedGame = false;
+				}
+
 				this->m_bInGameLoadingProgress = false;
 			}
 

@@ -325,7 +325,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	}
 }
 
-
+//Create the associated entity here
 void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
 {
 	g_szPackagePath = szPath;
@@ -335,3 +335,7 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	player.SetRotation(fRot);
 }
 
+//Restore game state
+void RestoreState(const string &in szIdent, const string &in szValue)
+{
+}

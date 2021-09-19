@@ -23,8 +23,11 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <codecvt>
 #include <algorithm>
+#include <iomanip>
+#include <ctime>
 #include <Windows.h>
 #include "resource.h"
 

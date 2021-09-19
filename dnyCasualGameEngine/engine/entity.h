@@ -1123,7 +1123,7 @@ namespace Entity {
 			if (!this->m_poFile)
 				return false;
 
-			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "tools\\" + szFile, std::ifstream::in);
+			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "packages\\" + szFile, std::ifstream::in);
 
 			return this->m_poFile->is_open();
 		}
@@ -1243,7 +1243,7 @@ namespace Entity {
 			int openMode = std::ifstream::out;
 			if (bAppend) openMode |= std::ifstream::app;
 
-			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "tools\\" + szFile, openMode);
+			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "packages\\" + szFile, openMode);
 
 			return this->m_poFile->is_open();
 		}
@@ -1306,6 +1306,219 @@ namespace Entity {
 		void Constr_Init(const std::string& szFile) { this->Open(szFile); }
 		void Construct(void* pMemory) { new (pMemory) CFileWriter(); }
 		void Destruct(void* pMemory) { ((CFileWriter*)pMemory)->~CFileWriter(); }
+	};
+
+	/* Save game writer */
+	class CSaveGameWriter {
+	private:
+		std::ofstream* m_poFile;
+
+		bool IsValidHandle(void)
+		{
+			//Check if file is opened 
+
+			return (this->m_poFile != nullptr) && (this->m_poFile->is_open());
+		}
+
+		void Release(void)
+		{
+			//Release resources
+
+			if (this->m_poFile) {
+				if (this->m_poFile->is_open()) {
+					this->m_poFile->close();
+				}
+
+				delete this->m_poFile;
+				this->m_poFile = nullptr;
+			}
+		}
+	public:
+		CSaveGameWriter() {}
+		~CSaveGameWriter() {}
+
+		bool BeginSaveGame(void)
+		{
+			//Begin writing save game
+
+			this->m_poFile = new std::ofstream();
+			if (!this->m_poFile)
+				return false;
+
+			tm time;
+
+			time_t t = std::time(nullptr);
+			localtime_s(&time, &t);
+
+			std::ostringstream oss;
+			oss << std::put_time(&time, "%d-%m-%Y_%H-%M-%S");
+
+			std::string szFile = "savegame_" + oss.str() + ".sav";
+
+			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "saves\\" + szFile, std::ifstream::out);
+			if (!this->m_poFile->is_open()) {
+				delete this->m_poFile;
+				return false;
+			}
+
+			return true;
+		}
+
+		bool WritePackage(const std::string& szPackage)
+		{
+			//Write package name
+
+			return this->WriteAttribute("package", szPackage);
+		}
+
+		bool WriteMap(const std::string& szMap)
+		{
+			//Write map name
+
+			return this->WriteAttribute("map", szMap);
+		}
+
+		bool WritePlayerLocation(const Entity::Vector& vecPos)
+		{
+			//Write player location
+
+			return this->WriteAttribute("playerlocation", std::to_string(vecPos[0]) + "x" + std::to_string(vecPos[1]));
+		}
+
+		bool WriteAttribute(const std::string& szName, const std::string& szValue)
+		{
+			//Write save game attribute
+
+			if (!this->IsValidHandle()) {
+				return false;
+			}
+
+			std::string szLine = szName + " " + szValue + "\n";
+
+			this->m_poFile->write(szLine.c_str(), szLine.length());
+
+			return true;
+		}
+
+		void EndSaveGame(void)
+		{
+			//Finish file writing
+
+			this->Release();
+		}
+
+		//AngelScript interface methods
+		void Construct(void* pMemory) { new (pMemory) CSaveGameWriter(); }
+		void Destruct(void* pMemory) { ((CSaveGameWriter*)pMemory)->~CSaveGameWriter(); }
+	};
+
+	/* Save game reader */
+	class CSaveGameReader {
+	public:
+		struct save_game_entry_s {
+			std::string szIdent;
+			std::string szValue;
+		};
+	private:
+		std::ifstream* m_poFile;
+		std::vector<save_game_entry_s> m_vData;
+
+		bool IsValidFileHandle(void)
+		{
+			//Indicate if valid file handle
+
+			return (this->m_poFile != nullptr) && (this->m_poFile->is_open());
+		}
+
+		void Release(void)
+		{
+			//Release resources
+
+			if (this->m_poFile) {
+				if (this->m_poFile->is_open()) {
+					this->m_poFile->close();
+				}
+
+				delete this->m_poFile;
+				this->m_poFile = nullptr;
+			}
+		}
+	public:
+		CSaveGameReader() {}
+		~CSaveGameReader() {}
+
+		bool OpenSaveGameFile(const std::string& szFile)
+		{
+			//Open save game file
+
+			this->m_poFile = new std::ifstream();
+			if (!this->m_poFile)
+				return false;
+
+			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "saves\\" + szFile, std::ifstream::in);
+
+			return this->m_poFile->is_open();
+		}
+
+		void AcquireSaveGameData(void)
+		{
+			//Acquire all save game data
+
+			if (!this->IsValidFileHandle()) {
+				return;
+			}
+
+			this->m_poFile->seekg(0, std::ios_base::beg);
+
+			while (!this->m_poFile->eof()) {
+				char szLineBuffer[1024 * 4] = { 0 };
+				this->m_poFile->getline(szLineBuffer, sizeof(szLineBuffer), '\n');
+
+				std::string szLine = szLineBuffer;
+
+				size_t uiFirstSpace = szLine.find(' ');
+				if (uiFirstSpace != std::string::npos) {
+					std::string szIdent;
+					std::string szValue;
+
+					szIdent = szLine.substr(0, uiFirstSpace);
+					szValue = szLine.substr(uiFirstSpace + 1);
+
+					save_game_entry_s sItem;
+					sItem.szIdent = szIdent;
+					sItem.szValue = szValue;
+					this->m_vData.push_back(sItem);
+				}
+			}
+		}
+
+		std::string GetDataItem(const std::string& szIdent)
+		{
+			//Get data item value
+
+			for (size_t i = 0; i < this->m_vData.size(); i++) {
+				if (this->m_vData[i].szIdent == szIdent) {
+					return this->m_vData[i].szValue;
+				}
+			}
+
+			return "";
+		}
+
+		void Close(void)
+		{
+			//Finish file operation
+
+			this->m_vData.clear();
+			this->Release();
+		}
+
+		//Getter
+		const std::vector<save_game_entry_s>& GetDataVector(void) const { return this->m_vData; }
+
+		//AngelScript interface methods
+		void Construct(void* pMemory) { new (pMemory) CSaveGameWriter(); }
+		void Destruct(void* pMemory) { ((CSaveGameWriter*)pMemory)->~CSaveGameWriter(); }
 	};
 
 	bool Initialize(void);

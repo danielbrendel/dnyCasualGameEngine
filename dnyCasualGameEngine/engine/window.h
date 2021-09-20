@@ -176,7 +176,7 @@ namespace DxWindow {
 				this->Release();
 				return false;
 			}
-			std::cout << this->GetResolutionX() << "x" << this->GetResolutionY() << std::endl;
+			
 			//Update the window initiallly
 			UpdateWindow(this->m_hWindow);
 

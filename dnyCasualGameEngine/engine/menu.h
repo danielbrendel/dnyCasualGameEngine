@@ -24,6 +24,7 @@ namespace Menu {
 	void MainMenu_OnOpenSettings(class CMenu* pMenu);
 	void MainMenu_OnQuitGame(class CMenu* pMenu);
 
+	/* Base menu interface */
 	class IMenu {
 	protected:
 		bool m_bActive;
@@ -60,6 +61,8 @@ namespace Menu {
 			return this->m_bActive;
 		}
 	};
+
+	/* Button component */
 
 	class IButtonClickHandler {
 	public:
@@ -126,6 +129,7 @@ namespace Menu {
 		void SetHoverColor(const Entity::Color& color) { this->m_sHoverColor = color; }
 	};
 
+	/* Checkbox component */
 	const int CB_BOX_SIZE = 12;
 	const int CB_BOX_GAP = 10;
 	class CCheckbox {
@@ -213,6 +217,7 @@ namespace Menu {
 		std::wstring GetLabel(void) { return this->m_wszLabel; }
 	};
 
+	/* Combobox component */
 	const int CB_HEIGHT = 20;
 	const int CB_LIST_ITEM_GAP = 2;
 	class CComboBox {
@@ -318,6 +323,7 @@ namespace Menu {
 		bool IsOpen(void) { return this->m_bOpen; }
 	};
 
+	/* Slider component */
 	const int SLIDER_WIDTH = 6;
 	const int SLIDER_HEIGHT = 15;
 	const int SLIDER_LINE_HEIGHT = 4;
@@ -417,6 +423,7 @@ namespace Menu {
 		int GetMaxValue(void) const { return this->m_iMax; }
 	};
 
+	/* Form component */
 	class CForm : public IMenu {
 	private:
 		Entity::Vector m_vecPos;
@@ -457,6 +464,8 @@ namespace Menu {
 		void SetBodyColor(const Entity::Color& col) { this->m_sColBody = col; }
 		void SetTitleTextColor(const Entity::Color& col) { this->m_sColTitleText = col; }
 	};
+
+	/* Image listview component */
 
 	class IImageListViewSelector {
 	public:
@@ -583,6 +592,7 @@ namespace Menu {
 		const viewitem_s& GetItem(const size_t uiIdent) const { static viewitem_s sDummy;  if (uiIdent < this->m_vItems.size()) return this->m_vItems[uiIdent]; else return sDummy; }
 	};
 
+	/* Main menu component */
 	#define MAINMENU_FONTSIZE_W 15
 	#define MAINMENU_FONTSIZE_H 20
 	class CMainMenu : public IMenu {
@@ -727,6 +737,7 @@ namespace Menu {
 		}
 	};
 
+	/* Play menu component */
 	class CPlayMenu : public IMenu, IButtonClickHandler {
 	private:
 		CButton m_oPlay;
@@ -754,6 +765,7 @@ namespace Menu {
 		}
 	};
 
+	/* Package menu component */
 	class CPackageMenu : public IMenu, public IButtonClickHandler, IImageListViewSelector {
 	private:
 		struct package_s {
@@ -924,6 +936,7 @@ namespace Menu {
 		}
 	};
 
+	/* Tab menu component */
 	class CTabMenu : public IMenu {
 	private:
 		struct menu_item_s {
@@ -1027,6 +1040,7 @@ namespace Menu {
 		virtual void SetActiveTab(size_t uiIndex) { this->m_uiSelectedTab = uiIndex; }
 	};
 
+	/* Key binding component */
 	const int BK_OBJECT_WIDTH = 290;
 	const int BK_OBJECT_HEIGHT = 35;
 	class CKeyBinding : public IMenu {
@@ -1156,6 +1170,7 @@ namespace Menu {
 		int GetVkey(void) const { return this->m_vKey; }
 	};
 
+	/* Keys submenu component */
 	class CSettingsKeys : public IMenu, public IButtonClickHandler {
 	private:
 		Entity::Vector m_vecPos;
@@ -1304,6 +1319,7 @@ namespace Menu {
 		virtual void OnButtonClick(class CButton* pButton);
 	};
 
+	/* Graphics settings submenu component */
 	class CSettingsGfx : public IMenu, IButtonClickHandler {
 	private:
 		Entity::Vector m_vecPos;
@@ -1380,6 +1396,7 @@ namespace Menu {
 		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
 	};
 
+	/* Sound settings submenu component */
 	class CSettingsSnd : public IMenu, IButtonClickHandler {
 	private:
 		Entity::Vector m_vecPos;
@@ -1442,6 +1459,7 @@ namespace Menu {
 		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
 	};
 
+	/* Settings menu component */
 	class CSettingsMenu : public IMenu {
 	private:
 		CSettingsKeys m_oMenuKeys;
@@ -1504,6 +1522,7 @@ namespace Menu {
 		}
 	};
 
+	/* GUI cursor component */
 	class CCursor {
 	private:
 		DxRenderer::HD3DSPRITE m_hCursor;
@@ -1557,6 +1576,7 @@ namespace Menu {
 		void SetActiveStatus(bool value) { this->m_bActive = value; }
 	};
 
+	/* Main menu container component */
 	class CMenu {
 	private:
 		CMainMenu m_oMainMenu;
@@ -1725,6 +1745,7 @@ namespace Menu {
 		}
 	};
 
+	/* Intermission menu component */
 	class CIntermissionMenu : public IButtonClickHandler {
 	private:
 		CForm m_oForm;
@@ -1816,6 +1837,7 @@ namespace Menu {
 		virtual void OnButtonClick(class CButton* pButton);
 	};
 
+	/* Game over menu component */
 	class CGameOverMenu : public IButtonClickHandler {
 	private:
 		CForm m_oForm;

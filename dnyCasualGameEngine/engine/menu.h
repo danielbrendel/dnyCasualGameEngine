@@ -747,9 +747,7 @@ namespace Menu {
 		{
 		}
 
-		virtual void OnButtonClick(class CButton* pButton)
-		{
-		}
+		virtual void OnButtonClick(class CButton* pButton);
 
 		virtual void Release(void)
 		{

@@ -2,6 +2,8 @@
 string g_szPackagePath = "";
 
 #include "weapon_laser.as"
+#include "../../.common/entities/explosion.as"
+#include "tankcls.as"
 
 const int BTN_FORWARD = (1 << 0);
 const int BTN_BACKWARD = (1 << 1);
@@ -217,6 +219,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		this.m_fRotation = fRot;
 	}
 	
+	//Set health
+	void SetHealth(uint health)
+	{
+		this.m_uiHealth = health;
+	}
+	
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
@@ -321,7 +329,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Return save game properties
 	string GetSaveGameProperties()
 	{	
-		return Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+		return Sav_CreateProperty("id", formatInt(Ent_GetId(@this))) + 
+			Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
 			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
 			Sav_CreateProperty("rot", formatFloat(this.m_fRotation)) +
 			Sav_CreateProperty("health", formatInt(this.m_uiHealth));
@@ -347,6 +356,45 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 //Restore game state
 void RestoreState(const string &in szIdent, const string &in szValue)
 {
+	string id = Sav_GetValueFromProperties(szValue, "id");
+	if (id != "") {
+		IScriptedEntity@ ent = Ent_GetEntityHandle(parseInt(id));
+		if (@ent != null) {
+			int x = parseInt(Sav_GetValueFromProperties(szValue, "x"));
+			int y = parseInt(Sav_GetValueFromProperties(szValue, "y"));
+			float rot = parseFloat(Sav_GetValueFromProperties(szValue, "rot"));
+			
+			ent.SetPosition(Vector(x, y));
+			ent.SetRotation(rot);
+			
+			string health = Sav_GetValueFromProperties(szValue, "health");
+			if (health != "") {
+				if (ent.GetName() == "player") {
+					CPlayerEntity@ casted = cast<CPlayerEntity>(ent);
+					casted.SetHealth(parseInt(health));
+				} else if (ent.GetName() == "tank") {
+					CTankEntity@ casted = cast<CTankEntity>(ent);
+					casted.SetHealth(parseInt(health));
+				}
+			}
+		}
+	} else {
+		int x = parseInt(Sav_GetValueFromProperties(szValue, "x"));
+		int y = parseInt(Sav_GetValueFromProperties(szValue, "y"));
+		float rot = parseFloat(Sav_GetValueFromProperties(szValue, "rot"));
+	
+		if (szIdent == "decal") {
+			CDecalEntity @dcl = CDecalEntity();
+			dcl.SetRotation(rot);
+			Ent_SpawnEntity("decal", @dcl, Vector(x, y));
+		} else if (szIdent == "explosion") {
+			CExplosionEntity @expl = CExplosionEntity();
+			expl.SetRotation(rot);
+			Ent_SpawnEntity("explosion", @expl, Vector(x, y));
+		} else {
+			Print("Unknown spawnable entity ident: " + szIdent);
+		}
+	}
 }
 
 //Save game state to disk

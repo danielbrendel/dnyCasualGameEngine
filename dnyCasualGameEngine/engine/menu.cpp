@@ -13,6 +13,10 @@
 */
 
 namespace Menu {
+	void CPlayMenu::OnButtonClick(class CButton* pButton)
+	{
+	}
+
 	void CPackageMenu::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		this->m_oButton.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);

@@ -67,6 +67,10 @@ namespace Game {
 
 					const std::vector<Entity::CSaveGameReader::save_game_entry_s>& vList = this->m_oSaveGameReader.GetDataVector();
 					for (size_t i = 0; i < vList.size(); i++) {
+						if ((vList[i].szIdent == "package") || (vList[i].szIdent == "map")) {
+							continue;
+						}
+
 						Scripting::HSISCRIPT hScript = this->FindScript(L"player");
 
 						std::string szIdent = vList[i].szIdent;

@@ -72,6 +72,7 @@ namespace Game {
 
 		struct map_s {
 			std::wstring wszName;
+			std::wstring wszFileName;
 			std::wstring wszBackground;
 		};
 
@@ -107,6 +108,7 @@ namespace Game {
 		bool m_bGameOver;
 		Entity::CSaveGameReader m_oSaveGameReader;
 		bool m_bLoadSavedGame;
+		Entity::CHudInfoMessages m_oHudInfoMessages;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -155,6 +157,8 @@ namespace Game {
 				pConsole->AddLine(L"Failed to execute package index map script", Console::ConColor(255, 0, 0));
 				return false;
 			}
+
+			this->m_sMap.wszFileName = this->m_sPackage.wszMapIndex;
 
 			//Set map background
 
@@ -353,7 +357,7 @@ namespace Game {
 			pConfigMgr->CCommand::Add(L"ent_spawn", L"Spawn scripted entity", &Cmd_EntSpawn);
 			pConfigMgr->CCommand::Add(L"ent_require", L"Require entity script", &Cmd_EntRequire);
 			pConfigMgr->CCommand::Add(L"env_goal", L"Spawn goal entity", &Cmd_EnvGoal);
-
+			
 			//Execute configuration scripts
 			pConfigMgr->Execute(wszBasePath + L"app.cfg");
 			pConfigMgr->Execute(wszBasePath + L"config.cfg");
@@ -674,6 +678,15 @@ namespace Game {
 			this->m_oMenu.AddPackage(wszName, wszPath);
 		}
 
+		void AddHudInfoMessage(const std::wstring& wszMessage, const Entity::HudMessageColor eColor, int iDuration = Entity::HUDMSG_DEFAULDURATION)
+		{
+			this->m_oHudInfoMessages.AddMessage(wszMessage, eColor, iDuration);
+		}
+
+		//Return package name
+		std::wstring GetPackageName(void) { return this->m_sPackage.wszPakName; }
+		//Return current map name
+		std::wstring GetCurrentMap(void) { return this->m_sMap.wszFileName; }
 		//Return package path
 		std::wstring GetPackagePath(void) { return (!this->m_sPackage.wszPakPath.length()) ? wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\" : this->m_sPackage.wszPakPath + L"\\"; }
 		//Return key binding

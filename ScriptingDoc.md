@@ -22,6 +22,12 @@ __Version__: 1.0
 * SEEKW_BEGIN: Start from the begin of a file
 * SEEKW_CURRENT: Start from current file offset
 * SEEKW_END: Start from the end of a file
+### HudInfoMessageColor:
+* HUD_MSG_COLOR_DEFAULT: Default color
+* HUD_MSG_COLOR_GREEN: Green color
+* HUD_MSG_COLOR_RED: Red color
+* HUD_MSG_COLOR_YELLOW: Yellow color
+* HUD_MSG_COLOR_BLUE: Blue color
 	
 ## Callbacks:
 ```angelscript
@@ -237,18 +243,24 @@ int GetPlayerScore()
 void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
 //Used to restore a game state. This is used in the context of loading a saved game
 void RestoreState(const string &in szIdent, const string &in szValue)
+//Used to save the current game state to disk
+bool SaveGame()
 ```
 
 ## Available API functions:
 ```angelscript
-//Print a text to the console
-void Print(const string& in)
-//Print text to the console with the given color
-void PrintClr(const string& in, const ConColor &in)
+//Return current package name
+string GetPackageName()
+//Return current map name
+string GetCurrentMap()
 //Return the package path of the current loaded game or mod
 string GetPackagePath()
 //Return path to the common directory where to include common assets and scripts
 string GetCommonPath()
+//Print a text to the console
+void Print(const string& in)
+//Print text to the console with the given color
+void PrintClr(const string& in, const ConColor &in)
 //Get the virtual key code of a key binding identifier
 int GetKeyBinding(const string &in)
 //Load a font
@@ -275,6 +287,8 @@ bool R_DrawLine(const Vector&in start, const Vector&in end, const Color&in color
 bool R_DrawSprite(const SpriteHandle hSprite, const Vector&in pos, int iFrame, float fRotation, const Vector &in vRotPos, float fScale1, float fScale2, bool bUseCustomColorMask, const Color&in color)
 //Draw a string on the screen.
 bool R_DrawString(const FontHandle font, const string&in szText, const Vector&in pos, const Color&in color)
+//Add a HUD message
+void R_AddHudMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)
 //Check if the required position is inside the view in order to be drawn
 bool R_ShouldDraw(const Vector &in vMyPos, const Vector &in vMySize)
 //Get the relative drawing positions of absolute world positions according to the view

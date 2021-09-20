@@ -1521,5 +1521,83 @@ namespace Entity {
 		void Destruct(void* pMemory) { ((CSaveGameWriter*)pMemory)->~CSaveGameWriter(); }
 	};
 
+	/* HUD info messages */
+	const int HUDMSG_DEFAULDURATION = 3000;
+	enum HudMessageColor { HM_GREEN = 1, HM_RED, HM_YELLOW, HM_BLUE };
+	class CHudInfoMessages {
+	private:
+		struct message_s {
+			std::wstring wszMsg;
+			CTimer oTimer;
+			Color sColor;
+		};
+
+		std::vector<message_s> m_vMessages;
+	public:
+		CHudInfoMessages() {}
+		~CHudInfoMessages() {}
+
+		void AddMessage(const std::wstring& wszMessage, const HudMessageColor eColor, int iDuration = HUDMSG_DEFAULDURATION)
+		{
+			//Add new message to list
+
+			message_s sMessage;
+			sMessage.wszMsg = wszMessage;
+
+			switch (eColor) {
+			case HM_GREEN:
+				sMessage.sColor = Color(50, 130, 0, 150);
+				break;
+			case HM_RED:
+				sMessage.sColor = Color(235, 29, 36, 150);
+				break;
+			case HM_YELLOW:
+				sMessage.sColor = Color(255, 250, 200, 100);
+				break;
+			case HM_BLUE:
+				sMessage.sColor = Color(0, 130, 255, 150);
+				break;
+			default:
+				sMessage.sColor = Color(50, 50, 50, 150);
+				break;
+			}
+
+			sMessage.oTimer.SetDelay(iDuration);
+			sMessage.oTimer.Reset();
+			sMessage.oTimer.SetActive(true);
+
+			this->m_vMessages.push_back(sMessage);
+		}
+
+		void Process(void)
+		{
+			//Process messages
+
+			for (size_t i = 0; i < this->m_vMessages.size(); i++) {
+				this->m_vMessages[i].oTimer.Update();
+				if (this->m_vMessages[i].oTimer.Elapsed()) {
+					this->m_vMessages.erase(this->m_vMessages.begin() + i);
+					break;
+				}
+			}
+		}
+
+		void Draw(void)
+		{
+			//Draw messages
+
+			for (size_t i = 0; i < this->m_vMessages.size(); i++) {
+				int iBoxWidth = 20 + (int)this->m_vMessages[i].wszMsg.length() * iDefaultFontSize[0];
+				int iBoxHeight = iDefaultFontSize[1] + 4;
+				int drawx = pWindow->GetResolutionX() / 2 - iBoxWidth / 2;
+				int drawy = pWindow->GetResolutionY() - 100 - (iBoxHeight + 3) * (int)i;
+
+				pRenderer->DrawBox(drawx, drawy, iBoxWidth, iBoxHeight, 1, 255, 255, 255, 150);
+				pRenderer->DrawFilledBox(drawx + 1, drawy + 1, iBoxWidth - 1, iBoxHeight - 1, this->m_vMessages[i].sColor.r, this->m_vMessages[i].sColor.g, this->m_vMessages[i].sColor.b, this->m_vMessages[i].sColor.a);
+				pRenderer->DrawString(pDefaultFont, this->m_vMessages[i].wszMsg, drawx + 5, drawy + 2, 200, 200, 200, 150);
+			}
+		}
+	};
+
 	bool Initialize(void);
 }

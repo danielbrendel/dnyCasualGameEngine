@@ -175,6 +175,11 @@ namespace Entity {
 			return pRenderer->DrawString(pFont, Utils::ConvertToWideString(szText), pos[0], pos[1], color.r, color.g, color.b, color.a);
 		}
 
+		void AddHudMessage(const std::string& szMsg, HudMessageColor color, int iDuration = HUDMSG_DEFAULDURATION)
+		{
+			Game::pGame->AddHudInfoMessage(Utils::ConvertToWideString(szMsg), color, iDuration);
+		}
+
 		bool ShouldDraw(const Vector& vMyPos, const Vector& vMySize)
 		{
 			//Determine whether this entity is in viewport so it should be drawn
@@ -382,6 +387,16 @@ namespace Entity {
 			return (rand() % (end - start)) + start;
 		}
 
+		std::string GetPackageName(void)
+		{
+			return Utils::ConvertToAnsiString(Game::pGame->GetPackageName());
+		}
+
+		std::string GetCurrentMap(void)
+		{
+			return Utils::ConvertToAnsiString(Game::pGame->GetCurrentMap());
+		}
+
 		std::string GetPackagePath(void)
 		{
 			return Utils::ConvertToAnsiString(Game::pGame->GetPackagePath());
@@ -497,6 +512,12 @@ namespace Entity {
 		ADD_ENUM(hEnum, "SEEKW_BEGIN", CFileReader::SEEKW_BEGIN);
 		ADD_ENUM(hEnum, "SEEKW_CURRENT", CFileReader::SEEKW_CURRENT);
 		ADD_ENUM(hEnum, "SEEKW_END", CFileReader::SEEKW_END);
+		REG_ENUM("HudInfoMessageColor", hEnum);
+		ADD_ENUM(hEnum, "HUD_MSG_COLOR_DEFAULT", 0);
+		ADD_ENUM(hEnum, "HUD_MSG_COLOR_GREEN", HudMessageColor::HM_GREEN);
+		ADD_ENUM(hEnum, "HUD_MSG_COLOR_RED", HudMessageColor::HM_RED);
+		ADD_ENUM(hEnum, "HUD_MSG_COLOR_YELLOW", HudMessageColor::HM_YELLOW);
+		ADD_ENUM(hEnum, "HUD_MSG_COLOR_BLUE", HudMessageColor::HM_BLUE);
 
 		//Register function def
 		REG_FUNCDEF("bool FuncFileListing(const string& in)");
@@ -659,10 +680,12 @@ namespace Entity {
 			std::string szDefinition;
 			void* pFunction;
 		} sGameAPIFunctions[] = {
-			{ "void Print(const string& in)", &APIFuncs::Print },
-			{ "void PrintClr(const string& in, const ConColor &in)", &APIFuncs::Print2 },
+			{ "string GetPackageName()", &APIFuncs::GetPackageName },
+			{ "string GetCurrentMap()", &APIFuncs::GetCurrentMap },
 			{ "string GetPackagePath()", &APIFuncs::GetPackagePath },
 			{ "string GetCommonPath()", &APIFuncs::GetCommonPath },
+			{ "void Print(const string& in)", &APIFuncs::Print },
+			{ "void PrintClr(const string& in, const ConColor &in)", &APIFuncs::Print2 },
 			{ "int GetKeyBinding(const string &in)", &APIFuncs::GetKeyBinding },
 			{ "FontHandle R_LoadFont(const string& in, uint8 ucFontSizeW, uint8 ucFontSizeH)", &APIFuncs::LoadFont },
 			{ "bool R_GetSpriteInfo(const string &in, SpriteInfo &out)", &APIFuncs::GetSpriteInfo },
@@ -673,6 +696,7 @@ namespace Entity {
 			{ "bool R_DrawLine(const Vector&in start, const Vector&in end, const Color&in color)", &APIFuncs::DrawLine },
 			{ "bool R_DrawSprite(const SpriteHandle hSprite, const Vector&in pos, int iFrame, float fRotation, const Vector &in vRotPos, float fScale1, float fScale2, bool bUseCustomColorMask, const Color&in color)", &APIFuncs::DrawSprite },
 			{ "bool R_DrawString(const FontHandle font, const string&in szText, const Vector&in pos, const Color&in color)", &APIFuncs::DrawString },
+			{ "void R_AddHudMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },
 			{ "bool R_ShouldDraw(const Vector &in vMyPos, const Vector &in vMySize)", APIFuncs::ShouldDraw },
 			{ "void R_GetDrawingPosition(const Vector &in vMyPos, const Vector &in vMySize, Vector &out)", &APIFuncs::GetDrawingPosition },
 			{ "FontHandle R_GetDefaultFont()", &APIFuncs::GetDefaultFont },

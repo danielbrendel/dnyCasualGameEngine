@@ -323,6 +323,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	{
 		return 0;
 	}
+	
+	//Return health
+	uint32 GetPlayerHealth()
+	{
+		return this.m_uiHealth;
+	}
 }
 
 //Create the associated entity here
@@ -338,4 +344,32 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 //Restore game state
 void RestoreState(const string &in szIdent, const string &in szValue)
 {
+}
+
+//Save game state to disk
+bool SaveGame()
+{
+	Print("Saving game...");
+	
+	CPlayerEntity@ player = cast<CPlayerEntity>(@Ent_GetPlayerEntity());
+	
+	SaveGameWriter writer;
+	writer.BeginSaveGame();
+	writer.WritePackage(GetPackageName());
+	writer.WriteMap(GetCurrentMap());
+	writer.WritePlayerLocation(player.GetPosition());
+	writer.WriteAttribute("playerrot", formatFloat(player.GetRotation()));
+	writer.WriteAttribute("playerhealth", formatInt(player.GetPlayerHealth()));
+	
+	for (size_t i = 0; i < Ent_GetEntityCount(); i++) {
+		IScriptedEntity@ ent = Ent_GetEntityHandle(i);
+		if ((ent != null) && (ent.GetName() != "player")) {
+			Vector pos = ent.GetPosition();
+			writer.WriteAttribute("entity", ent.GetName() + "|" + formatInt(pos[0]) + "x" + formatInt(pos[1]) + "|" + formatFloat(ent.GetRotation()));
+		}
+	}
+	
+	writer.EndSaveGame();
+	
+	return true;
 }

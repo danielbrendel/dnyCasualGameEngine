@@ -39,6 +39,8 @@ namespace Game {
 			return false;
 		}
 
+		this->m_sMap.wszFileName = wszMap;
+
 		//Set map background
 		return pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\gfx\\" + this->m_sMap.wszBackground);
 	}
@@ -110,6 +112,9 @@ namespace Game {
 				}
 			}
 
+			//Process HUD info messages
+			this->m_oHudInfoMessages.Process();
+
 			Sleep(1);
 		}
 	}
@@ -153,6 +158,9 @@ namespace Game {
 		if (this->m_oMenu.IsOpen()) {
 			this->m_oMenu.Draw();
 		}
+
+		//Draw HUD info messages
+		this->m_oHudInfoMessages.Draw();
 
 		if (this->m_bInGameLoadingProgress) {
 			pRenderer->DrawSprite(this->m_hLoadingScreen, 0, 0, 0, 0.0f);
@@ -282,6 +290,19 @@ namespace Game {
 			}
 		}
 
+		if ((vKey == g_oInputMgr.GetKeyBindingCode(L"SAVEGAME")) && (!bDown)) {
+			size_t uiPlayerScript = this->FindScript(L"player");
+			bool bResult = false;
+
+			pScriptingInt->CallScriptFunction(this->m_vEntityScripts[uiPlayerScript].hScript, true, "SaveGame", nullptr, &bResult, Scripting::FA_BYTE);
+
+			if (bResult) {
+				this->m_oHudInfoMessages.AddMessage(L"Game saved!", Entity::HudMessageColor::HM_GREEN);
+			} else {
+				this->m_oHudInfoMessages.AddMessage(L"Failed to save game", Entity::HudMessageColor::HM_RED);
+			}
+		}
+
 		if (!this->m_oMenu.IsOpen()) {
 			const Entity::CScriptedEntsMgr::playerentity_s& playerEntity = Entity::oScriptedEntMgr.GetPlayerEntity();
 
@@ -303,7 +324,7 @@ namespace Game {
 	{
 		//Handle key input
 
-		if (vKey == VK_F1 && bDown) {
+		if ((vKey == g_oInputMgr.GetKeyBindingCode(L"CONSOLE")) && (bDown)) {
 			pConsole->Toggle();
 		}
 

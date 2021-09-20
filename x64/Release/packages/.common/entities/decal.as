@@ -116,7 +116,7 @@ class CDecalEntity : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
-		return "";
+		return "decal";
 	}
 	
 	//Indicate if this entity is movable
@@ -129,5 +129,13 @@ class CDecalEntity : IScriptedEntity
 	Vector& GetSize()
 	{
 		return this.m_vecPos;
+	}
+	
+	//Return save game properties
+	string GetSaveGameProperties()
+	{
+		return Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
+			Sav_CreateProperty("rot", formatFloat(this.GetRotation()));
 	}
 }

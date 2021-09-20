@@ -142,4 +142,10 @@ class CLaserEntity : IScriptedEntity
 	{
 		return this.m_vecPos;
 	}
+	
+	//Return save game properties
+	string GetSaveGameProperties()
+	{
+		return "";
+	}
 }

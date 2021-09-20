@@ -168,7 +168,6 @@ SaveGameWriter() //Default constructor
 bool BeginSaveGame() //Begin writing to save game file
 bool WritePackage(const string &in szPackage) //Write package name to file
 bool WriteMap(const string &in szMap) //Write map to file
-bool WritePlayerLocation(const Vector &in vecPos) //Write player location to file
 bool WriteAttribute(const string &in szName, const string &in szValue) //Write any data key-pair value that belongs to a state to be saved
 void EndSaveGame() //Finish file writing
 ```
@@ -221,6 +220,8 @@ void OnDamage(uint32)
 bool NeedsRemoval()
 //Return a name string here, e.g. the class name or instance name. Used to distinguish the entity class from others
 string GetName()
+//Return a string that contains all save game properties for this entity
+string GetSaveGameProperties()
 ```
 ### IPlayerEntity:
 * Used to implement player specific behaviors
@@ -326,6 +327,10 @@ bool Util_ListSprites(const string& in, FuncFileListing @cb)
 bool Util_ListSounds(const string& in, FuncFileListing @cb)
 //Return a random number between the given values
 int Util_Random(int start, int end)
+//Create a save game property with ident and value
+string Sav_CreateProperty(const string &in ident, const string &in value)
+//Extract a value by ident from a save game property string
+string Sav_GetValueFromProperties(const string &in properties, const string &in ident)
 ```
 
 ## AngelScript internals:

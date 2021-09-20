@@ -318,16 +318,19 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	{
 	}
 	
+	//Return save game properties
+	string GetSaveGameProperties()
+	{	
+		return Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
+			Sav_CreateProperty("rot", formatFloat(this.m_fRotation)) +
+			Sav_CreateProperty("health", formatInt(this.m_uiHealth));
+	}
+	
 	//Called for returning the current score
 	int GetPlayerScore()
 	{
 		return 0;
-	}
-	
-	//Return health
-	uint32 GetPlayerHealth()
-	{
-		return this.m_uiHealth;
 	}
 }
 
@@ -351,21 +354,15 @@ bool SaveGame()
 {
 	Print("Saving game...");
 	
-	CPlayerEntity@ player = cast<CPlayerEntity>(@Ent_GetPlayerEntity());
-	
 	SaveGameWriter writer;
 	writer.BeginSaveGame();
 	writer.WritePackage(GetPackageName());
 	writer.WriteMap(GetCurrentMap());
-	writer.WritePlayerLocation(player.GetPosition());
-	writer.WriteAttribute("playerrot", formatFloat(player.GetRotation()));
-	writer.WriteAttribute("playerhealth", formatInt(player.GetPlayerHealth()));
 	
 	for (size_t i = 0; i < Ent_GetEntityCount(); i++) {
 		IScriptedEntity@ ent = Ent_GetEntityHandle(i);
-		if ((ent != null) && (ent.GetName() != "player")) {
-			Vector pos = ent.GetPosition();
-			writer.WriteAttribute("entity", ent.GetName() + "|" + formatInt(pos[0]) + "x" + formatInt(pos[1]) + "|" + formatFloat(ent.GetRotation()));
+		if (ent != null) {
+			writer.WriteAttribute(ent.GetName(), ent.GetSaveGameProperties());
 		}
 	}
 	

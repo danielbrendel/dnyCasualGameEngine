@@ -146,4 +146,10 @@ class CGunEntity : IScriptedEntity
 	{
 		return this.m_vecPos;
 	}
+	
+	//Return save game properties
+	string GetSaveGameProperties()
+	{
+		return "";
+	}
 }

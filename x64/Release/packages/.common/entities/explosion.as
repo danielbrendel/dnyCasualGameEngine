@@ -140,4 +140,12 @@ class CExplosionEntity : IScriptedEntity
 	{
 		return this.m_vecPos;
 	}
+	
+	//Return save game properties
+	string GetSaveGameProperties()
+	{
+		return Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
+			Sav_CreateProperty("rot", formatFloat(this.GetRotation()));
+	}
 }

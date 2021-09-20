@@ -283,6 +283,15 @@ class CTankEntity : IScriptedEntity
 	{
 		return "tank";
 	}
+	
+	//Return save game properties
+	string GetSaveGameProperties()
+	{
+		return Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+				Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
+				Sav_CreateProperty("rot", formatFloat(this.m_fRotation)) +
+				Sav_CreateProperty("health", formatInt(this.m_uiHealth));
+	}
 }
 
 

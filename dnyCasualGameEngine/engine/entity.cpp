@@ -411,6 +411,31 @@ namespace Entity {
 		{
 			return Game::pGame->GetKeyBinding(Utils::ConvertToWideString(szIdent));
 		}
+
+		std::string CreateSaveGameProperty(const std::string& szIdent, const std::string& szValue)
+		{
+			return szIdent + ":" + szValue + ";";
+		}
+
+		std::string GetSaveGameValueFromProperties(const std::string& szProperties, const std::string& szIdent)
+		{
+			size_t uiPos = szProperties.find(szIdent + ":");
+			if (uiPos != std::string::npos) {
+				std::string szValue = "";
+
+				for (size_t i = uiPos + szIdent.length() + 1; i < szProperties.length(); i++) {
+					if (szProperties[i] == ';') {
+						break;
+					}
+
+					szValue += szProperties[i];
+				}
+
+				return szValue;
+			}
+
+			return "";
+		}
 	}
 
 	void CSolidSprite::Draw(void)
@@ -636,7 +661,6 @@ namespace Entity {
 		ADD_CLASSF("bool BeginSaveGame()", asMETHOD(CSaveGameWriter, BeginSaveGame), hClasses);
 		ADD_CLASSF("bool WritePackage(const string &in szPackage)", asMETHOD(CSaveGameWriter, WritePackage), hClasses);
 		ADD_CLASSF("bool WriteMap(const string &in szMap)", asMETHOD(CSaveGameWriter, WriteMap), hClasses);
-		ADD_CLASSF("bool WritePlayerLocation(const Vector &in vecPos)", asMETHOD(CSaveGameWriter, WritePlayerLocation), hClasses);
 		ADD_CLASSF("bool WriteAttribute(const string &in szName, const string &in szValue)", asMETHOD(CSaveGameWriter, WriteAttribute), hClasses);
 		ADD_CLASSF("void EndSaveGame()", asMETHOD(CSaveGameWriter, EndSaveGame), hClasses);
 		REG_CLASSV("SaveGameReader", sizeof(CSaveGameReader), hClasses);
@@ -667,6 +691,7 @@ namespace Entity {
 		REG_IFM("IScriptedEntity", "void OnDamage(uint32)");
 		REG_IFM("IScriptedEntity", "bool NeedsRemoval()");
 		REG_IFM("IScriptedEntity", "string GetName()");
+		REG_IFM("IScriptedEntity", "string GetSaveGameProperties()");
 
 		REG_IF("IPlayerEntity");
 		REG_IFM("IPlayerEntity", "void OnKeyPress(int vKey, bool bDown)");
@@ -715,6 +740,8 @@ namespace Entity {
 			{ "bool Util_ListSprites(const string& in, FuncFileListing @cb)", &APIFuncs::ListSprites },
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
 			{ "int Util_Random(int start, int end)", &APIFuncs::Random },
+			{ "string Sav_CreateProperty(const string &in ident, const string &in value)", &APIFuncs::CreateSaveGameProperty },
+			{ "string Sav_GetValueFromProperties(const string &in properties, const string &in ident)", &APIFuncs::GetSaveGameValueFromProperties }
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

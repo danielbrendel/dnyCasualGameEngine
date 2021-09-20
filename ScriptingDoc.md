@@ -247,6 +247,8 @@ void Print(const string& in)
 void PrintClr(const string& in, const ConColor &in)
 //Return the package path of the current loaded game or mod
 string GetPackagePath()
+//Return path to the common directory where to include common assets and scripts
+string GetCommonPath()
 //Get the virtual key code of a key binding identifier
 int GetKeyBinding(const string &in)
 //Load a font

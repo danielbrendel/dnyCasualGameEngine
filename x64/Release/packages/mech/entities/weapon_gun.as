@@ -1,4 +1,4 @@
-#include "explosion.as"
+#include "../../.common/entities/explosion.as"
 
 const uint32 GUN_SHOT_DAMAGE = 35;
 

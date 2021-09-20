@@ -2,7 +2,7 @@
 string g_szPackagePath = "";
 
 #include "weapon_gun.as"
-#include "explosion.as"
+#include "../../.common/entities/explosion.as"
 
 class CTankEntity : IScriptedEntity
 {

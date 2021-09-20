@@ -463,8 +463,13 @@ namespace Game {
 		int dir = _wtoi(pConfigMgr->ExpressionItemValue(8).c_str());
 		bool wall = pConfigMgr->ExpressionItemValue(9) == L"true";
 
+		std::wstring wszFullFilePath = pGame->m_sPackage.wszPakPath + L"\\gfx\\" + wszFile;
+		if (!Utils::FileExists(wszFullFilePath)) {
+			wszFullFilePath = wszBasePath + L"packages\\.common\\gfx\\" + wszFile;
+		}
+		
 		Entity::CSolidSprite oSprite;
-		oSprite.Initialize(x, y, w, h, pGame->m_sPackage.wszPakPath + L"\\gfx\\" + wszFile, repeat, dir, rot, wall);
+		oSprite.Initialize(x, y, w, h, wszFullFilePath, repeat, dir, rot, wall);
 
 		pGame->m_vSolidSprites.push_back(oSprite);
 	}

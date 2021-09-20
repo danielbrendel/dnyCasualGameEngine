@@ -157,7 +157,13 @@ namespace Game {
 			}
 
 			//Set map background
-			pRenderer->SetBackgroundPicture(wszPackagePath + L"\\gfx\\" + this->m_sMap.wszBackground);
+
+			std::wstring wszBackgroundFile = wszPackagePath + L"\\gfx\\" + this->m_sMap.wszBackground;
+			if (!Utils::FileExists(wszBackgroundFile)) {
+				wszBackgroundFile = wszBasePath + L"packages\\.common\\gfx\\" + this->m_sMap.wszBackground;
+			}
+
+			pRenderer->SetBackgroundPicture(wszBackgroundFile);
 
 			this->m_bGameStarted = true;
 
@@ -168,8 +174,13 @@ namespace Game {
 		{
 			//Spawn entity into world
 
+			std::wstring wszFullScriptPath = this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as";
+			if (!Utils::FileExists(wszFullScriptPath)) {
+				wszFullScriptPath = wszBasePath + L"packages\\.common\\entities\\" + wszName + L".as";
+			}
+
 			//Check if entity script exists
-			if (!Utils::FileExists(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as")) {
+			if (!Utils::FileExists(wszFullScriptPath)) {
 				pConsole->AddLine(L"Entity script does not exist", Console::ConColor(255, 0, 0));
 				return false;
 			}
@@ -178,9 +189,9 @@ namespace Game {
 			Scripting::HSISCRIPT hScript;
 			size_t uiScriptListId = this->FindScript(wszName);
 			if (uiScriptListId == std::string::npos) {
-				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as"));
+				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszFullScriptPath));
 				if (hScript == SI_INVALID_ID) {
-					pConsole->AddLine(L"Failed to load entity script: " + this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
+					pConsole->AddLine(L"Failed to load entity script: " + wszFullScriptPath, Console::ConColor(255, 0, 0));
 					return false;
 				}
 
@@ -223,9 +234,14 @@ namespace Game {
 		bool RequireEntityScript(const std::wstring& wszName)
 		{
 			//Load entity script
-			// 
+			
+			std::wstring wszFullFilePath = this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as";
+			if (!Utils::FileExists(wszFullFilePath)) {
+				wszFullFilePath = wszBasePath + L"packages\\.common\\entities\\" + wszName + L".as";
+			}
+
 			//Check if entity script exists
-			if (!Utils::FileExists(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as")) {
+			if (!Utils::FileExists(wszFullFilePath)) {
 				pConsole->AddLine(L"Entity script does not exist", Console::ConColor(255, 0, 0));
 				return false;
 			}
@@ -234,9 +250,9 @@ namespace Game {
 			Scripting::HSISCRIPT hScript;
 			size_t uiScriptListId = this->FindScript(wszName);
 			if (uiScriptListId == std::string::npos) {
-				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as"));
+				hScript = pScriptingInt->LoadScript(Utils::ConvertToAnsiString(wszFullFilePath));
 				if (hScript == SI_INVALID_ID) {
-					pConsole->AddLine(L"Failed to load entity script: " + this->m_sPackage.wszPakPath + L"\\entities\\" + wszName + L".as", Console::ConColor(255, 0, 0));
+					pConsole->AddLine(L"Failed to load entity script: " + wszFullFilePath, Console::ConColor(255, 0, 0));
 					return false;
 				}
 

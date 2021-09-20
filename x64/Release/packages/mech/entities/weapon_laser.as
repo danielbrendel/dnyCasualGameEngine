@@ -1,4 +1,4 @@
-#include "explosion.as"
+#include "../../.common/entities/explosion.as"
 
 class CLaserEntity : IScriptedEntity
 {

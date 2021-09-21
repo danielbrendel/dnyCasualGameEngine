@@ -441,6 +441,36 @@ namespace Entity {
 
 			return "";
 		}
+
+		void SetSteamAchievement(const std::string& szName)
+		{
+			pAchievements->UnlockAchievement(szName.c_str());
+		}
+
+		void SetSteamStatInt(const std::string& szName, int iValue)
+		{
+			pAchievements->SetStat(szName.c_str(), iValue);
+		}
+
+		void SetSteamStatFloat(const std::string& szName, float fValue)
+		{
+			pAchievements->SetStat(szName.c_str(), fValue);
+		}
+
+		bool IsSteamAchievementUnlocked(const std::string& szName)
+		{
+			return pAchievements->IsAchievementUnlocked(szName.c_str());
+		}
+
+		int GetSteamStatInt(const std::string& szName)
+		{
+			return pAchievements->GetStatInt(szName.c_str());
+		}
+
+		float GetSteamStatFloat(const std::string& szName)
+		{
+			return pAchievements->GetStatFloat(szName.c_str());
+		}
 	}
 
 	void CSolidSprite::Draw(void)
@@ -756,7 +786,13 @@ namespace Entity {
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
 			{ "int Util_Random(int start, int end)", &APIFuncs::Random },
 			{ "string Sav_CreateProperty(const string &in ident, const string &in value)", &APIFuncs::CreateSaveGameProperty },
-			{ "string Sav_GetValueFromProperties(const string &in properties, const string &in ident)", &APIFuncs::GetSaveGameValueFromProperties }
+			{ "string Sav_GetValueFromProperties(const string &in properties, const string &in ident)", &APIFuncs::GetSaveGameValueFromProperties },
+			{ "void Steam_SetAchievement(const string &in szName)", &APIFuncs::SetSteamAchievement },
+			{ "void Steam_SetStat(const string &in szName, int iValue)", &APIFuncs::SetSteamStatInt },
+			{ "void Steam_SetStat(const string &in szName, float fValue)", &APIFuncs::SetSteamStatFloat },
+			{ "bool Steam_IsAchievementUnlocked(const string &in szName)", &APIFuncs::IsSteamAchievementUnlocked },
+			{ "int Steam_GetStatInt(const string &in szName)", &APIFuncs::GetSteamStatInt },
+			{ "float Steam_GetStatFloat(const string &in szName)", &APIFuncs::GetSteamStatFloat },
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

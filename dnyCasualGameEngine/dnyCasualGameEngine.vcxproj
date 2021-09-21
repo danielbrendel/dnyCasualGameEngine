@@ -146,6 +146,7 @@
     <ClCompile Include="as\add_on\scriptbuilder\scriptbuilder.cpp" />
     <ClCompile Include="as\add_on\scriptmath\scriptmath.cpp" />
     <ClCompile Include="as\add_on\scriptstdstring\scriptstdstring.cpp" />
+    <ClCompile Include="engine\achievements.cpp" />
     <ClCompile Include="engine\console.cpp" />
     <ClCompile Include="engine\entity.cpp" />
     <ClCompile Include="engine\game.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="engine\workshop.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\achievements.h" />
     <ClInclude Include="engine\configmgr.h" />
     <ClInclude Include="engine\console.h" />
     <ClInclude Include="engine\entity.h" />

@@ -41,6 +41,9 @@ namespace Game {
 
 		this->m_sMap.wszFileName = wszMap;
 
+		//Publish current achievements
+		pAchievements->PublishAchievementAndStatProgress();
+
 		//Set map background
 		return pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\gfx\\" + this->m_sMap.wszBackground);
 	}
@@ -58,6 +61,8 @@ namespace Game {
 
 			//Perform game loading if indicated
 			if (this->m_bInGameLoadingProgress) {
+				pAchievements->PublishAchievementAndStatProgress();
+
 				if (!this->StartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath)) {
 					pConsole->AddLine(L"Failed to start new game", Console::ConColor(250, 0, 0));
 				}
@@ -218,6 +223,9 @@ namespace Game {
 
 		//Show cursor
 		this->m_oCursor.SetActiveStatus(true);
+
+		//Publish current achievements
+		pAchievements->PublishAchievementAndStatProgress();
 
 		//Restore background image
 		pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");

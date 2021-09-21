@@ -19,6 +19,7 @@
 #include "configmgr.h"
 #include "console.h"
 #include "input.h"
+#include "achievements.h"
 
 extern DxWindow::CDxWindow* pWindow;
 extern DxRenderer::CDxRenderer* pRenderer;
@@ -40,6 +41,8 @@ extern ConfigMgr::CCVar::cvar_s* pGfxFullscreen;
 extern ConfigMgr::CCVar::cvar_s* pSndVolume;
 
 extern Input::CInputMgr g_oInputMgr;
+
+extern Achievements::CSteamAchievements* pAchievements;
 
 extern DxRenderer::d3dfont_s* pDefaultFont;
 extern int iDefaultFontSize[2];

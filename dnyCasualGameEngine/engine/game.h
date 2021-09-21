@@ -462,6 +462,13 @@ namespace Game {
 				return false;
 			}
 
+			//Initialize Steam Achievements manager
+			pAchievements = new Achievements::CSteamAchievements();
+			if (!pAchievements) {
+				this->Release();
+				return false;
+			}
+
 			//Load banner
 			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\banner.png", 1, 768, 150, 1, false);
 			
@@ -687,6 +694,7 @@ namespace Game {
 			FREE(pScriptingInt);
 			FREE(pConfigMgr);
 			FREE(pSteamDownloader);
+			FREE(pAchievements);
 
 			//Clear indicators
 			this->m_bGameStarted = false;

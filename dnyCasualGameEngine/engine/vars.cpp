@@ -32,5 +32,7 @@ ConfigMgr::CCVar::cvar_s* pSndVolume = nullptr;
 
 Input::CInputMgr g_oInputMgr;
 
+Achievements::CSteamAchievements* pAchievements = nullptr;
+
 DxRenderer::d3dfont_s* pDefaultFont = nullptr;
 int iDefaultFontSize[2];

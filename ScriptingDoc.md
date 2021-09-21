@@ -333,6 +333,18 @@ int Util_Random(int start, int end)
 string Sav_CreateProperty(const string &in ident, const string &in value)
 //Extract a value by ident from a save game property string
 string Sav_GetValueFromProperties(const string &in properties, const string &in ident)
+//Unlock an achievement
+void Steam_SetAchievement(const string &in szName)
+//Set stat value (int)
+void Steam_SetStat(const string &in szName, int iValue)
+//Set stat value (float)
+void Steam_SetStat(const string &in szName, float fValue)
+//Check if achievement is already unlocked
+bool Steam_IsAchievementUnlocked(const string &in szName)
+//Get stat value (int)
+int Steam_GetStatInt(const string &in szName)
+//Get stat value (float)
+float Steam_GetStatFloat(const string &in szName)
 ```
 
 ## AngelScript internals:

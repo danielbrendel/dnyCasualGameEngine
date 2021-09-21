@@ -300,6 +300,8 @@ FontHandle R_GetDefaultFont()
 SoundHandle S_QuerySound(const string&in szSoundFile)
 //Play a sound with the given volume (1-10)
 bool S_PlaySound(SoundHandle hSound, int32 lVolume)
+//Get current game volume
+int S_GetCurrentVolume()
 //Get the center of the width of the screen
 int Wnd_GetWindowCenterX()
 //Get the center of the height of the screen

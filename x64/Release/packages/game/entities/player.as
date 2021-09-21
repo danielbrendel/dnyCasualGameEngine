@@ -347,7 +347,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
 {
 	g_szPackagePath = szPath;
-	R_AddHudMessage("Wow wie cool!", HUD_MSG_COLOR_GREEN);
+	
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
 	player.SetRotation(fRot);

@@ -1885,7 +1885,7 @@ namespace Menu {
 		{
 			//Initialize cursor
 
-			this->m_hCursor = pRenderer->LoadSprite(wszBasePath + L"media\\menucursor.png", 1, 16, 16, 1, false);
+			this->m_hCursor = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\menucursor.png", 1, 16, 16, 1, false);
 			if (this->m_hCursor == GFX_INVALID_SPRITE_ID) {
 				return false;
 			}

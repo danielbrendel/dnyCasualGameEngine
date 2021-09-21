@@ -463,10 +463,10 @@ namespace Game {
 			}
 
 			//Load banner
-			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\banner.png", 1, 768, 150, 1, false);
+			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\banner.png", 1, 768, 150, 1, false);
 			
 			//Set game menu background and open the menu
-			pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");
+			pRenderer->SetBackgroundPicture(wszBasePath + L"media\\gfx\\background.jpg");
 			this->m_oMenu.SetOpenStatus(true);
 
 			//Initialize intermission menu
@@ -482,11 +482,14 @@ namespace Game {
 			this->m_oCursor.SetActiveStatus(true);
 
 			//Load loading screen image
-			this->m_hLoadingScreen = pRenderer->LoadSprite(wszBasePath + L"media\\game_loading.png", 1, pWindow->GetResolutionX(), pWindow->GetResolutionY(), 1, true);
+			this->m_hLoadingScreen = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\game_loading.png", 1, pWindow->GetResolutionX(), pWindow->GetResolutionY(), 1, true);
 			if (this->m_hLoadingScreen == GFX_INVALID_SPRITE_ID) {
 				this->Release();
 				return false;
 			}
+
+			//Initialize HUD message component
+			this->m_oHudInfoMessages.Initialize();
 
 			//Add info text
 			pConsole->AddLine(std::wstring(pAppName->szValue) + L" v" + std::wstring(pAppVersion->szValue) + L" developed by " + std::wstring(pAppAuthor->szValue) + L" (" + std::wstring(pAppContact->szValue) + L")", Console::ConColor(100, 215, 255));

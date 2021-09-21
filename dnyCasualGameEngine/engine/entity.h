@@ -1512,6 +1512,9 @@ namespace Entity {
 
 	/* HUD info messages */
 	const int HUDMSG_DEFAULDURATION = 3000;
+	const int HUDMSG_FONTSIZE_W = 14;
+	const int HUDMSG_FONTSIZE_H = 30;
+	const int HUDMSG_SPRITE_SIZE = 50;
 	enum HudMessageColor { HM_GREEN = 1, HM_RED, HM_YELLOW, HM_BLUE };
 	class CHudInfoMessages {
 	private:
@@ -1522,9 +1525,31 @@ namespace Entity {
 		};
 
 		std::vector<message_s> m_vMessages;
+		DxRenderer::HD3DSPRITE m_hExclamation;
+		DxRenderer::d3dfont_s* m_pFont;
+		DxSound::HDXSOUND m_hSound;
 	public:
 		CHudInfoMessages() {}
 		~CHudInfoMessages() {}
+
+		bool Initialize(void)
+		{
+			//Initialize component
+
+			this->m_hExclamation = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\exclamation.png", 1, HUDMSG_SPRITE_SIZE, HUDMSG_SPRITE_SIZE, 1, true);
+			if (this->m_hExclamation == GFX_INVALID_SPRITE_ID) {
+				return false;
+			}
+
+			this->m_pFont = pRenderer->LoadFont(L"Arial", HUDMSG_FONTSIZE_W, HUDMSG_FONTSIZE_H);
+			if (!this->m_pFont) {
+				return false;
+			}
+
+			this->m_hSound = pSound->QuerySound(wszBasePath + L"media\\sound\\hint.wav");
+
+			return true;
+		}
 
 		void AddMessage(const std::wstring& wszMessage, const HudMessageColor eColor, int iDuration = HUDMSG_DEFAULDURATION)
 		{
@@ -1541,7 +1566,7 @@ namespace Entity {
 				sMessage.sColor = Color(235, 29, 36, 150);
 				break;
 			case HM_YELLOW:
-				sMessage.sColor = Color(255, 250, 200, 100);
+				sMessage.sColor = Color(135, 135, 0, 150);
 				break;
 			case HM_BLUE:
 				sMessage.sColor = Color(0, 130, 255, 150);
@@ -1556,6 +1581,8 @@ namespace Entity {
 			sMessage.oTimer.SetActive(true);
 
 			this->m_vMessages.push_back(sMessage);
+
+			pSound->Play(this->m_hSound, pSndVolume->iValue, 0);
 		}
 
 		void Process(void)
@@ -1576,14 +1603,15 @@ namespace Entity {
 			//Draw messages
 
 			for (size_t i = 0; i < this->m_vMessages.size(); i++) {
-				int iBoxWidth = 20 + (int)this->m_vMessages[i].wszMsg.length() * iDefaultFontSize[0];
-				int iBoxHeight = iDefaultFontSize[1] + 4;
+				int iBoxWidth = HUDMSG_SPRITE_SIZE + (int)this->m_vMessages[i].wszMsg.length() * HUDMSG_FONTSIZE_W + 50;
+				int iBoxHeight = HUDMSG_SPRITE_SIZE + 2;
 				int drawx = pWindow->GetResolutionX() / 2 - iBoxWidth / 2;
 				int drawy = pWindow->GetResolutionY() - 100 - (iBoxHeight + 3) * (int)i;
 
 				pRenderer->DrawBox(drawx, drawy, iBoxWidth, iBoxHeight, 1, 255, 255, 255, 150);
 				pRenderer->DrawFilledBox(drawx + 1, drawy + 1, iBoxWidth - 1, iBoxHeight - 1, this->m_vMessages[i].sColor.r, this->m_vMessages[i].sColor.g, this->m_vMessages[i].sColor.b, this->m_vMessages[i].sColor.a);
-				pRenderer->DrawString(pDefaultFont, this->m_vMessages[i].wszMsg, drawx + 5, drawy + 2, 200, 200, 200, 150);
+				pRenderer->DrawSprite(this->m_hExclamation, drawx + 3, drawy + 1, 0, 0.0f);
+				pRenderer->DrawString(this->m_pFont, this->m_vMessages[i].wszMsg, drawx + 5 + 50, drawy + 10, 200, 200, 200, 150);
 			}
 		}
 	};

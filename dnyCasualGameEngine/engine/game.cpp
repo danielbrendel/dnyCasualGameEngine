@@ -441,6 +441,15 @@ namespace Game {
 		g_oInputMgr.AddKeyBinding(wszIdent, vCode);
 	}
 
+	void Cmd_Echo(void)
+	{
+		std::wstring wszText = pConfigMgr->ExpressionItemValue(1);
+
+		if (pConsole) {
+			pConsole->AddLine(wszText);
+		}
+	}
+
 	void Cmd_PackageName(void)
 	{
 		pGame->m_sPackage.wszName = pConfigMgr->ExpressionItemValue(1);

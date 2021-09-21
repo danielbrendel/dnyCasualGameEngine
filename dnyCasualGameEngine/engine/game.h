@@ -54,6 +54,7 @@ namespace Game {
 	void Cmd_EntSpawn(void);
 	void Cmd_EnvGoal(void);
 	void Cmd_Bind(void);
+	void Cmd_Echo(void);
 
 	void OnHandleWorkshopItem(const std::wstring& wszItem);
 	void HandlePackageUpload(const std::wstring& wszArgs);
@@ -123,6 +124,7 @@ namespace Game {
 		friend void Cmd_EntRequire(void);
 		friend void Cmd_EnvGoal(void);
 		friend void Cmd_Bind(void);
+		friend void Cmd_Echo(void);
 
 		bool LoadPackage(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
 		{
@@ -347,6 +349,7 @@ namespace Game {
 			
 			//Add commands
 			pConfigMgr->CCommand::Add(L"bind", L"Bind command to key", &Cmd_Bind);
+			pConfigMgr->CCommand::Add(L"echo", L"Print text to console", &Cmd_Echo);
 			pConfigMgr->CCommand::Add(L"package_name", L"Package name", &Cmd_PackageName);
 			pConfigMgr->CCommand::Add(L"package_version", L"Package version", &Cmd_PackageVersion);
 			pConfigMgr->CCommand::Add(L"package_author", L"Package author", &Cmd_PackageAuthor);

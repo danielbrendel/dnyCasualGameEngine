@@ -409,7 +409,7 @@ bool SaveGame()
 	
 	for (size_t i = 0; i < Ent_GetEntityCount(); i++) {
 		IScriptedEntity@ ent = Ent_GetEntityHandle(i);
-		if (ent != null) {
+		if (@ent != null) {
 			writer.WriteAttribute(ent.GetName(), ent.GetSaveGameProperties());
 		}
 	}

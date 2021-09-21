@@ -1312,6 +1312,7 @@ namespace Entity {
 	class CSaveGameWriter {
 	private:
 		std::ofstream* m_poFile;
+		std::string m_szFileName;
 
 		bool IsValidHandle(void)
 		{
@@ -1334,7 +1335,7 @@ namespace Entity {
 			}
 		}
 	public:
-		CSaveGameWriter() {}
+		CSaveGameWriter() : m_poFile(nullptr) {}
 		~CSaveGameWriter() {}
 
 		bool BeginSaveGame(void)
@@ -1353,9 +1354,9 @@ namespace Entity {
 			std::ostringstream oss;
 			oss << std::put_time(&time, "%d-%m-%Y_%H-%M-%S");
 
-			std::string szFile = "savegame_" + oss.str() + ".sav";
+			this->m_szFileName = "savegame_" + oss.str() + ".sav";
 
-			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "saves\\" + szFile, std::ifstream::out);
+			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "saves\\" + this->m_szFileName, std::ifstream::out);
 			if (!this->m_poFile->is_open()) {
 				delete this->m_poFile;
 				return false;
@@ -1378,13 +1379,6 @@ namespace Entity {
 			return this->WriteAttribute("map", szMap);
 		}
 
-		bool WritePlayerLocation(const Entity::Vector& vecPos)
-		{
-			//Write player location
-
-			return this->WriteAttribute("playerlocation", std::to_string(vecPos[0]) + "x" + std::to_string(vecPos[1]));
-		}
-
 		bool WriteAttribute(const std::string& szName, const std::string& szValue)
 		{
 			//Write save game attribute
@@ -1400,12 +1394,7 @@ namespace Entity {
 			return true;
 		}
 
-		void EndSaveGame(void)
-		{
-			//Finish file writing
-
-			this->Release();
-		}
+		void EndSaveGame(void);
 
 		//AngelScript interface methods
 		void Construct(void* pMemory) { new (pMemory) CSaveGameWriter(); }
@@ -1444,7 +1433,7 @@ namespace Entity {
 			}
 		}
 	public:
-		CSaveGameReader() {}
+		CSaveGameReader() : m_poFile(nullptr) {}
 		~CSaveGameReader() {}
 
 		bool OpenSaveGameFile(const std::string& szFile)

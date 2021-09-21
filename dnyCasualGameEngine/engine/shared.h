@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <ctime>
+#include <strsafe.h>
 #include <Windows.h>
 #include "resource.h"
 

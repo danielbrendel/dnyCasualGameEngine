@@ -527,6 +527,10 @@ namespace Game {
 			bool bResult = this->LoadPackage(wszPackage, wszFromPath);
 			if (!bResult) {
 				this->m_oMenu.SetOpenStatus(true);
+				this->m_oCursor.SetActiveStatus(true);
+
+				this->AddHudInfoMessage(L"Failed to load game", Entity::HudMessageColor::HM_RED, 5000);
+
 				return false;
 			}
 
@@ -695,5 +699,7 @@ namespace Game {
 		Entity::CGoalEntity* GetGoalEntity(void) { return this->m_pGoalEntity; }
 		//Get cursor
 		Menu::CCursor* GetCursor(void) { return &this->m_oCursor; }
+		//Get main menu
+		Menu::CMenu* GetMenu(void) { return &this->m_oMenu; }
 	};
 }

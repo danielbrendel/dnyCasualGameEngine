@@ -737,28 +737,377 @@ namespace Menu {
 		}
 	};
 
+	/* Listview component */
+	const int LB_ITEM_GAP = 4;
+	class IListBoxSelectHandler {
+	public:
+		virtual void OnListBoxSelectEvent(class CListBox* pListBox, size_t uiItem) = 0;
+	};
+	class CListBox {
+	private:
+		struct listbox_item_s {
+			std::wstring wszDisplayText;
+			std::wstring wszDataContent;
+		};
+
+		IListBoxSelectHandler* m_pHandler;
+		std::vector<listbox_item_s> m_vItems;
+		size_t m_uiSelectedItem;
+		size_t m_uiDrawingIndex;
+		size_t m_uiItemDisplayCountY;
+		Entity::Vector m_vecMousePos;
+		Entity::Vector m_vecPosition;
+		Entity::Vector m_vecSize;
+		Entity::Color m_sFrameColor;
+		Entity::Color m_sFillColor;
+		Entity::Color m_sTextColor;
+		Entity::Color m_sHoverColor;
+		Entity::Color m_sSelectColor;
+
+		bool IsInItemRange(const size_t uiItem)
+		{
+			//Check if mouse coords are in item range
+
+			if ((this->m_vecMousePos[0] > this->m_vecPosition[0]) && (this->m_vecMousePos[0] < this->m_vecPosition[0] + this->m_vecSize[0]) && (this->m_vecMousePos[1] > this->m_vecPosition[1] + 3 + (int)(uiItem - this->m_uiDrawingIndex) * (iDefaultFontSize[1] + LB_ITEM_GAP * 2)) && (this->m_vecMousePos[1] < this->m_vecPosition[1] + 3 + (int)(uiItem - this->m_uiDrawingIndex) * (iDefaultFontSize[1] + LB_ITEM_GAP * 2) + iDefaultFontSize[1] + LB_ITEM_GAP * 2)) {
+				return true;
+			}
+
+			return false;
+		}
+	public:
+		CListBox() : m_uiSelectedItem(std::string::npos), m_uiDrawingIndex(0), m_pHandler(nullptr) {}
+		~CListBox() {}
+
+		void AddItem(const std::wstring& wszDisplay, const std::wstring& wszData)
+		{
+			//Add listbox item
+
+			listbox_item_s sItem;
+			sItem.wszDisplayText = wszDisplay;
+			sItem.wszDataContent = wszData;
+
+			this->m_vItems.push_back(sItem);
+		}
+
+		void InsertAt(const size_t uiPos, const std::wstring& wszDisplay, const std::wstring& wszData)
+		{
+			//Insert at position
+
+			listbox_item_s sItem;
+			sItem.wszDisplayText = wszDisplay;
+			sItem.wszDataContent = wszData;
+
+			this->m_vItems.insert(this->m_vItems.begin() + uiPos, sItem);
+		}
+
+		void EditItem(const size_t uiId, const std::wstring& wszDisplay, const std::wstring& wszData)
+		{
+			//Edit listbox item
+
+			if (uiId < this->m_vItems.size()) {
+				this->m_vItems[uiId].wszDisplayText = wszDisplay;
+				this->m_vItems[uiId].wszDataContent = wszData;
+			}
+		}
+
+		void RemoveItem(const size_t uiId)
+		{
+			//Remove an item
+
+			if (uiId < this->m_vItems.size()) {
+				this->m_vItems.erase(this->m_vItems.begin() + uiId);
+			}
+		}
+
+		const size_t GetCount(void) const
+		{
+			//Return item count
+
+			return this->m_vItems.size();
+		}
+
+		std::wstring GetItem(const size_t uiId)
+		{
+			//Get item data value by ID
+
+			if (uiId < this->m_vItems.size()) {
+				return this->m_vItems[uiId].wszDataContent;
+			}
+
+			return L"";
+		}
+
+		std::wstring GetItemDisplayText(const size_t uiId)
+		{
+			//Get item display text by ID
+
+			if (uiId < this->m_vItems.size()) {
+				return this->m_vItems[uiId].wszDisplayText;
+			}
+
+			return L"";
+		}
+
+		size_t GetSelectedItem(void)
+		{
+			//Get selected item ID
+
+			return this->m_uiSelectedItem;
+		}
+
+		void Clear(void)
+		{
+			//Clear all items
+
+			this->m_vItems.clear();
+		}
+
+		void UpdateDimension(void)
+		{
+			//Update dimension
+
+			this->m_uiItemDisplayCountY = this->m_vecSize[1] / (iDefaultFontSize[1] + LB_ITEM_GAP * 2);
+		}
+
+		void Draw(void)
+		{
+			//Draw component
+
+			pRenderer->DrawBox(this->m_vecPosition[0], this->m_vecPosition[1], this->m_vecSize[0], this->m_vecSize[1], 1, this->m_sFrameColor.r, this->m_sFrameColor.g, this->m_sFrameColor.b, this->m_sFrameColor.a);
+			pRenderer->DrawFilledBox(this->m_vecPosition[0] + 1, this->m_vecPosition[1] + 1, this->m_vecSize[0] - 1, this->m_vecSize[1] - 1, this->m_sFillColor.r, this->m_sFillColor.g, this->m_sFillColor.b, this->m_sFillColor.a);
+
+			for (size_t i = this->m_uiDrawingIndex; i < this->m_uiDrawingIndex + this->m_uiItemDisplayCountY; i++) {
+				if (i >= this->m_vItems.size()) {
+					continue;
+				}
+
+				if (this->IsInItemRange(i)) {
+					pRenderer->DrawFilledBox(this->m_vecPosition[0] + 1, this->m_vecPosition[1] + 3 + (int)(i - this->m_uiDrawingIndex) * (iDefaultFontSize[1] + LB_ITEM_GAP * 2) - iDefaultFontSize[1] / 2, this->m_vecSize[0] - 1, iDefaultFontSize[1] + LB_ITEM_GAP * 2, this->m_sHoverColor.r, this->m_sHoverColor.g, this->m_sHoverColor.b, this->m_sHoverColor.a);
+				}
+
+				if (i == this->m_uiSelectedItem) {
+					pRenderer->DrawFilledBox(this->m_vecPosition[0] + 1, this->m_vecPosition[1] + 3 + (int)(i - this->m_uiDrawingIndex) * (iDefaultFontSize[1] + LB_ITEM_GAP * 2) - iDefaultFontSize[1] / 2, this->m_vecSize[0] - 1, iDefaultFontSize[1] + LB_ITEM_GAP * 2, this->m_sSelectColor.r, this->m_sSelectColor.g, this->m_sSelectColor.b, this->m_sSelectColor.a);
+				}
+
+				pRenderer->DrawString(pDefaultFont, this->m_vItems[i].wszDisplayText, this->m_vecPosition[0] + 5, this->m_vecPosition[1] + 3 + (int)(i - this->m_uiDrawingIndex) * (iDefaultFontSize[1] + LB_ITEM_GAP * 2), this->m_sTextColor.r, this->m_sTextColor.g, this->m_sTextColor.b, this->m_sTextColor.a);
+			}
+		}
+
+		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
+		{
+			//Handle mouse events
+
+			if (!iMouseKey) {
+				this->m_vecMousePos = Entity::Vector(x, y);
+			} else {
+				if ((iMouseKey == 1) && (!bDown)) {
+					for (size_t i = 0; i < this->m_vItems.size(); i++) {
+						if (this->IsInItemRange(i)) {
+							this->m_uiSelectedItem = i;
+
+							if (this->m_pHandler) {
+								this->m_pHandler->OnListBoxSelectEvent(this, i);
+							}
+
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		void OnMouseWheelEvent(short wDistance, bool bForward)
+		{
+			//Handle mouse wheel event
+
+			if (!bForward) {
+				int iTopValue = (int)this->m_vItems.size() - (int)this->m_uiItemDisplayCountY;
+				if (iTopValue < 0) {
+					iTopValue = 0;
+				}
+
+				if (this->m_uiDrawingIndex < (size_t)iTopValue) {
+					this->m_uiDrawingIndex++;
+				}
+			} else {
+				if (this->m_uiDrawingIndex > 0) {
+					this->m_uiDrawingIndex--;
+				}
+			}
+		}
+
+		//Setters
+		void SetPosition(const Entity::Vector& vec) { this->m_vecPosition = vec; }
+		void SetSize(const Entity::Vector& vec) { this->m_vecSize = vec; this->UpdateDimension(); }
+		void SetOwner(IListBoxSelectHandler* pOwner) { this->m_pHandler = pOwner; }
+		void SetFrameColor(const Entity::Color& col) { this->m_sFrameColor = col; }
+		void SetFillColor(const Entity::Color& col) { this->m_sFillColor = col; }
+		void SetTextColor(const Entity::Color& col) { this->m_sTextColor = col; }
+		void SetHoverColor(const Entity::Color& col) { this->m_sHoverColor = col; }
+		void SetSelectColor(const Entity::Color& col) { this->m_sSelectColor = col; }
+	};
+
 	/* Play menu component */
-	class CPlayMenu : public IMenu, IButtonClickHandler {
+	class CPlayMenu : public IMenu, IButtonClickHandler, IListBoxSelectHandler {
 	private:
 		CButton m_oPlay;
+		CListBox m_oSaveGames;
+		CButton m_oLoad;
+
+		void AcquireSavedGameStates(void)
+		{
+			//Acquire all saved game states
+
+			WIN32_FIND_DATA sFindData = { 0 };
+
+			HANDLE hFileSearch = FindFirstFile((wszBasePath + L"saves\\*.*").c_str(), &sFindData);
+			if (hFileSearch != INVALID_HANDLE_VALUE) {
+				while (FindNextFile(hFileSearch, &sFindData)) {
+					if (sFindData.cFileName[0] == '.') {
+						continue;
+					}
+
+					if ((sFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
+						if (Utils::ExtractFileExt(sFindData.cFileName) != L"sav") {
+							continue;
+						}
+
+						std::wstring wszDisplayText;
+						std::wstring wszDataContent;
+						SYSTEMTIME stUTC, stLocal;
+						wchar_t wszBuffer[MAX_PATH] = { 0 };
+
+						FileTimeToSystemTime(&sFindData.ftLastWriteTime, &stUTC);
+						SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
+
+						StringCchPrintf(wszBuffer, sizeof(wszBuffer), TEXT("%02d/%02d/%d %02d:%02d:%02d"), stLocal.wMonth, stLocal.wDay, stLocal.wYear, stLocal.wHour, stLocal.wMinute, stLocal.wSecond);
+
+						Entity::CSaveGameReader reader;
+						reader.OpenSaveGameFile(Utils::ConvertToAnsiString(std::wstring(sFindData.cFileName)));
+						reader.AcquireSaveGameData();
+						wszDisplayText = Utils::ConvertToWideString(reader.GetDataItem("package") + " | " + reader.GetDataItem("map") + " | ") + std::wstring(wszBuffer);
+						wszDataContent = std::wstring(sFindData.cFileName);
+						reader.Close();
+
+						this->m_oSaveGames.AddItem(wszDisplayText, wszDataContent);
+					}
+				}
+
+				FindClose(hFileSearch);
+			}
+		}
 	public:
 		CPlayMenu() {}
 		~CPlayMenu() {}
 
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
 		{
+			//Initialize component
+
+			this->m_oPlay.SetText(L"Start new game");
+			this->m_oPlay.SetPosition(Entity::Vector(250, 200));
+			this->m_oPlay.SetSize(Entity::Vector(230, 35));
+			this->m_oPlay.SetOwner(this);
+			this->m_oPlay.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oPlay.SetFrameColor(Entity::Color(0, 0, 0, 150));
+			this->m_oPlay.SetFillColor(Entity::Color(103, 225, 123, 150));
+			this->m_oPlay.SetHoverColor(Entity::Color(143, 235, 155, 150));
+
+			this->m_oSaveGames.SetOwner(this);
+			this->m_oSaveGames.SetPosition(Entity::Vector(265, 300));
+			this->m_oSaveGames.SetSize(Entity::Vector(600, 300));
+			this->m_oSaveGames.SetFrameColor(Entity::Color(150, 150, 150, 150));
+			this->m_oSaveGames.SetFillColor(Entity::Color(50, 50, 50, 150));
+			this->m_oSaveGames.SetTextColor(Entity::Color(200, 200, 200, 150));
+			this->m_oSaveGames.SetHoverColor(Entity::Color(100, 100, 100, 150));
+			this->m_oSaveGames.SetSelectColor(Entity::Color(150, 150, 150, 150));
+
+			this->m_oLoad.SetText(L"Load game");
+			this->m_oLoad.SetPosition(Entity::Vector(265, 300 + 300 + 10));
+			this->m_oLoad.SetSize(Entity::Vector(150, 35));
+			this->m_oLoad.SetOwner(this);
+			this->m_oLoad.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oLoad.SetFrameColor(Entity::Color(200, 200, 200, 150));
+			this->m_oLoad.SetFillColor(Entity::Color(50, 50, 50, 150));
+			this->m_oLoad.SetHoverColor(Entity::Color(100, 100, 100, 150));
+
+			this->AcquireSavedGameStates();
+
 			return true;
+		}
+
+		void AddSaveGameToList(const std::wstring& wszFile, FILETIME* fileTime = nullptr)
+		{
+			//Add a save game file to list
+
+			std::wstring wszDisplayText;
+			std::wstring wszDataContent;
+			SYSTEMTIME stUTC, stLocal;
+			std::wstring wszDateAndTime;
+
+			if (fileTime != nullptr) {
+				wchar_t wszBuffer[MAX_PATH] = { 0 };
+				FileTimeToSystemTime(fileTime, &stUTC);
+				SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
+
+				StringCchPrintf(wszBuffer, sizeof(wszBuffer), TEXT("%02d/%02d/%d %02d:%02d:%02d"), stLocal.wMonth, stLocal.wDay, stLocal.wYear, stLocal.wHour, stLocal.wMinute, stLocal.wSecond);
+			
+				wszDateAndTime = wszBuffer;
+			} else {
+				tm time;
+				time_t t = std::time(nullptr);
+				localtime_s(&time, &t);
+
+				std::ostringstream oss;
+				oss << std::put_time(&time, "%m/%d/%Y %H:%M:%S");
+
+				wszDateAndTime = Utils::ConvertToWideString(oss.str());
+			}
+
+			Entity::CSaveGameReader reader;
+			reader.OpenSaveGameFile(Utils::ConvertToAnsiString(wszFile));
+			reader.AcquireSaveGameData();
+			wszDisplayText = Utils::ConvertToWideString(reader.GetDataItem("package") + " | " + reader.GetDataItem("map") + " | ") + std::wstring(wszDateAndTime);
+			wszDataContent = std::wstring(wszFile);
+			reader.Close();
+
+			this->m_oSaveGames.InsertAt(0, wszDisplayText, wszDataContent);
 		}
 
 		virtual void Draw(void)
 		{
+			//Draw component
+
+			this->m_oPlay.Draw();
+			this->m_oSaveGames.Draw();
+			this->m_oLoad.Draw();
+
+			pRenderer->DrawString(pDefaultFont, L"Saved games", 265, 279, 200, 200, 200, 150);
+
+			if (this->m_oSaveGames.GetCount() == 0) {
+				const std::wstring wszHint = L"No saved games yet.";
+				pRenderer->DrawString(pDefaultFont, wszHint, 265 + 300 - ((int)wszHint.length() * iDefaultFontSize[0] / 2), 300 + 150 - iDefaultFontSize[1] / 2, 200, 200, 200, 150);
+			}
 		}
 
 		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 		{
+			//Handle mouse events
+
+			this->m_oPlay.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSaveGames.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oLoad.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		virtual void OnMouseWheelEvent(short wDistance, bool bForward)
+		{
+			//Handle mouse wheel event
+
+			this->m_oSaveGames.OnMouseWheelEvent(wDistance, bForward);
 		}
 
 		virtual void OnButtonClick(class CButton* pButton);
+		virtual void OnListBoxSelectEvent(class CListBox* pListBox, size_t uiItem);
 
 		virtual void Release(void)
 		{
@@ -1649,6 +1998,10 @@ namespace Menu {
 		{
 			//Handle mouse wheel event
 			
+			if (this->m_oPlayMenu.IsActive()) {
+				this->m_oPlayMenu.OnMouseWheelEvent(wDistance, bForward);
+			}
+
 			if (this->m_oPackageMenu.IsActive()) {
 				this->m_oPackageMenu.OnMouseWheelEvent(wDistance, bForward);
 			}
@@ -1742,6 +2095,11 @@ namespace Menu {
 		bool IsOpen(void)
 		{
 			return this->m_bOpen;
+		}
+
+		void AddToSaveGameList(const std::wstring& wszFile)
+		{
+			this->m_oPlayMenu.AddSaveGameToList(wszFile);
 		}
 	};
 

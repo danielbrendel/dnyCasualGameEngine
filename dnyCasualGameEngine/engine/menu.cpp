@@ -15,6 +15,19 @@
 namespace Menu {
 	void CPlayMenu::OnButtonClick(class CButton* pButton)
 	{
+		if (pButton == &this->m_oPlay) {
+			Game::pGame->InitStartGame(L"game");
+		} else if (pButton == &this->m_oLoad) {
+			if (this->m_oSaveGames.GetSelectedItem() != std::string::npos) {
+				Game::pGame->LoadSavedGameState(this->m_oSaveGames.GetItem(this->m_oSaveGames.GetSelectedItem()));
+			} else {
+				Game::pGame->AddHudInfoMessage(L"Please select a saved game state", Entity::HudMessageColor::HM_RED, 5000);
+			}
+		}
+	}
+
+	void CPlayMenu::OnListBoxSelectEvent(class CListBox* pListBox, size_t uiItem)
+	{
 	}
 
 	void CPackageMenu::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

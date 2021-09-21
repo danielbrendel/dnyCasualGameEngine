@@ -488,6 +488,15 @@ namespace Entity {
 		pRenderer->DrawSprite(this->m_vSprites[this->m_iCurrentFrame], vecOut[0], vecOut[1], 0, 0.0f);
 	}
 
+	void CSaveGameWriter::EndSaveGame(void)
+	{
+		//Finish file writing
+
+		this->Release();
+
+		Game::pGame->GetMenu()->AddToSaveGameList(Utils::ConvertToWideString(this->m_szFileName));
+	}
+
 	bool Initialize(void)
 	{
 		//Initialize entity scripting

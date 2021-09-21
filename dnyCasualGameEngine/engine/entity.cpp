@@ -226,6 +226,11 @@ namespace Entity {
 			return pSound->Play(hSound, lVolume, 0);
 		}
 
+		int GetCurrentVolume(void)
+		{
+			return pSndVolume->iValue;
+		}
+
 		int GetWindowCenterX(void)
 		{
 			return pRenderer->GetWindowWidth() / 2;
@@ -736,7 +741,7 @@ namespace Entity {
 			{ "FontHandle R_GetDefaultFont()", &APIFuncs::GetDefaultFont },
 			{ "SoundHandle S_QuerySound(const string&in szSoundFile)", &APIFuncs::QuerySound },
 			{ "bool S_PlaySound(SoundHandle hSound, int32 lVolume)", &APIFuncs::PlaySound_ },
-			
+			{ "int S_GetCurrentVolume()", &APIFuncs::GetCurrentVolume },
 			{ "int Wnd_GetWindowCenterX()", &APIFuncs::GetWindowCenterX },
 			{ "int Wnd_GetWindowCenterY()", &APIFuncs::GetWindowCenterY },
 			{ "bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in, bool bSpawn = true)", &APIFuncs::SpawnScriptedEntity },

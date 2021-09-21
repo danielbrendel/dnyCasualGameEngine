@@ -64,7 +64,7 @@ namespace Game {
 
 				if (this->m_bLoadSavedGame) { //Handle load saved game state case
 					this->LoadMap(Utils::ConvertToWideString(this->m_oSaveGameReader.GetDataItem("map")));
-
+					
 					const std::vector<Entity::CSaveGameReader::save_game_entry_s>& vList = this->m_oSaveGameReader.GetDataVector();
 					for (size_t i = 0; i < vList.size(); i++) {
 						if ((vList[i].szIdent == "package") || (vList[i].szIdent == "map")) {
@@ -75,7 +75,7 @@ namespace Game {
 
 						std::string szIdent = vList[i].szIdent;
 						std::string szValue = vList[i].szValue;
-
+						
 						BEGIN_PARAMS(vArgs);
 						PUSH_OBJECT(&szIdent);
 						PUSH_OBJECT(&szValue);

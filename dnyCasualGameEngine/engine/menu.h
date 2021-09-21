@@ -2201,6 +2201,7 @@ namespace Menu {
 		CForm m_oForm;
 		CButton m_oBtnRestart;
 		CButton m_oBtnReturnToMainMenu;
+		CButton m_oBtnLoadLastSavedGame;
 		std::wstring m_wszTitle;
 		Entity::Vector m_vecPos;
 		Entity::Vector m_vecSize;
@@ -2233,6 +2234,14 @@ namespace Menu {
 			this->m_oBtnRestart.SetOwner(this);
 			this->m_oBtnRestart.SetText(L"Try again");
 
+			this->m_oBtnLoadLastSavedGame.SetFrameColor(Entity::Color(200, 200, 200, 150));
+			this->m_oBtnLoadLastSavedGame.SetFillColor(Entity::Color(50, 150, 50, 150));
+			this->m_oBtnLoadLastSavedGame.SetHoverColor(Entity::Color(70, 180, 70, 150));
+			this->m_oBtnLoadLastSavedGame.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBtnLoadLastSavedGame.SetSize(Entity::Vector(200, 35));
+			this->m_oBtnLoadLastSavedGame.SetOwner(this);
+			this->m_oBtnLoadLastSavedGame.SetText(L"Quick load");
+
 			this->m_oBtnReturnToMainMenu.SetFrameColor(Entity::Color(200, 200, 200, 150));
 			this->m_oBtnReturnToMainMenu.SetFillColor(Entity::Color(50, 150, 50, 150));
 			this->m_oBtnReturnToMainMenu.SetHoverColor(Entity::Color(70, 180, 70, 150));
@@ -2251,7 +2260,8 @@ namespace Menu {
 			this->m_vecPos = vec;
 
 			this->m_oForm.SetPosition(vec);
-			this->m_oBtnRestart.SetPosition(Entity::Vector(vec[0] + 10, vec[1] + this->m_vecSize[1] - 85));
+			this->m_oBtnRestart.SetPosition(Entity::Vector(vec[0] + 10, vec[1] + this->m_vecSize[1] - 115));
+			this->m_oBtnLoadLastSavedGame.SetPosition(Entity::Vector(vec[0] + 10, vec[1] + this->m_vecSize[1] - 85));
 			this->m_oBtnReturnToMainMenu.SetPosition(Entity::Vector(vec[0] + 10, vec[1] + this->m_vecSize[1] - 45));
 		}
 
@@ -2261,6 +2271,7 @@ namespace Menu {
 
 			this->m_oForm.Draw();
 			this->m_oBtnRestart.Draw();
+			this->m_oBtnLoadLastSavedGame.Draw();
 			this->m_oBtnReturnToMainMenu.Draw();
 
 			pRenderer->DrawString(pDefaultFont, L"Your game is over.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 79, 250, 250, 250, 150);
@@ -2272,6 +2283,7 @@ namespace Menu {
 			//Handle mouse events
 
 			this->m_oBtnRestart.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oBtnLoadLastSavedGame.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oBtnReturnToMainMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
 

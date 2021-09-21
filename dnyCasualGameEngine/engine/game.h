@@ -108,6 +108,7 @@ namespace Game {
 		bool m_bGameOver;
 		Entity::CSaveGameReader m_oSaveGameReader;
 		bool m_bLoadSavedGame;
+		std::wstring m_szQuickLoadFile;
 		Entity::CHudInfoMessages m_oHudInfoMessages;
 
 		friend void Cmd_PackageName(void);
@@ -575,9 +576,10 @@ namespace Game {
 
 		void LoadSavedGameState(const std::wstring& wszFile)
 		{
-			//Load saved game state from disk
+			//Init loading saved game state from disk
 
 			this->m_bLoadSavedGame = true;
+			this->m_szQuickLoadFile = wszFile;
 
 			this->m_oSaveGameReader.OpenSaveGameFile(Utils::ConvertToAnsiString(wszFile));
 			this->m_oSaveGameReader.AcquireSaveGameData();
@@ -586,6 +588,14 @@ namespace Game {
 			std::string szFromPath = this->m_oSaveGameReader.GetDataItem("frompath");
 
 			this->InitStartGame(Utils::ConvertToWideString(szPackage), Utils::ConvertToWideString(szFromPath));
+		}
+
+		void QuickLoad(void)
+		{
+			//Init quick load
+			
+			this->StopGame();
+			this->LoadSavedGameState(this->m_szQuickLoadFile);
 		}
 
 		void Process(void);

@@ -118,6 +118,8 @@ namespace Menu {
 
 		if (pButton == &this->m_oBtnRestart) {
 			Game::pGame->InitRestartGame();
+		} else if (pButton == &this->m_oBtnLoadLastSavedGame) {
+			Game::pGame->QuickLoad();
 		} else if (pButton == &this->m_oBtnReturnToMainMenu) {
 			Game::pGame->StopGame();
 		}

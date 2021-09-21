@@ -28,6 +28,7 @@ namespace Menu {
 
 	void CPlayMenu::OnListBoxSelectEvent(class CListBox* pListBox, size_t uiItem)
 	{
+		pSound->Play(this->m_hSelect, pSndVolume->iValue, 0);
 	}
 
 	void CPackageMenu::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

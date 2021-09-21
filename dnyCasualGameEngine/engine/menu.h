@@ -953,6 +953,7 @@ namespace Menu {
 		CButton m_oPlay;
 		CListBox m_oSaveGames;
 		CButton m_oLoad;
+		DxSound::HDXSOUND m_hSelect;
 
 		void AcquireSavedGameStates(void)
 		{
@@ -1030,6 +1031,8 @@ namespace Menu {
 			this->m_oLoad.SetFrameColor(Entity::Color(200, 200, 200, 150));
 			this->m_oLoad.SetFillColor(Entity::Color(50, 50, 50, 150));
 			this->m_oLoad.SetHoverColor(Entity::Color(100, 100, 100, 150));
+
+			this->m_hSelect = pSound->QuerySound(wszBasePath + L"media\\sound\\listbox_select.wav");
 
 			this->AcquireSavedGameStates();
 
@@ -1302,12 +1305,17 @@ namespace Menu {
 		int m_iTabSpace;
 		Entity::Vector m_vecMousePos;
 		size_t m_uiHoverItem;
+		DxSound::HDXSOUND m_hSelect;
 	public:
 		CTabMenu() : m_uiSelectedTab(std::string::npos), m_uiHoverItem(std::string::npos), m_iTabSpace(20) {}
 		~CTabMenu() {}
 
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
 		{
+			//Initialize component
+
+			this->m_hSelect = pSound->QuerySound(wszBasePath + L"media\\sound\\mainmenu_select.wav");
+
 			return true;
 		}
 
@@ -1372,6 +1380,8 @@ namespace Menu {
 			} else {
 				if ((iMouseKey == 1) && (!bDown) && (this->m_uiHoverItem != std::string::npos)) {
 					this->m_uiSelectedTab = this->m_uiHoverItem;
+
+					pSound->Play(this->m_hSelect, pSndVolume->iValue, 0);
 				}
 			}
 
@@ -1830,6 +1840,7 @@ namespace Menu {
 			this->m_oMenuGfx.SetPosition(Entity::Vector(250, 250));
 			this->m_oMenuSnd.SetPosition(Entity::Vector(250, 250));
 
+			this->m_oTabMenu.Initialize(w, h, pGameStarted);
 			this->m_oTabMenu.AddItem(L"Bindings", &this->m_oMenuKeys);
 			this->m_oTabMenu.AddItem(L"Graphics", &this->m_oMenuGfx);
 			this->m_oTabMenu.AddItem(L"Sound   ", &this->m_oMenuSnd);
@@ -1935,6 +1946,7 @@ namespace Menu {
 		bool m_bOpen;
 		int m_iMouseX;
 		int m_iMouseY;
+		DxSound::HDXSOUND m_hSelect;
 	public:
 		CMenu() : m_bOpen(false) {}
 		~CMenu() {}
@@ -1958,6 +1970,8 @@ namespace Menu {
 			if (!this->m_oSettingsMenu.Initialize(w, h, pGameStarted)) {
 				return false;
 			}
+
+			this->m_hSelect = pSound->QuerySound(wszBasePath + L"media\\sound\\mainmenu_select.wav");
 
 			this->m_oMainMenu.SetClassPointer(this);
 			this->m_oMainMenu.SetActiveStatus(true);
@@ -2064,6 +2078,8 @@ namespace Menu {
 			this->m_oPlayMenu.SetActiveStatus(true);
 			this->m_oPackageMenu.SetActiveStatus(false);
 			this->m_oSettingsMenu.SetActiveStatus(false);
+
+			pSound->Play(this->m_hSelect, pSndVolume->iValue, 0);
 		}
 
 		void OpenPackageMenu(void)
@@ -2071,6 +2087,8 @@ namespace Menu {
 			this->m_oPackageMenu.SetActiveStatus(true);
 			this->m_oPlayMenu.SetActiveStatus(false);
 			this->m_oSettingsMenu.SetActiveStatus(false);
+
+			pSound->Play(this->m_hSelect, pSndVolume->iValue, 0);
 		}
 
 		void OpenSettingsMenu(void)
@@ -2078,6 +2096,8 @@ namespace Menu {
 			this->m_oSettingsMenu.SetActiveStatus(true);
 			this->m_oPackageMenu.SetActiveStatus(false);
 			this->m_oPlayMenu.SetActiveStatus(false);
+
+			pSound->Play(this->m_hSelect, pSndVolume->iValue, 0);
 		}
 
 		void OnCloseAll(void)

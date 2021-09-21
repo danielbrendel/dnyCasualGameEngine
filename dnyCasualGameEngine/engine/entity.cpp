@@ -736,6 +736,7 @@ namespace Entity {
 			{ "FontHandle R_GetDefaultFont()", &APIFuncs::GetDefaultFont },
 			{ "SoundHandle S_QuerySound(const string&in szSoundFile)", &APIFuncs::QuerySound },
 			{ "bool S_PlaySound(SoundHandle hSound, int32 lVolume)", &APIFuncs::PlaySound_ },
+			
 			{ "int Wnd_GetWindowCenterX()", &APIFuncs::GetWindowCenterX },
 			{ "int Wnd_GetWindowCenterY()", &APIFuncs::GetWindowCenterY },
 			{ "bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in, bool bSpawn = true)", &APIFuncs::SpawnScriptedEntity },

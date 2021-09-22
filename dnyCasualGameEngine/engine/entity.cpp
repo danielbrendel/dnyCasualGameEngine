@@ -471,6 +471,88 @@ namespace Entity {
 		{
 			return pAchievements->GetStatFloat(szName.c_str());
 		}
+
+		ConfigMgr::CCVar::cvar_s* RegisterCVar(const std::string& szName, ConfigMgr::CCVar::cvar_type_e eType, const std::string& szInitial)
+		{
+			return pConfigMgr->CCVar::Add(Utils::ConvertToWideString(szName), eType, Utils::ConvertToWideString(szInitial));
+		}
+
+		bool GetCVarBool(const std::string& szName, bool bFallback)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (!pCVar) {
+				return bFallback;
+			}
+
+			return pCVar->bValue;
+		}
+
+		int GetCVarInt(const std::string& szName, int iFallback)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (!pCVar) {
+				return iFallback;
+			}
+
+			return pCVar->iValue;
+		}
+
+		float GetCVarFloat(const std::string& szName, float fFallback)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (!pCVar) {
+				return fFallback;
+			}
+
+			return pCVar->fValue;
+		}
+
+		std::string GetCVarString(const std::string& szName, const std::string& szFallback)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (!pCVar) {
+				return szFallback;
+			}
+
+			return Utils::ConvertToAnsiString(pCVar->szValue);
+		}
+
+		void SetCVarBool(const std::string& szName, bool value)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (pCVar) {
+				pCVar->bValue = value;
+			}
+		}
+
+		void SetCVarInt(const std::string& szName, int value)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (pCVar) {
+				pCVar->iValue = value;
+			}
+		}
+
+		void SetCVarFloat(const std::string& szName, float value)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (pCVar) {
+				pCVar->fValue = value;
+			}
+		}
+
+		void SetCVarString(const std::string& szName, const std::string& value)
+		{
+			ConfigMgr::CCVar::cvar_s* pCVar = pConfigMgr->CCVar::Find(Utils::ConvertToWideString(szName));
+			if (pCVar) {
+				wcscpy(pCVar->szValue, Utils::ConvertToWideString(value).c_str());
+			}
+		}
+
+		bool ExecConfig(const std::string& szFile)
+		{
+			return pConfigMgr->Execute(Game::pGame->GetPackagePath() + Utils::ConvertToWideString(szFile));
+		}
 	}
 
 	void CSolidSprite::Draw(void)
@@ -568,6 +650,7 @@ namespace Entity {
 		REG_TYPEDEF("uint64", "SpriteHandle");
 		REG_TYPEDEF("uint64", "FontHandle");
 		REG_TYPEDEF("uint64", "SoundHandle");
+		REG_TYPEDEF("uint64", "CVarHandle");
 		REG_TYPEDEF("uint8", "DamageValue");
 
 		//Register enum
@@ -587,6 +670,11 @@ namespace Entity {
 		ADD_ENUM(hEnum, "HUD_MSG_COLOR_RED", HudMessageColor::HM_RED);
 		ADD_ENUM(hEnum, "HUD_MSG_COLOR_YELLOW", HudMessageColor::HM_YELLOW);
 		ADD_ENUM(hEnum, "HUD_MSG_COLOR_BLUE", HudMessageColor::HM_BLUE);
+		REG_ENUM("CVarType", hEnum);
+		ADD_ENUM(hEnum, "CVAR_TYPE_BOOL", ConfigMgr::CCVar::CVAR_TYPE_BOOL);
+		ADD_ENUM(hEnum, "CVAR_TYPE_INT", ConfigMgr::CCVar::CVAR_TYPE_INT);
+		ADD_ENUM(hEnum, "CVAR_TYPE_FLOAT", ConfigMgr::CCVar::CVAR_TYPE_FLOAT);
+		ADD_ENUM(hEnum, "CVAR_TYPE_STRING", ConfigMgr::CCVar::CVAR_TYPE_STRING);
 
 		//Register function def
 		REG_FUNCDEF("bool FuncFileListing(const string& in)");
@@ -793,6 +881,16 @@ namespace Entity {
 			{ "bool Steam_IsAchievementUnlocked(const string &in szName)", &APIFuncs::IsSteamAchievementUnlocked },
 			{ "int Steam_GetStatInt(const string &in szName)", &APIFuncs::GetSteamStatInt },
 			{ "float Steam_GetStatFloat(const string &in szName)", &APIFuncs::GetSteamStatFloat },
+			{ "CVarHandle CVar_Register(const string &in szName, CVarType eType, const string &in szInitial)", &APIFuncs::RegisterCVar },
+			{ "bool CVar_GetBool(const string &in szName, bool fallback)", APIFuncs::GetCVarBool },
+			{ "int CVar_GetInt(const string &in szName, int fallback)", APIFuncs::GetCVarInt },
+			{ "float CVar_GetFloat(const string &in szName, float fallback)", APIFuncs::GetCVarFloat },
+			{ "string CVar_GetString(const string &in szName, const string &in fallback)", APIFuncs::GetCVarString },
+			{ "void CVar_SetBool(const string &in szName, bool value)", APIFuncs::SetCVarBool },
+			{ "void CVar_SetInt(const string &in szName, int value)", APIFuncs::SetCVarInt },
+			{ "void CVar_SetFloat(const string &in szName, float value)", APIFuncs::SetCVarFloat },
+			{ "void CVar_SetString(const string &in szName, const string &in value)", APIFuncs::SetCVarString },
+			{ "bool ExecConfig(const string &in szFile)", APIFuncs::ExecConfig },
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

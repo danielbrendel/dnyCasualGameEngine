@@ -135,10 +135,10 @@ namespace ConfigMgr {
 					pCVar->iValue = _wtoi(szInitialValue.c_str());
 					break;
 				case CVAR_TYPE_FLOAT:
-					pCVar->fValue = (float)_wtoi(szInitialValue.c_str());
+					pCVar->fValue = (float)_wtof(szInitialValue.c_str());
 					break;
 				case CVAR_TYPE_DOUBLE:
-					pCVar->dblValue = _wtoi(szInitialValue.c_str());
+					pCVar->dblValue = _wtof(szInitialValue.c_str());
 					break;
 				case CVAR_TYPE_STRING:
 					wcscpy_s(pCVar->szValue, szInitialValue.c_str());
@@ -253,10 +253,10 @@ namespace ConfigMgr {
 					pCVar->iValue = _wtoi(szValue.c_str());
 					break;
 				case CVAR_TYPE_FLOAT:
-					pCVar->fValue = (float)_wtoi(szValue.c_str());
+					pCVar->fValue = (float)_wtof(szValue.c_str());
 					break;
 				case CVAR_TYPE_DOUBLE:
-					pCVar->dblValue = _wtoi(szValue.c_str());
+					pCVar->dblValue = _wtof(szValue.c_str());
 					break;
 				case CVAR_TYPE_STRING:
 					wcscpy_s(pCVar->szValue, szValue.c_str());

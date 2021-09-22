@@ -10,6 +10,7 @@ __Version__: 1.0
 * SpriteHandle: A handle to a sprite (64 Bit)
 * SoundHandle: A handle to a sound (64 Bit)
 * FontHandle: A handle to a font (64 Bit)
+* CVarHandle: A handle to a CVar (control/config variable, 64 Bit)
 * DamageValue: Value containing a damage value. 0 * 255 (1 Byte)
 
 ## Enums:
@@ -28,6 +29,11 @@ __Version__: 1.0
 * HUD_MSG_COLOR_RED: Red color
 * HUD_MSG_COLOR_YELLOW: Yellow color
 * HUD_MSG_COLOR_BLUE: Blue color
+### CVarType
+* CVAR_TYPE_BOOL: Boolean CVar
+* CVAR_TYPE_INT: Integer CVar
+* CVAR_TYPE_FLOAT: Float CVar
+* CVAR_TYPE_STRING: String CVar
 	
 ## Callbacks:
 ```angelscript
@@ -345,6 +351,26 @@ bool Steam_IsAchievementUnlocked(const string &in szName)
 int Steam_GetStatInt(const string &in szName)
 //Get stat value (float)
 float Steam_GetStatFloat(const string &in szName)
+//Register a CVar of a given type
+CVarHandle CVar_Register(const string &in szName, CVarType eType, const string &in szInitial)
+//Get boolean value of CVar
+bool CVar_GetBool(const string &in szName, bool fallback)
+//Get integer value of CVar
+int CVar_GetInt(const string &in szName, int fallback)
+//Get float value of CVar
+float CVar_GetFloat(const string &in szName, float fallback)
+//Get string value of CVar
+string CVar_GetString(const string &in szName, const string &in fallback)
+//Set CVar boolean value
+void CVar_SetBool(const string &in szName, bool value)
+//Set CVar integer value
+void CVar_SetInt(const string &in szName, int value)
+//Set CVar float value
+void CVar_SetFloat(const string &in szName, float value)
+//Set CVar string value
+void CVar_SetString(const string &in szName, const string &in value)
+//Execute a configuration script file
+bool ExecConfig(const string &in szFile)
 ```
 
 ## AngelScript internals:

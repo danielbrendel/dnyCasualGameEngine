@@ -1010,7 +1010,7 @@ namespace Entity {
 
 			for (size_t i = 1; i < GOAL_ENTITY_MAX_SPRITES + 1; i++) {
 				std::wstring wszFileName = L"portal" + ((i < 10) ? L"0" + std::to_wstring(i) : std::to_wstring(i)) + L".png";
-				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszBasePath + L"media\\portal\\" + wszFileName, 1, this->m_vecSize[0], this->m_vecSize[1], 1, true);
+				DxRenderer::HD3DSPRITE hSprite = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\portal\\" + wszFileName, 1, this->m_vecSize[0], this->m_vecSize[1], 1, true);
 				this->m_vSprites.push_back(hSprite);
 			}
 

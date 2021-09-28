@@ -50,5 +50,16 @@ namespace Input {
 
 			return 0;
 		}
+
+		void SetKeyBindingCode(const std::wstring& wszIdent, int vCode)
+		{
+			//Set key binding code
+
+			for (size_t i = 0; i < this->m_vBindings.size(); i++) {
+				if (this->m_vBindings[i].wszIdent == wszIdent) {
+					this->m_vBindings[i].vCode = vCode;
+				}
+			}
+		}
 	};
 }

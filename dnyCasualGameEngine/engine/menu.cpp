@@ -65,9 +65,28 @@ namespace Menu {
 	void CSettingsKeys::OnButtonClick(class CButton* pButton)
 	{
 		if (pButton == &this->m_btnSave) {
-
+			this->SaveBindings();
+			Game::pGame->AddHudInfoMessage(L"Settings saved!", Entity::HudMessageColor::HM_GREEN);
 		} else if (pButton == &this->m_btnRestoreDefaults) {
+			this->RestoreDefaults();
+			this->SaveBindings();
+			Game::pGame->AddHudInfoMessage(L"Default key settings restored!", Entity::HudMessageColor::HM_GREEN);
+		}
+	}
 
+	void CSettingsGfx::OnButtonClick(class CButton* pButton)
+	{
+		if (pButton == &this->m_btnSave) {
+			this->SaveGfxSettings();
+			Game::pGame->AddHudInfoMessage(L"Settings saved!", Entity::HudMessageColor::HM_GREEN);
+		}
+	}
+
+	void CSettingsSnd::OnButtonClick(class CButton* pButton)
+	{
+		if (pButton == &this->m_btnSave) {
+			this->SaveSoundSettings();
+			Game::pGame->AddHudInfoMessage(L"Settings saved!", Entity::HudMessageColor::HM_GREEN);
 		}
 	}
 

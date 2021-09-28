@@ -55,6 +55,7 @@ namespace Game {
 	void Cmd_EnvGoal(void);
 	void Cmd_Bind(void);
 	void Cmd_Echo(void);
+	void Cmd_Exec(void);
 
 	void OnHandleWorkshopItem(const std::wstring& wszItem);
 	void HandlePackageUpload(const std::wstring& wszArgs);
@@ -125,6 +126,7 @@ namespace Game {
 		friend void Cmd_EnvGoal(void);
 		friend void Cmd_Bind(void);
 		friend void Cmd_Echo(void);
+		friend void Cmd_Exec(void);
 
 		bool LoadPackage(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
 		{
@@ -345,9 +347,10 @@ namespace Game {
 			pGfxResolutionWidth = pConfigMgr->CCVar::Add(L"gfx_resolution_width", ConfigMgr::CCVar::CVAR_TYPE_INT, L"1024");
 			pGfxResolutionHeight = pConfigMgr->CCVar::Add(L"gfx_resolution_height", ConfigMgr::CCVar::CVAR_TYPE_INT, L"768");
 			pGfxFullscreen = pConfigMgr->CCVar::Add(L"gfx_fullscreen", ConfigMgr::CCVar::CVAR_TYPE_BOOL, L"1");
-			pSndVolume = pConfigMgr->CCVar::Add(L"snd_volume", ConfigMgr::CCVar::CVAR_TYPE_INT, L"100");
+			pSndVolume = pConfigMgr->CCVar::Add(L"snd_volume", ConfigMgr::CCVar::CVAR_TYPE_INT, L"10");
 			
 			//Add commands
+			pConfigMgr->CCommand::Add(L"exec", L"Execute a script file", &Cmd_Exec);
 			pConfigMgr->CCommand::Add(L"bind", L"Bind command to key", &Cmd_Bind);
 			pConfigMgr->CCommand::Add(L"echo", L"Print text to console", &Cmd_Echo);
 			pConfigMgr->CCommand::Add(L"package_name", L"Package name", &Cmd_PackageName);
@@ -368,6 +371,7 @@ namespace Game {
 			
 			//Link with Steam
 
+			#ifdef APP_USESTEAM
 			if (SteamAPI_RestartAppIfNecessary(pAppSteamID->iValue)) {
 				this->Release();
 				return true;
@@ -377,6 +381,7 @@ namespace Game {
 				this->Release();
 				return false;
 			}
+			#endif
 
 			//Instantiate window manager
 			pWindow = new DxWindow::CDxWindow();
@@ -449,6 +454,7 @@ namespace Game {
 				return false;
 			}
 
+			#ifdef APP_USESTEAM
 			//Instantiate Steam Workshop downloader object
 			pSteamDownloader = new Workshop::CSteamDownload(&OnHandleWorkshopItem);
 			if (!pSteamDownloader) {
@@ -468,6 +474,7 @@ namespace Game {
 				this->Release();
 				return false;
 			}
+			#endif
 
 			//Load banner
 			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\banner.png", 1, 768, 150, 1, false);
@@ -677,6 +684,13 @@ namespace Game {
 		{
 			//Release game component
 
+			if (!this->m_bInit)
+				return;
+
+			//Clear indicators
+			this->m_bGameStarted = false;
+			this->m_bInit = false;
+
 			//Stop current game
 			this->StopGame();
 
@@ -695,10 +709,6 @@ namespace Game {
 			FREE(pConfigMgr);
 			FREE(pSteamDownloader);
 			FREE(pAchievements);
-
-			//Clear indicators
-			this->m_bGameStarted = false;
-			this->m_bInit = false;
 		}
 
 		void AddPackage(const std::wstring& wszName, const std::wstring& wszPath)

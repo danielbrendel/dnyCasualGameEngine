@@ -41,8 +41,10 @@ namespace Game {
 
 		this->m_sMap.wszFileName = wszMap;
 
+		#ifdef APP_USESTEAM
 		//Publish current achievements
 		pAchievements->PublishAchievementAndStatProgress();
+		#endif
 
 		//Set map background
 		return pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\gfx\\" + this->m_sMap.wszBackground);
@@ -56,12 +58,16 @@ namespace Game {
 			//Perform window processing
 			pWindow->Process();
 
+			#ifdef APP_USESTEAM
 			//Process Steam callbacks
 			SteamAPI_RunCallbacks();
+			#endif
 
 			//Perform game loading if indicated
 			if (this->m_bInGameLoadingProgress) {
+				#ifdef APP_USESTEAM
 				pAchievements->PublishAchievementAndStatProgress();
+				#endif
 
 				if (!this->StartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath)) {
 					pConsole->AddLine(L"Failed to start new game", Console::ConColor(250, 0, 0));
@@ -85,7 +91,7 @@ namespace Game {
 						PUSH_OBJECT(&szIdent);
 						PUSH_OBJECT(&szValue);
 
-						bool bResult = pScriptingInt->CallScriptFunction(hScript, true, "RestoreState", &vArgs, nullptr, Scripting::FA_VOID);
+						pScriptingInt->CallScriptFunction(hScript, true, "RestoreState", &vArgs, nullptr, Scripting::FA_VOID);
 
 						END_PARAMS(vArgs);
 					}
@@ -158,13 +164,10 @@ namespace Game {
 			}
 		}
 
-		//Draw banner if in main menu and no game is running
-		if (!this->m_bGameStarted) {
-			pRenderer->DrawSprite(this->m_hBanner, pGfxResolutionWidth->iValue / 2 - 768 / 2, 10, 0, 0.0f);
-		}
-		
 		//Draw menu if opened
 		if (this->m_oMenu.IsOpen()) {
+			pRenderer->DrawSprite(this->m_hBanner, pGfxResolutionWidth->iValue / 2 - 768 / 2, 10, 0, 0.0f);
+
 			this->m_oMenu.Draw();
 		}
 
@@ -218,17 +221,19 @@ namespace Game {
 
 		//Inform menu
 		this->m_oMenu.OnStopGame();
-		this->m_oMenu.OnCloseAll();
+		//this->m_oMenu.OnCloseAll();
 		this->m_oMenu.SetOpenStatus(true);
 
 		//Show cursor
 		this->m_oCursor.SetActiveStatus(true);
 
+		#ifdef APP_USESTEAM
 		//Publish current achievements
 		pAchievements->PublishAchievementAndStatProgress();
+		#endif
 
 		//Restore background image
-		pRenderer->SetBackgroundPicture(wszBasePath + L"media\\background.jpg");
+		pRenderer->SetBackgroundPicture(wszBasePath + L"media\\gfx\\background.jpg");
 	}
 
 	void CGame::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
@@ -288,7 +293,7 @@ namespace Game {
 	void CGame::OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		//Called for key events
-		
+
 		if (vKey == g_oInputMgr.GetKeyBindingCode(L"MENU")) {
 			if (!bDown) {
 				if (this->m_bGameStarted) {
@@ -439,6 +444,13 @@ namespace Game {
 		if (pConsole) {
 			pConsole->AddLine(Utils::ConvertToWideString(szErrMsg), sColor);
 		}
+	}
+
+	void Cmd_Exec(void)
+	{
+		std::wstring wszText = pConfigMgr->ExpressionItemValue(1);
+
+		pConfigMgr->Execute(wszBasePath + wszText);
 	}
 
 	void Cmd_Bind(void)

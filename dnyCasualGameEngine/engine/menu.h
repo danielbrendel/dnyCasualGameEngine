@@ -1542,8 +1542,63 @@ namespace Menu {
 		CKeyBinding m_oAttack;
 		CKeyBinding m_oUse;
 		CKeyBinding m_oMenu;
+		CKeyBinding m_oQuickSave;
+		CKeyBinding m_oConsole;
 		CButton m_btnSave;
 		CButton m_btnRestoreDefaults;
+
+		void SaveBindings(void)
+		{
+			//Save key bindings
+
+			g_oInputMgr.SetKeyBindingCode(L"MOVE_FORWARD", this->m_oMoveForward.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"MOVE_BACKWARD", this->m_oMoveBackward.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"TURN_LEFT", this->m_oTurnLeft.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"TURN_RIGHT", this->m_oTurnRight.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"MOVE_LEFT", this->m_oStrafeLeft.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"MOVE_RIGHT", this->m_oStrafeRight.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"ATTACK", this->m_oAttack.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"USE", this->m_oUse.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"MENU", this->m_oMenu.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"SAVEGAME", this->m_oQuickSave.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"CONSOLE", this->m_oConsole.GetVkey());
+
+			std::wofstream hFile;
+			hFile.open(wszBasePath + L"bindings.cfg", std::wifstream::out);
+			if (hFile.is_open()) {
+				hFile << L"# Key bindings configuration file" << std::endl << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oMoveForward.GetVkey()) + L" \"" + this->m_oMoveForward.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oMoveBackward.GetVkey()) + L" \"" + this->m_oMoveBackward.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oTurnLeft.GetVkey()) + L" \"" + this->m_oTurnLeft.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oTurnRight.GetVkey()) + L" \"" + this->m_oTurnRight.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oStrafeLeft.GetVkey()) + L" \"" + this->m_oStrafeLeft.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oStrafeRight.GetVkey()) + L" \"" + this->m_oStrafeRight.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oAttack.GetVkey()) + L" \"" + this->m_oAttack.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oUse.GetVkey()) + L" \"" + this->m_oUse.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oMenu.GetVkey()) + L" \"" + this->m_oMenu.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oQuickSave.GetVkey()) + L" \"" + this->m_oQuickSave.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oConsole.GetVkey()) + L" \"" + this->m_oConsole.GetCommand() + L"\"" << std::endl;
+
+				hFile.close();
+			}
+		}
+
+		void RestoreDefaults(void)
+		{
+			//Restore default key bindings
+
+			this->m_oMoveForward.SetVkey(87);
+			this->m_oMoveBackward.SetVkey(83);
+			this->m_oTurnLeft.SetVkey(39);
+			this->m_oTurnRight.SetVkey(37);
+			this->m_oStrafeLeft.SetVkey(65);
+			this->m_oStrafeRight.SetVkey(68);
+			this->m_oAttack.SetVkey(32);
+			this->m_oUse.SetVkey(69);
+			this->m_oMenu.SetVkey(27);
+			this->m_oQuickSave.SetVkey(113);
+			this->m_oConsole.SetVkey(112);
+		}
 	public:
 		CSettingsKeys() {}
 		~CSettingsKeys() {}
@@ -1597,6 +1652,16 @@ namespace Menu {
 			this->m_oMenu.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MENU"));
 			this->m_oMenu.SetPosition(Entity::Vector(550, 350));
 
+			this->m_oQuickSave.Initialize(0, 0, nullptr);
+			this->m_oQuickSave.SetCommand(L"SAVEGAME");
+			this->m_oQuickSave.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SAVEGAME"));
+			this->m_oQuickSave.SetPosition(Entity::Vector(550, 400));
+
+			this->m_oConsole.Initialize(0, 0, nullptr);
+			this->m_oConsole.SetCommand(L"CONSOLE");
+			this->m_oConsole.SetVkey(g_oInputMgr.GetKeyBindingCode(L"CONSOLE"));
+			this->m_oConsole.SetPosition(Entity::Vector(550, 450));
+
 			this->m_btnSave.SetOwner(this);
 			this->m_btnSave.SetFillColor(Entity::Color(50, 135, 0, 150));
 			this->m_btnSave.SetFrameColor(Entity::Color(250, 250, 250, 150));
@@ -1631,6 +1696,8 @@ namespace Menu {
 			this->m_oAttack.Draw();
 			this->m_oUse.Draw();
 			this->m_oMenu.Draw();
+			this->m_oQuickSave.Draw();
+			this->m_oConsole.Draw();
 
 			this->m_btnSave.Draw();
 			this->m_btnRestoreDefaults.Draw();
@@ -1649,6 +1716,8 @@ namespace Menu {
 			this->m_oAttack.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oUse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oQuickSave.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oConsole.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 
 			this->m_btnSave.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_btnRestoreDefaults.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
@@ -1685,6 +1754,31 @@ namespace Menu {
 		CComboBox m_oResolutions;
 		CCheckbox m_oFullscreen;
 		CButton m_btnSave;
+
+		void SaveGfxSettings(void)
+		{
+			//Save graphics settings
+
+			std::wstring wszWidth = L"1024";
+			std::wstring wszHeight = L"768";
+			std::wstring wszSelectedResolution = this->m_oResolutions.GetSelectedItem();
+			size_t uiDelim = wszSelectedResolution.find(L"x");
+			if (uiDelim != std::string::npos) {
+				wszWidth = wszSelectedResolution.substr(0, uiDelim);
+				wszHeight = wszSelectedResolution.substr(uiDelim + 1);
+			}
+
+			std::wofstream hFile;
+			hFile.open(wszBasePath + L"gfx.cfg", std::wofstream::out);
+			if (hFile.is_open()) {
+				hFile << L"# Sound settings configuration file" << std::endl << std::endl;
+				hFile << L"gfx_resolution_width " + wszWidth << std::endl;
+				hFile << L"gfx_resolution_height " + wszHeight << std::endl;
+				hFile << L"gfx_fullscreen " << ((this->m_oFullscreen.IsChecked()) ? L"1" : L"0") << std::endl;
+
+				hFile.close();
+			}
+		}
 	public:
 		CSettingsGfx() {}
 		~CSettingsGfx() {}
@@ -1705,7 +1799,7 @@ namespace Menu {
 			this->m_oResolutions.AddItem(L"1024x768");
 
 			this->m_oFullscreen.SetCheckColor(Entity::Color(50, 135, 0, 150));
-			this->m_oFullscreen.SetChecked(false);
+			this->m_oFullscreen.SetChecked(pGfxFullscreen->bValue);
 			this->m_oFullscreen.SetFrameColor(Entity::Color(200, 200, 200, 150));
 			this->m_oFullscreen.SetHoverColor(Entity::Color(255, 255, 255, 150));
 			this->m_oFullscreen.SetLabel(L"Run in fullscreen");
@@ -1750,7 +1844,7 @@ namespace Menu {
 		{
 		}
 
-		virtual void OnButtonClick(class CButton* pButton) {}
+		virtual void OnButtonClick(class CButton* pButton);
 
 		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
 	};
@@ -1761,6 +1855,22 @@ namespace Menu {
 		Entity::Vector m_vecPos;
 		CSlider m_oVolume;
 		CButton m_btnSave;
+
+		void SaveSoundSettings(void)
+		{
+			//Save sound settings
+
+			pSndVolume->iValue = this->m_oVolume.GetValue();
+
+			std::wofstream hFile;
+			hFile.open(wszBasePath + L"sound.cfg", std::wofstream::out);
+			if (hFile.is_open()) {
+				hFile << L"# Sound settings configuration file" << std::endl << std::endl;
+				hFile << L"snd_volume " + std::to_wstring(this->m_oVolume.GetValue()) << std::endl;
+
+				hFile.close();
+			}
+		}
 	public:
 		CSettingsSnd() {}
 		~CSettingsSnd() {}
@@ -1772,7 +1882,7 @@ namespace Menu {
 			this->m_oVolume.SetHintColor(Entity::Color(200, 200, 200, 150));
 			this->m_oVolume.SetHoverColor(Entity::Color(200, 200, 200, 150));
 			this->m_oVolume.SetLineColor(Entity::Color(150, 150, 150, 150));
-			this->m_oVolume.SetMaxValue(100);
+			this->m_oVolume.SetMaxValue(10);
 			this->m_oVolume.SetPosition(Entity::Vector(250, 300));
 			this->m_oVolume.SetSliderColor(Entity::Color(150, 150, 0, 150));
 			this->m_oVolume.SetValue(pSndVolume->iValue);
@@ -1813,7 +1923,7 @@ namespace Menu {
 		{
 		}
 
-		virtual void OnButtonClick(class CButton* pButton) {}
+		virtual void OnButtonClick(class CButton* pButton);
 
 		virtual void SetPosition(const Entity::Vector& vec) { this->m_vecPos = vec; }
 	};
@@ -1908,7 +2018,7 @@ namespace Menu {
 		{
 			//Release resource
 
-			pRenderer->FreeSprite(this->m_hCursor);
+			//pRenderer->FreeSprite(this->m_hCursor);
 		}
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
@@ -2036,7 +2146,7 @@ namespace Menu {
 
 			if (!this->m_bOpen)
 				return;
-
+			
 			if (this->m_oMainMenu.IsActive()) {
 				this->m_oMainMenu.Draw();
 

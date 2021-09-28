@@ -611,7 +611,10 @@ namespace Entity {
 
 		this->Release();
 
-		Game::pGame->GetMenu()->AddToSaveGameList(Utils::ConvertToWideString(this->m_szFileName));
+		Game::pGame->GetMenu()->AddToSaveGameList(Utils::ConvertToWideString(*this->m_pszFileName));
+
+		delete this->m_pszFileName;
+		this->m_pszFileName = nullptr;
 	}
 
 	bool Initialize(void)

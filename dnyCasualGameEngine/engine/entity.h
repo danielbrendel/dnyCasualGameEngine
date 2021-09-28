@@ -1312,7 +1312,7 @@ namespace Entity {
 	class CSaveGameWriter {
 	private:
 		std::ofstream* m_poFile;
-		std::string m_szFileName;
+		std::string* m_pszFileName;
 
 		bool IsValidHandle(void)
 		{
@@ -1335,7 +1335,7 @@ namespace Entity {
 			}
 		}
 	public:
-		CSaveGameWriter() : m_poFile(nullptr) {}
+		CSaveGameWriter() : m_poFile(nullptr), m_pszFileName(nullptr) {}
 		~CSaveGameWriter() {}
 
 		bool BeginSaveGame(void)
@@ -1346,6 +1346,10 @@ namespace Entity {
 			if (!this->m_poFile)
 				return false;
 
+			this->m_pszFileName = new std::string("");
+			if (!this->m_pszFileName)
+				return false;
+
 			tm time;
 
 			time_t t = std::time(nullptr);
@@ -1353,10 +1357,10 @@ namespace Entity {
 
 			std::ostringstream oss;
 			oss << std::put_time(&time, "%d-%m-%Y_%H-%M-%S");
+			
+			*this->m_pszFileName = std::string("savegame_" + oss.str() + ".sav");
 
-			this->m_szFileName = "savegame_" + oss.str() + ".sav";
-
-			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "saves\\" + this->m_szFileName, std::ifstream::out);
+			this->m_poFile->open(Utils::ConvertToAnsiString(wszBasePath) + "saves\\" + *this->m_pszFileName, std::ifstream::out);
 			if (!this->m_poFile->is_open()) {
 				delete this->m_poFile;
 				return false;

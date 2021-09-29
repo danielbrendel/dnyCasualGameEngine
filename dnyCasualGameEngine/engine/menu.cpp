@@ -79,6 +79,7 @@ namespace Menu {
 		if (pButton == &this->m_btnSave) {
 			this->SaveGfxSettings();
 			Game::pGame->AddHudInfoMessage(L"Settings saved!", Entity::HudMessageColor::HM_GREEN);
+			pConfigMgr->Parse(L"restart");
 		}
 	}
 

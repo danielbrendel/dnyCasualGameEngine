@@ -424,10 +424,13 @@ namespace Entity {
 
 		std::string GetSaveGameValueFromProperties(const std::string& szProperties, const std::string& szIdent)
 		{
-			size_t uiPos = szProperties.find(szIdent + ":");
+			//Extract value from property string by ident
+
+			size_t uiPos = szProperties.find(szIdent + ":"); //Find position of delimiter
 			if (uiPos != std::string::npos) {
 				std::string szValue = "";
 
+				//Copy chars from char next to delimiter until end-delimiter char
 				for (size_t i = uiPos + szIdent.length() + 1; i < szProperties.length(); i++) {
 					if (szProperties[i] == ';') {
 						break;

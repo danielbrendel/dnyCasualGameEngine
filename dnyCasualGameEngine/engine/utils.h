@@ -31,4 +31,5 @@ namespace Utils {
 	std::vector<std::wstring> ListFilesByExt(const std::wstring& wszBaseDir, const wchar_t** pFileList, const size_t uiListLen);
 	bool RemoveEntireDirectory(const std::wstring& wszDirectory);
 	bool CopyEntireDirectory(const std::wstring& wszFrom, const std::wstring& wszTo);
+	bool CreateRestartScript(void);
 }

@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "vars.h"
 
 /*
 	Casual Game Engine (dnyCasualGameEngine) developed by Daniel Brendel
@@ -326,5 +327,28 @@ namespace Utils {
 		sFileOpStruct.pTo = pwszTo;
 
 		return SHFileOperation(&sFileOpStruct) == 0;
+	}
+
+	bool CreateRestartScript(void)
+	{
+		//Create a restarter script
+
+		std::wstring wszBatchScript = L"@echo off\ncls\ntaskkill /PID " + std::to_wstring(GetCurrentProcessId()) + "\nstart " APP_EXEFILENAME "\n";
+		std::wstring wszBatchFile = wszBasePath + L"restarter.bat";
+
+		if (FileExists(wszBatchFile)) {
+			DeleteFile(wszBatchFile.c_str());
+		}
+
+		std::wofstream hFile;
+		hFile.open(wszBasePath + L"restarter.bat", std::wifstream::out);
+		if (hFile.is_open()) {
+			hFile << wszBatchScript;
+			hFile.close();
+
+			return true;
+		}
+
+		return false;
 	}
 }

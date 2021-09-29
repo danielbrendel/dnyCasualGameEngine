@@ -463,6 +463,14 @@ namespace Game {
 		pConfigMgr->Execute(wszBasePath + wszText);
 	}
 
+	void Cmd_Restart(void)
+	{
+		pGame->m_bInAppRestart = true;
+		pGame->Release();
+
+		ShellExecute(0, L"open", (wszBasePath + L"restarter.bat").c_str(), L"", wszBasePath.c_str(), SW_HIDE);
+	}
+
 	void Cmd_Bind(void)
 	{
 		int vCode = _wtoi(pConfigMgr->ExpressionItemValue(1).c_str());

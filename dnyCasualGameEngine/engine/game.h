@@ -56,6 +56,7 @@ namespace Game {
 	void Cmd_Bind(void);
 	void Cmd_Echo(void);
 	void Cmd_Exec(void);
+	void Cmd_Restart(void);
 
 	void OnHandleWorkshopItem(const std::wstring& wszItem);
 	void HandlePackageUpload(const std::wstring& wszArgs);
@@ -113,6 +114,7 @@ namespace Game {
 		std::wstring m_szQuickLoadFile;
 		Entity::CHudInfoMessages m_oHudInfoMessages;
 		Entity::CHud* m_pHud;
+		bool m_bInAppRestart;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -128,6 +130,7 @@ namespace Game {
 		friend void Cmd_Bind(void);
 		friend void Cmd_Echo(void);
 		friend void Cmd_Exec(void);
+		friend void Cmd_Restart(void);
 
 		bool LoadPackage(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
 		{
@@ -304,7 +307,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr), m_bInAppRestart(false) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -354,6 +357,7 @@ namespace Game {
 			pConfigMgr->CCommand::Add(L"exec", L"Execute a script file", &Cmd_Exec);
 			pConfigMgr->CCommand::Add(L"bind", L"Bind command to key", &Cmd_Bind);
 			pConfigMgr->CCommand::Add(L"echo", L"Print text to console", &Cmd_Echo);
+			pConfigMgr->CCommand::Add(L"restart", L"Restart application", &Cmd_Restart);
 			pConfigMgr->CCommand::Add(L"package_name", L"Package name", &Cmd_PackageName);
 			pConfigMgr->CCommand::Add(L"package_version", L"Package version", &Cmd_PackageVersion);
 			pConfigMgr->CCommand::Add(L"package_author", L"Package author", &Cmd_PackageAuthor);
@@ -512,6 +516,9 @@ namespace Game {
 				this->Release();
 				return false;
 			}
+
+			//Create restart script
+			Utils::CreateRestartScript();
 
 			//Add info text
 			pConsole->AddLine(std::wstring(pAppName->szValue) + L" v" + std::wstring(pAppVersion->szValue) + L" developed by " + std::wstring(pAppAuthor->szValue) + L" (" + std::wstring(pAppContact->szValue) + L")", Console::ConColor(100, 215, 255));
@@ -718,6 +725,11 @@ namespace Game {
 			FREE(pConfigMgr);
 			FREE(pSteamDownloader);
 			FREE(pAchievements);
+
+			//Delete restarter script if not in restart progress
+			if (!this->m_bInAppRestart) {
+				DeleteFile((wszBasePath + L"restarter.bat").c_str());
+			}
 		}
 
 		void AddPackage(const std::wstring& wszName, const std::wstring& wszPath)

@@ -1446,7 +1446,7 @@ namespace Menu {
 		virtual void Draw(void)
 		{
 			//Draw menu
-			pConsole->AddLine(std::to_wstring(this->m_vecPos[0]) + L"x" + std::to_wstring(this->m_vecPos[1]));
+			
 			pRenderer->DrawBox(this->m_vecPos[0], this->m_vecPos[1], BK_OBJECT_WIDTH, BK_OBJECT_HEIGHT, 1, 50, 50, 50, 150);
 
 			if (this->m_bHover) {
@@ -1491,7 +1491,7 @@ namespace Menu {
 		virtual void OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 		{
 			//Handle key events
-
+			
 			if ((this->m_bInSet) && (!bDown)) {
 				this->UpdateKeyValue(vKey);
 
@@ -1736,6 +1736,8 @@ namespace Menu {
 			this->m_oAttack.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oUse.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oMenu.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oQuickSave.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oConsole.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
 
 		virtual void Release(void)
@@ -1787,6 +1789,8 @@ namespace Menu {
 		{
 			//Initialize component
 
+			static std::wstring awszResolutions[] = {L"640x480", L"800x600", L"1024x768"};
+
 			this->m_oResolutions.SetFillColor(Entity::Color(50, 50, 50, 150));
 			this->m_oResolutions.SetFrameColor(Entity::Color(255, 255, 255, 150));
 			this->m_oResolutions.SetHoverColor(Entity::Color(0, 50, 125, 150));
@@ -1794,9 +1798,14 @@ namespace Menu {
 			this->m_oResolutions.SetSelectedItem(0);
 			this->m_oResolutions.SetTextColor(Entity::Color(200, 200, 200, 255));
 			this->m_oResolutions.SetWidth(200);
-			this->m_oResolutions.AddItem(L"640x480");
-			this->m_oResolutions.AddItem(L"800x600");
-			this->m_oResolutions.AddItem(L"1024x768");
+
+			for (size_t i = 0; i < _countof(awszResolutions); i++) {
+				this->m_oResolutions.AddItem(awszResolutions[i]);
+
+				if (std::to_wstring(pWindow->GetResolutionX()) + L"x" + std::to_wstring(pWindow->GetResolutionY()) == awszResolutions[i]) {
+					this->m_oResolutions.SetSelectedItem(i);
+				}
+			}
 
 			this->m_oFullscreen.SetCheckColor(Entity::Color(50, 135, 0, 150));
 			this->m_oFullscreen.SetChecked(pGfxFullscreen->bValue);
@@ -1825,6 +1834,8 @@ namespace Menu {
 			this->m_oFullscreen.Draw();
 			this->m_oResolutions.Draw();
 			this->m_btnSave.Draw();
+
+			pRenderer->DrawString(pDefaultFont, L"Note: Saving graphic settings will trigger an application restart", 250, 340, 150, 150, 0, 255);
 		}
 
 		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
@@ -1882,7 +1893,7 @@ namespace Menu {
 			this->m_oVolume.SetHintColor(Entity::Color(200, 200, 200, 255));
 			this->m_oVolume.SetHoverColor(Entity::Color(200, 200, 200, 150));
 			this->m_oVolume.SetLineColor(Entity::Color(150, 150, 150, 150));
-			this->m_oVolume.SetMaxValue(10);
+			this->m_oVolume.SetMaxValue(10 + 1);
 			this->m_oVolume.SetPosition(Entity::Vector(250, 300));
 			this->m_oVolume.SetSliderColor(Entity::Color(150, 150, 0, 150));
 			this->m_oVolume.SetValue(pSndVolume->iValue);

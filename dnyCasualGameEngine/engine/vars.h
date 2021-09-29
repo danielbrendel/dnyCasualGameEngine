@@ -20,6 +20,7 @@
 #include "console.h"
 #include "input.h"
 #include "achievements.h"
+#include "locale.h"
 
 extern DxWindow::CDxWindow* pWindow;
 extern DxRenderer::CDxRenderer* pRenderer;
@@ -34,6 +35,7 @@ extern ConfigMgr::CCVar::cvar_s* pAppVersion;
 extern ConfigMgr::CCVar::cvar_s* pAppAuthor;
 extern ConfigMgr::CCVar::cvar_s* pAppContact;
 extern ConfigMgr::CCVar::cvar_s* pAppSteamID;
+extern ConfigMgr::CCVar::cvar_s* pAppLang;
 
 extern ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth;
 extern ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight;
@@ -46,3 +48,5 @@ extern Achievements::CSteamAchievements* pAchievements;
 
 extern DxRenderer::d3dfont_s* pDefaultFont;
 extern int iDefaultFontSize[2];
+
+extern Localization::CLocalizationMgr oPackageLocaleMgr;

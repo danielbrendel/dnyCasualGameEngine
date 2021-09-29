@@ -113,6 +113,9 @@
     <ClInclude Include="engine\achievements.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="engine\locale.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="engine\app.rc">

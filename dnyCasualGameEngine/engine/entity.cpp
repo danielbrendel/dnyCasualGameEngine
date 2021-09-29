@@ -180,6 +180,11 @@ namespace Entity {
 			Game::pGame->AddHudInfoMessage(Utils::ConvertToWideString(szMsg), color, iDuration);
 		}
 
+		std::string QueryLangPhrase(const std::string& szIdent, const std::string& szDefault = "")
+		{
+			return Utils::ConvertToAnsiString(oPackageLocaleMgr.QueryPhrase(Utils::ConvertToWideString(szIdent), Utils::ConvertToWideString(szDefault)));
+		}
+
 		bool ShouldDraw(const Vector& vMyPos, const Vector& vMySize)
 		{
 			//Determine whether this entity is in viewport so it should be drawn
@@ -933,6 +938,8 @@ namespace Entity {
 			{ "void HUD_SetAmmoDisplayItem(const string &in szIdent)", APIFuncs::SetHUDAmmoDisplayItem },
 			{ "bool HUD_IsEnabled()", APIFuncs::IsHUDEnabled },
 			{ "void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },
+			{ "string Lang_QueryPhrase(const string &in szIdent, const string &in szDefault = \"\")", &APIFuncs::QueryLangPhrase },
+			{ "string _(const string &in szIdent, const string &in szDefault = \"\")", &APIFuncs::QueryLangPhrase }
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

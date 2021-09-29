@@ -24,6 +24,7 @@ ConfigMgr::CCVar::cvar_s* pAppVersion = nullptr;
 ConfigMgr::CCVar::cvar_s* pAppAuthor = nullptr;
 ConfigMgr::CCVar::cvar_s* pAppContact = nullptr;
 ConfigMgr::CCVar::cvar_s* pAppSteamID = nullptr;
+ConfigMgr::CCVar::cvar_s* pAppLang = nullptr;
 
 ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight = nullptr;
@@ -36,3 +37,5 @@ Achievements::CSteamAchievements* pAchievements = nullptr;
 
 DxRenderer::d3dfont_s* pDefaultFont = nullptr;
 int iDefaultFontSize[2];
+
+Localization::CLocalizationMgr oPackageLocaleMgr;

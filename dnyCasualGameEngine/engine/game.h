@@ -140,6 +140,9 @@ namespace Game {
 
 			this->m_sPackage.wszPakName = wszPackage;
 			this->m_sPackage.wszPakPath = wszPackagePath;
+
+			oPackageLocaleMgr.SetLanguagePath(wszPackagePath + L"\\lang");
+			oPackageLocaleMgr.SetLocale(pAppLang->szValue);
 			
 			//Check if package folder exists
 			if (!Utils::DirExists(wszPackagePath)) {
@@ -348,6 +351,7 @@ namespace Game {
 			pAppAuthor = pConfigMgr->CCVar::Add(L"app_author", ConfigMgr::CCVar::CVAR_TYPE_STRING, APP_AUTHOR);
 			pAppContact = pConfigMgr->CCVar::Add(L"app_contact", ConfigMgr::CCVar::CVAR_TYPE_STRING, APP_CONTACT);
 			pAppSteamID = pConfigMgr->CCVar::Add(L"app_steamid", ConfigMgr::CCVar::CVAR_TYPE_INT, std::to_wstring(APP_STEAMID));
+			pAppLang = pConfigMgr->CCVar::Add(L"app_language", ConfigMgr::CCVar::CVAR_TYPE_STRING, L"en");
 			pGfxResolutionWidth = pConfigMgr->CCVar::Add(L"gfx_resolution_width", ConfigMgr::CCVar::CVAR_TYPE_INT, L"1024");
 			pGfxResolutionHeight = pConfigMgr->CCVar::Add(L"gfx_resolution_height", ConfigMgr::CCVar::CVAR_TYPE_INT, L"768");
 			pGfxFullscreen = pConfigMgr->CCVar::Add(L"gfx_fullscreen", ConfigMgr::CCVar::CVAR_TYPE_BOOL, L"1");

@@ -383,6 +383,8 @@ void HUD_SetAmmoDisplayItem(const string &in szIdent)
 bool HUD_IsEnabled()
 //Add a HUD info message
 void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)
+//Query a language phrase of a language file of current locale. Alternatively you can use '_' as shortcut
+string Lang_QueryPhrase(const string &in szIdent, const string &in szDefault = "")
 ```
 
 ## AngelScript internals:

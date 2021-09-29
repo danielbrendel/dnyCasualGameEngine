@@ -1615,9 +1615,148 @@ namespace Entity {
 				pRenderer->DrawBox(drawx, drawy, iBoxWidth, iBoxHeight, 1, 255, 255, 255, 150);
 				pRenderer->DrawFilledBox(drawx + 1, drawy + 1, iBoxWidth - 1, iBoxHeight - 1, this->m_vMessages[i].sColor.r, this->m_vMessages[i].sColor.g, this->m_vMessages[i].sColor.b, this->m_vMessages[i].sColor.a);
 				pRenderer->DrawSprite(this->m_hExclamation, drawx + 3, drawy + 1, 0, 0.0f);
-				pRenderer->DrawString(this->m_pFont, this->m_vMessages[i].wszMsg, drawx + 5 + 50, drawy + 10, 200, 200, 200, 150);
+				pRenderer->DrawString(this->m_pFont, this->m_vMessages[i].wszMsg, drawx + 5 + 50, drawy + 10, 200, 200, 200, 255);
 			}
 		}
+	};
+
+	const int HUD_FONT_SIZE_WIDTH = 15;
+	const int HUD_FONT_SIZE_HEIGHT = 20;
+	class CHud {
+	private:
+		struct ammo_item_s {
+			std::wstring wszIdent;
+			D3DXIMAGE_INFO sInfo;
+			DxRenderer::HD3DSPRITE hSprite;
+			size_t uiCurAmmo;
+			size_t uiMaxAmmo;
+		};
+
+		size_t m_uiHealth;
+		std::vector<ammo_item_s> m_vItems;
+		size_t m_uiDisplayItem;
+		DxRenderer::d3dfont_s* m_pFont;
+		DxRenderer::HD3DSPRITE m_hBar;
+		bool m_bEnable;
+	public:
+		CHud() : m_uiDisplayItem(std::string::npos), m_bEnable(true)
+		{
+			this->m_pFont = pRenderer->LoadFont(L"Consolas", HUD_FONT_SIZE_WIDTH, HUD_FONT_SIZE_HEIGHT);
+			this->m_hBar = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\healthbar.png", 1, 128, 33, 1, false);
+		}
+
+		~CHud() {}
+
+		void UpdateHealth(size_t value)
+		{
+			//Update health
+
+			this->m_uiHealth = value;
+		}
+
+		void AddAmmoItem(const std::wstring& wszIdent, const std::wstring& wszSprite)
+		{
+			//Add new ammo item
+
+			ammo_item_s sItem;
+
+			pRenderer->GetSpriteInfo(wszSprite, sItem.sInfo);
+
+			
+			sItem.wszIdent = wszIdent;
+			sItem.hSprite = pRenderer->LoadSprite(wszSprite, 1, sItem.sInfo.Width, sItem.sInfo.Height, 1, false);
+
+			this->m_vItems.push_back(sItem);
+		}
+
+		void UpdateAmmoItem(const std::wstring& wszIdent, size_t uiCurAmmo, size_t uiMaxAmmo)
+		{
+			//Update ammo item
+
+			for (size_t i = 0; i < this->m_vItems.size(); i++) {
+				if (this->m_vItems[i].wszIdent == wszIdent) {
+					this->m_vItems[i].uiCurAmmo = uiCurAmmo;
+					this->m_vItems[i].uiMaxAmmo = uiMaxAmmo;
+
+					break;
+				}
+			}
+		}
+
+		void SetAmmoDisplayItem(const std::wstring& wszIdent)
+		{
+			//Set ammo display item
+
+			this->m_uiDisplayItem = std::string::npos;
+
+			for (size_t i = 0; i < this->m_vItems.size(); i++) {
+				if (this->m_vItems[i].wszIdent == wszIdent) {
+					this->m_uiDisplayItem = i;
+					break;
+				}
+			}
+		}
+
+		void Draw(void)
+		{
+			//Draw HUD component
+
+			if (!this->m_bEnable)
+				return;
+
+			//Draw health text
+			int iHealthXPos = 10;
+			if ((this->m_uiHealth < 100) && (this->m_uiHealth >= 10)) {
+				iHealthXPos += HUD_FONT_SIZE_WIDTH;
+			} else if (this->m_uiHealth < 10) {
+				iHealthXPos += HUD_FONT_SIZE_WIDTH * 2;
+			}
+			pRenderer->DrawString(this->m_pFont, std::to_wstring(this->m_uiHealth), iHealthXPos, 13, 200, 200, 200, 255);
+
+			//Draw health bar
+			#define HUD_SHIELDBAR_LENGTH 128
+			#define HUD_SHIELDBAR_HEIGHT 33
+			Entity::Color sBarColor = Entity::Color(0, 255, 0, 255);
+			if ((this->m_uiHealth < 75) && (this->m_uiHealth >= 35)) {
+				sBarColor = Entity::Color(150, 150, 0, 150);
+			} else if (this->m_uiHealth < 35) {
+				sBarColor = Entity::Color(250, 0, 0, 150);
+			}
+			int iShieldBarWidth = (int)this->m_uiHealth * HUD_SHIELDBAR_LENGTH / 100;
+			const int iShieldBarPadding = 5;
+			pRenderer->DrawSprite(this->m_hBar, 65, 10, 0, 0.0f);
+			int iDrawingBarWidth = iShieldBarWidth - (iShieldBarPadding * 2);
+			if (iDrawingBarWidth > 0) {
+				pRenderer->DrawFilledBox(65 + iShieldBarPadding, 10 + iShieldBarPadding, iDrawingBarWidth, HUD_SHIELDBAR_HEIGHT - iShieldBarPadding * 2 - 1, sBarColor.r, sBarColor.g, sBarColor.b, sBarColor.a);
+			}
+
+			//Draw ammo info
+			if ((this->m_uiDisplayItem != std::string::npos) && (this->m_uiDisplayItem < this->m_vItems.size())) {
+				std::wstring wszCurAmmo = std::to_wstring(this->m_vItems[this->m_uiDisplayItem].uiCurAmmo);
+				std::wstring wszMaxAmmo = std::to_wstring(this->m_vItems[this->m_uiDisplayItem].uiMaxAmmo);
+
+				int iAmmoInfoStartX = pWindow->GetResolutionX() - this->m_vItems[this->m_uiDisplayItem].sInfo.Width - (int)wszCurAmmo.length() * HUD_FONT_SIZE_WIDTH - HUD_FONT_SIZE_WIDTH - (int)wszMaxAmmo.length() * HUD_FONT_SIZE_WIDTH - 20;
+
+				pRenderer->DrawSprite(this->m_vItems[this->m_uiDisplayItem].hSprite, iAmmoInfoStartX, 5, 0, 0.0f);
+				
+				pRenderer->DrawString(this->m_pFont, wszCurAmmo, iAmmoInfoStartX + this->m_vItems[this->m_uiDisplayItem].sInfo.Width + 5, 5 + this->m_vItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 255);
+
+				if (this->m_vItems[this->m_uiDisplayItem].uiMaxAmmo > 0) {
+					pRenderer->DrawString(this->m_pFont, L"/", iAmmoInfoStartX + this->m_vItems[this->m_uiDisplayItem].sInfo.Width + 5 + (int)wszCurAmmo.length() * HUD_FONT_SIZE_WIDTH, 5 + this->m_vItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 150);
+					pRenderer->DrawString(this->m_pFont, wszMaxAmmo, iAmmoInfoStartX + this->m_vItems[this->m_uiDisplayItem].sInfo.Width + 5 + ((int)wszCurAmmo.length() + 1) * HUD_FONT_SIZE_WIDTH, 5 + this->m_vItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 150);
+				}
+			}
+		}
+
+		void SetEnableStatus(bool value)
+		{
+			//Set enable status value
+
+			this->m_bEnable = value;
+		}
+
+		//Getter
+		bool IsEnabled(void) { return this->m_bEnable; }
 	};
 
 	bool Initialize(void);

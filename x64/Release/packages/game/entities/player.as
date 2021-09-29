@@ -89,7 +89,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 
 		if ((this.m_uiButtons & BTN_TURNRIGHT) == BTN_TURNRIGHT) {
 			this.m_fRotation -= 0.05f;
-		} 
+		}
+		
+		HUD_UpdateHealth(this.m_uiHealth);
 
 		//Process attacking
 		if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
@@ -144,7 +146,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
 		
 		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, bDrawCustomColor, sDrawingColor);
-		R_DrawString(R_GetDefaultFont(), formatInt(this.m_uiHealth), Vector(10, 10), Color(0, 0, 155, 150));
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -351,6 +352,10 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
 	player.SetRotation(fRot);
+	
+	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\laserhud.png");
+	HUD_UpdateAmmoItem("laser", 1000, 5000);
+	HUD_SetAmmoDisplayItem("laser");
 }
 
 //Restore game state

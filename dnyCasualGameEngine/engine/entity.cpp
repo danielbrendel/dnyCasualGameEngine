@@ -553,6 +553,36 @@ namespace Entity {
 		{
 			return pConfigMgr->Execute(Game::pGame->GetPackagePath() + Utils::ConvertToWideString(szFile));
 		}
+
+		void SetHUDEnableStatus(bool value)
+		{
+			Game::pGame->GetHUD()->SetEnableStatus(value);
+		}
+
+		void UpdateHUDHealth(size_t value)
+		{
+			Game::pGame->GetHUD()->UpdateHealth(value);
+		}
+
+		void AddHUDAmmoItem(const std::string& szIdent, const std::string& szSprite)
+		{
+			Game::pGame->GetHUD()->AddAmmoItem(Utils::ConvertToWideString(szIdent), Utils::ConvertToWideString(szSprite));
+		}
+
+		void UpdateHUDAmmoItem(const std::string& szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)
+		{
+			Game::pGame->GetHUD()->UpdateAmmoItem(Utils::ConvertToWideString(szIdent), uiCurAmmo, uiMaxAmmo);
+		}
+
+		void SetHUDAmmoDisplayItem(const std::string& szIdent)
+		{
+			Game::pGame->GetHUD()->SetAmmoDisplayItem(Utils::ConvertToWideString(szIdent));
+		}
+
+		bool IsHUDEnabled(void)
+		{
+			return Game::pGame->GetHUD()->IsEnabled();
+		}
 	}
 
 	void CSolidSprite::Draw(void)
@@ -894,6 +924,12 @@ namespace Entity {
 			{ "void CVar_SetFloat(const string &in szName, float value)", APIFuncs::SetCVarFloat },
 			{ "void CVar_SetString(const string &in szName, const string &in value)", APIFuncs::SetCVarString },
 			{ "bool ExecConfig(const string &in szFile)", APIFuncs::ExecConfig },
+			{ "void HUD_SetEnableStatus(bool value)", APIFuncs::SetHUDEnableStatus },
+			{ "void HUD_UpdateHealth(size_t value)", APIFuncs::UpdateHUDHealth },
+			{ "void HUD_AddAmmoItem(const string &in szIdent, const string &in szSprite)", APIFuncs::AddHUDAmmoItem },
+			{ "void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)", APIFuncs::UpdateHUDAmmoItem },
+			{ "void HUD_SetAmmoDisplayItem(const string &in szIdent)", APIFuncs::SetHUDAmmoDisplayItem },
+			{ "bool HUD_IsEnabled()", APIFuncs::IsHUDEnabled },
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

@@ -703,18 +703,18 @@ namespace Menu {
 
 		virtual void Draw(void)
 		{
-		//Draw menu
+			//Draw menu
 
-		for (size_t i = 0; i < this->m_vEntries.size(); i++) {
-			if (this->m_vEntries[i].bShow) {
-				if (this->m_vEntries[i].bHover) {
-					pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 230, 230, 230, 150);
-				}
-				else {
-					pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 200, 200, 200, 150);
+			for (size_t i = 0; i < this->m_vEntries.size(); i++) {
+				if (this->m_vEntries[i].bShow) {
+					if (this->m_vEntries[i].bHover) {
+						pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 230, 230, 230, 255);
+					}
+					else {
+						pRenderer->DrawString(this->m_pFont, this->m_vEntries[i].wszText, this->m_vEntries[i].x, this->m_vEntries[i].y, 200, 200, 200, 255);
+					}
 				}
 			}
-		}
 		}
 
 		virtual void Release(void)
@@ -1009,7 +1009,7 @@ namespace Menu {
 			this->m_oPlay.SetPosition(Entity::Vector(250, 200));
 			this->m_oPlay.SetSize(Entity::Vector(230, 35));
 			this->m_oPlay.SetOwner(this);
-			this->m_oPlay.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oPlay.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oPlay.SetFrameColor(Entity::Color(0, 0, 0, 150));
 			this->m_oPlay.SetFillColor(Entity::Color(103, 225, 123, 150));
 			this->m_oPlay.SetHoverColor(Entity::Color(143, 235, 155, 150));
@@ -1019,7 +1019,7 @@ namespace Menu {
 			this->m_oSaveGames.SetSize(Entity::Vector(600, 300));
 			this->m_oSaveGames.SetFrameColor(Entity::Color(150, 150, 150, 150));
 			this->m_oSaveGames.SetFillColor(Entity::Color(50, 50, 50, 150));
-			this->m_oSaveGames.SetTextColor(Entity::Color(200, 200, 200, 150));
+			this->m_oSaveGames.SetTextColor(Entity::Color(200, 200, 200, 255));
 			this->m_oSaveGames.SetHoverColor(Entity::Color(100, 100, 100, 150));
 			this->m_oSaveGames.SetSelectColor(Entity::Color(150, 150, 150, 150));
 
@@ -1027,7 +1027,7 @@ namespace Menu {
 			this->m_oLoad.SetPosition(Entity::Vector(265, 300 + 300 + 10));
 			this->m_oLoad.SetSize(Entity::Vector(150, 35));
 			this->m_oLoad.SetOwner(this);
-			this->m_oLoad.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oLoad.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oLoad.SetFrameColor(Entity::Color(200, 200, 200, 150));
 			this->m_oLoad.SetFillColor(Entity::Color(50, 50, 50, 150));
 			this->m_oLoad.SetHoverColor(Entity::Color(100, 100, 100, 150));
@@ -1200,7 +1200,7 @@ namespace Menu {
 			this->m_oButton.SetPosition(Entity::Vector(250, 200 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
 			this->m_oButton.SetSize(Entity::Vector(130, 35));
 			this->m_oButton.SetOwner(this);
-			this->m_oButton.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oButton.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oButton.SetFrameColor(Entity::Color(0, 0, 0, 150));
 			this->m_oButton.SetFillColor(Entity::Color(103, 225, 123, 150));
 			this->m_oButton.SetHoverColor(Entity::Color(143, 235, 155, 150));
@@ -1218,7 +1218,7 @@ namespace Menu {
 			this->m_oBrowse.SetPosition(Entity::Vector(450, 200 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
 			this->m_oBrowse.SetSize(Entity::Vector(150, 35));
 			this->m_oBrowse.SetOwner(this);
-			this->m_oBrowse.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBrowse.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oBrowse.SetFrameColor(Entity::Color(255, 255, 255, 150));
 			this->m_oBrowse.SetFillColor(Entity::Color(50, 50, 50, 150));
 			this->m_oBrowse.SetHoverColor(Entity::Color(150, 150, 150, 150));
@@ -1792,7 +1792,7 @@ namespace Menu {
 			this->m_oResolutions.SetHoverColor(Entity::Color(0, 50, 125, 150));
 			this->m_oResolutions.SetPosition(Entity::Vector(250, 250));
 			this->m_oResolutions.SetSelectedItem(0);
-			this->m_oResolutions.SetTextColor(Entity::Color(200, 200, 200, 150));
+			this->m_oResolutions.SetTextColor(Entity::Color(200, 200, 200, 255));
 			this->m_oResolutions.SetWidth(200);
 			this->m_oResolutions.AddItem(L"640x480");
 			this->m_oResolutions.AddItem(L"800x600");
@@ -1810,7 +1810,7 @@ namespace Menu {
 			this->m_btnSave.SetFillColor(Entity::Color(50, 135, 0, 150));
 			this->m_btnSave.SetFrameColor(Entity::Color(250, 250, 250, 150));
 			this->m_btnSave.SetHoverColor(Entity::Color(76, 155, 0, 150));
-			this->m_btnSave.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_btnSave.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_btnSave.SetPosition(Entity::Vector(250, 600));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
 			this->m_btnSave.SetText(L"Save");
@@ -1879,7 +1879,7 @@ namespace Menu {
 		{
 			//Initialize component
 
-			this->m_oVolume.SetHintColor(Entity::Color(200, 200, 200, 150));
+			this->m_oVolume.SetHintColor(Entity::Color(200, 200, 200, 255));
 			this->m_oVolume.SetHoverColor(Entity::Color(200, 200, 200, 150));
 			this->m_oVolume.SetLineColor(Entity::Color(150, 150, 150, 150));
 			this->m_oVolume.SetMaxValue(10);
@@ -1892,7 +1892,7 @@ namespace Menu {
 			this->m_btnSave.SetFillColor(Entity::Color(50, 135, 0, 150));
 			this->m_btnSave.SetFrameColor(Entity::Color(250, 250, 250, 150));
 			this->m_btnSave.SetHoverColor(Entity::Color(76, 155, 0, 150));
-			this->m_btnSave.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_btnSave.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_btnSave.SetPosition(Entity::Vector(250, 600));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
 			this->m_btnSave.SetText(L"Save");
@@ -1904,7 +1904,7 @@ namespace Menu {
 		{
 			//Draw controls
 
-			pRenderer->DrawString(pDefaultFont, L"Volume: ", this->m_vecPos[0], this->m_vecPos[1], 200, 200, 200, 150);
+			pRenderer->DrawString(pDefaultFont, L"Volume: ", this->m_vecPos[0], this->m_vecPos[1], 200, 200, 200, 255);
 
 			this->m_oVolume.Draw();
 
@@ -1957,7 +1957,7 @@ namespace Menu {
 
 			this->m_oTabMenu.SetPosition(Entity::Vector(250, 200));
 			this->m_oTabMenu.SetTabSpacing(20);
-			this->m_oTabMenu.SetTextColor(Entity::Color(200, 200, 200, 150));
+			this->m_oTabMenu.SetTextColor(Entity::Color(200, 200, 200, 255));
 			this->m_oTabMenu.SetHoverColor(Entity::Color(50, 200, 0, 150));
 			this->m_oTabMenu.SetSelectedColor(Entity::Color(10, 150, 0, 150));
 
@@ -2312,7 +2312,7 @@ namespace Menu {
 			this->m_oForm.Draw();
 			this->m_oButton.Draw();
 
-			pRenderer->DrawString(pDefaultFont, L"Your achieved score: " + std::to_wstring(this->m_iScore), this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, 200, 200, 200, 150);
+			pRenderer->DrawString(pDefaultFont, L"Your achieved score: " + std::to_wstring(this->m_iScore), this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, 200, 200, 200, 255);
 		}
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
@@ -2353,13 +2353,13 @@ namespace Menu {
 			this->m_oForm.SetBodyColor(Entity::Color(150, 150, 150, 150));
 			this->m_oForm.SetBorderColor(Entity::Color(200, 200, 200, 150));
 			this->m_oForm.SetTitleBarColor(Entity::Color(50, 125, 0, 150));
-			this->m_oForm.SetTitleTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oForm.SetTitleTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oForm.SetTitle(L"Game over!");
 
 			this->m_oBtnRestart.SetFrameColor(Entity::Color(200, 200, 200, 150));
 			this->m_oBtnRestart.SetFillColor(Entity::Color(50, 150, 50, 150));
 			this->m_oBtnRestart.SetHoverColor(Entity::Color(70, 180, 70, 150));
-			this->m_oBtnRestart.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBtnRestart.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oBtnRestart.SetSize(Entity::Vector(200, 35));
 			this->m_oBtnRestart.SetOwner(this);
 			this->m_oBtnRestart.SetText(L"Try again");
@@ -2367,7 +2367,7 @@ namespace Menu {
 			this->m_oBtnLoadLastSavedGame.SetFrameColor(Entity::Color(200, 200, 200, 150));
 			this->m_oBtnLoadLastSavedGame.SetFillColor(Entity::Color(50, 150, 50, 150));
 			this->m_oBtnLoadLastSavedGame.SetHoverColor(Entity::Color(70, 180, 70, 150));
-			this->m_oBtnLoadLastSavedGame.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBtnLoadLastSavedGame.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oBtnLoadLastSavedGame.SetSize(Entity::Vector(200, 35));
 			this->m_oBtnLoadLastSavedGame.SetOwner(this);
 			this->m_oBtnLoadLastSavedGame.SetText(L"Quick load");
@@ -2375,7 +2375,7 @@ namespace Menu {
 			this->m_oBtnReturnToMainMenu.SetFrameColor(Entity::Color(200, 200, 200, 150));
 			this->m_oBtnReturnToMainMenu.SetFillColor(Entity::Color(50, 150, 50, 150));
 			this->m_oBtnReturnToMainMenu.SetHoverColor(Entity::Color(70, 180, 70, 150));
-			this->m_oBtnReturnToMainMenu.SetTextColor(Entity::Color(250, 250, 250, 150));
+			this->m_oBtnReturnToMainMenu.SetTextColor(Entity::Color(250, 250, 250, 255));
 			this->m_oBtnReturnToMainMenu.SetSize(Entity::Vector(300, 35));
 			this->m_oBtnReturnToMainMenu.SetOwner(this);
 			this->m_oBtnReturnToMainMenu.SetText(L"Return to main menu");
@@ -2404,8 +2404,8 @@ namespace Menu {
 			this->m_oBtnLoadLastSavedGame.Draw();
 			this->m_oBtnReturnToMainMenu.Draw();
 
-			pRenderer->DrawString(pDefaultFont, L"Your game is over.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 79, 250, 250, 250, 150);
-			pRenderer->DrawString(pDefaultFont, L"You can try again or return to main menu.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, 250, 250, 250, 150);
+			pRenderer->DrawString(pDefaultFont, L"Your game is over.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 79, 250, 250, 250, 255);
+			pRenderer->DrawString(pDefaultFont, L"You can try again or return to main menu.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, 250, 250, 250, 255);
 		}
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

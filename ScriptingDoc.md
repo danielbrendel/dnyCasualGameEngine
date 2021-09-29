@@ -371,6 +371,18 @@ void CVar_SetFloat(const string &in szName, float value)
 void CVar_SetString(const string &in szName, const string &in value)
 //Execute a configuration script file
 bool ExecConfig(const string &in szFile)
+//Enable or disable drawing of HUD
+void HUD_SetEnableStatus(bool value)
+//Update HUD health value
+void HUD_UpdateHealth(size_t value)
+//Add new HUD ammo item
+void HUD_AddAmmoItem(const string &in szIdent, const string &in szSprite)
+//Update specific HUD ammo item
+void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)
+//Specify ammo item to display
+void HUD_SetAmmoDisplayItem(const string &in szIdent)
+//Check whether HUD is currently enabled or not
+bool HUD_IsEnabled()
 ```
 
 ## AngelScript internals:

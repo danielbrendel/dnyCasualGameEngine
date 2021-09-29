@@ -112,6 +112,7 @@ namespace Game {
 		bool m_bLoadSavedGame;
 		std::wstring m_szQuickLoadFile;
 		Entity::CHudInfoMessages m_oHudInfoMessages;
+		Entity::CHud* m_pHud;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -303,7 +304,7 @@ namespace Game {
 			return std::string::npos;
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -505,6 +506,13 @@ namespace Game {
 			//Initialize HUD message component
 			this->m_oHudInfoMessages.Initialize();
 
+			//Initialize game HUD
+			this->m_pHud = new Entity::CHud();
+			if (!this->m_pHud) {
+				this->Release();
+				return false;
+			}
+
 			//Add info text
 			pConsole->AddLine(std::wstring(pAppName->szValue) + L" v" + std::wstring(pAppVersion->szValue) + L" developed by " + std::wstring(pAppAuthor->szValue) + L" (" + std::wstring(pAppContact->szValue) + L")", Console::ConColor(100, 215, 255));
 			pConsole->AddLine("Powered by " APP_NAME L" v" APP_VERSION L" developed by " APP_AUTHOR L" (" APP_CONTACT L")", Console::ConColor(200, 200, 200));
@@ -701,6 +709,7 @@ namespace Game {
 			this->m_oCursor.Release();
 
 			//Free memory
+			FREE(this->m_pHud);
 			FREE(pConsole);
 			FREE(pSound);
 			FREE(pRenderer);
@@ -735,5 +744,7 @@ namespace Game {
 		Menu::CCursor* GetCursor(void) { return &this->m_oCursor; }
 		//Get main menu
 		Menu::CMenu* GetMenu(void) { return &this->m_oMenu; }
+		//Get HUD object
+		Entity::CHud* GetHUD(void) { return this->m_pHud; }
 	};
 }

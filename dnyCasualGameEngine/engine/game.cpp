@@ -162,6 +162,11 @@ namespace Game {
 					this->m_oGameOverMenu.Draw();
 				}
 			}
+
+			//Draw game HUD
+			if ((this->m_pHud) && (!this->m_oMenu.IsOpen())) {
+				this->m_pHud->Draw();
+			}
 		}
 
 		//Draw menu if opened
@@ -218,6 +223,8 @@ namespace Game {
 		this->m_bShowIntermission = false;
 		this->m_bGameStarted = false;
 		this->m_bGameOver = false;
+		this->m_bInGameLoadingProgress = false;
+		this->m_bLoadSavedGame = false;
 
 		//Inform menu
 		this->m_oMenu.OnStopGame();
@@ -244,10 +251,12 @@ namespace Game {
 
 		if (this->m_bShowIntermission) { //Inform intermission menu
 			this->m_oIntermissionMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			return;
 		}
 
 		if (this->m_bGameOver) { //Inform game over menu
 			this->m_oGameOverMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			return;
 		}
 
 		if (!this->m_oMenu.IsOpen()) {

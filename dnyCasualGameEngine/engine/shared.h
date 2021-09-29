@@ -16,7 +16,6 @@
 #define APP_AUTHOR L"Daniel Brendel"
 #define APP_CONTACT L"dbrendel1988<at>gmail<dot>com"
 #define APP_STEAMID 0
-//#define APP_USESTEAM
 
 #include <cstdlib>
 #include <cstdio>

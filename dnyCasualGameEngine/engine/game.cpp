@@ -41,10 +41,10 @@ namespace Game {
 
 		this->m_sMap.wszFileName = wszMap;
 
-		#ifdef APP_USESTEAM
 		//Publish current achievements
-		pAchievements->PublishAchievementAndStatProgress();
-		#endif
+		if (pAppSteamID->iValue != 0) {
+			pAchievements->PublishAchievementAndStatProgress();
+		}
 
 		//Set map background
 		return pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\gfx\\" + this->m_sMap.wszBackground);
@@ -58,16 +58,16 @@ namespace Game {
 			//Perform window processing
 			pWindow->Process();
 
-			#ifdef APP_USESTEAM
 			//Process Steam callbacks
-			SteamAPI_RunCallbacks();
-			#endif
+			if (pAppSteamID->iValue != 0) {
+				SteamAPI_RunCallbacks();
+			}
 
 			//Perform game loading if indicated
 			if (this->m_bInGameLoadingProgress) {
-				#ifdef APP_USESTEAM
-				pAchievements->PublishAchievementAndStatProgress();
-				#endif
+				if (pAppSteamID->iValue != 0) {
+					pAchievements->PublishAchievementAndStatProgress();
+				}
 
 				if (!this->StartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath)) {
 					pConsole->AddLine(L"Failed to start new game", Console::ConColor(250, 0, 0));
@@ -227,10 +227,10 @@ namespace Game {
 		//Show cursor
 		this->m_oCursor.SetActiveStatus(true);
 
-		#ifdef APP_USESTEAM
 		//Publish current achievements
-		pAchievements->PublishAchievementAndStatProgress();
-		#endif
+		if (pAppSteamID->iValue != 0) {
+			pAchievements->PublishAchievementAndStatProgress();
+		}
 
 		//Restore background image
 		pRenderer->SetBackgroundPicture(wszBasePath + L"media\\gfx\\background.jpg");

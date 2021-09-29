@@ -371,17 +371,17 @@ namespace Game {
 			
 			//Link with Steam
 
-			#ifdef APP_USESTEAM
-			if (SteamAPI_RestartAppIfNecessary(pAppSteamID->iValue)) {
-				this->Release();
-				return true;
-			}
+			if (pAppSteamID->iValue != 0) {
+				if (SteamAPI_RestartAppIfNecessary(pAppSteamID->iValue)) {
+					this->Release();
+					return true;
+				}
 
-			if (!SteamAPI_Init()) {
-				this->Release();
-				return false;
+				if (!SteamAPI_Init()) {
+					this->Release();
+					return false;
+				}
 			}
-			#endif
 
 			//Instantiate window manager
 			pWindow = new DxWindow::CDxWindow();
@@ -454,27 +454,27 @@ namespace Game {
 				return false;
 			}
 
-			#ifdef APP_USESTEAM
-			//Instantiate Steam Workshop downloader object
-			pSteamDownloader = new Workshop::CSteamDownload(&OnHandleWorkshopItem);
-			if (!pSteamDownloader) {
-				this->Release();
-				return false;
-			}
+			if (pAppSteamID->iValue != 0) {
+				//Instantiate Steam Workshop downloader object
+				pSteamDownloader = new Workshop::CSteamDownload(&OnHandleWorkshopItem);
+				if (!pSteamDownloader) {
+					this->Release();
+					return false;
+				}
 
-			//Process subscribed Workshop items
-			if (!pSteamDownloader->ProcessSubscribedItems()) {
-				this->Release();
-				return false;
-			}
+				//Process subscribed Workshop items
+				if (!pSteamDownloader->ProcessSubscribedItems()) {
+					this->Release();
+					return false;
+				}
 
-			//Initialize Steam Achievements manager
-			pAchievements = new Achievements::CSteamAchievements();
-			if (!pAchievements) {
-				this->Release();
-				return false;
+				//Initialize Steam Achievements manager
+				pAchievements = new Achievements::CSteamAchievements();
+				if (!pAchievements) {
+					this->Release();
+					return false;
+				}
 			}
-			#endif
 
 			//Load banner
 			this->m_hBanner = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\banner.png", 1, 768, 150, 1, false);

@@ -1711,7 +1711,7 @@ namespace Entity {
 			} else if (this->m_uiHealth < 10) {
 				iHealthXPos += HUD_FONT_SIZE_WIDTH * 2;
 			}
-			pRenderer->DrawString(this->m_pFont, std::to_wstring(this->m_uiHealth), iHealthXPos, 13, 200, 200, 200, 255);
+			pRenderer->DrawString(this->m_pFont, std::to_wstring(this->m_uiHealth), iHealthXPos, 19, 200, 200, 200, 255);
 
 			//Draw health bar
 			#define HUD_SHIELDBAR_LENGTH 128
@@ -1724,10 +1724,10 @@ namespace Entity {
 			}
 			int iShieldBarWidth = (int)this->m_uiHealth * HUD_SHIELDBAR_LENGTH / 100;
 			const int iShieldBarPadding = 5;
-			pRenderer->DrawSprite(this->m_hBar, 65, 10, 0, 0.0f);
+			pRenderer->DrawSprite(this->m_hBar, 65, 15, 0, 0.0f);
 			int iDrawingBarWidth = iShieldBarWidth - (iShieldBarPadding * 2);
 			if (iDrawingBarWidth > 0) {
-				pRenderer->DrawFilledBox(65 + iShieldBarPadding, 10 + iShieldBarPadding, iDrawingBarWidth, HUD_SHIELDBAR_HEIGHT - iShieldBarPadding * 2 - 1, sBarColor.r, sBarColor.g, sBarColor.b, sBarColor.a);
+				pRenderer->DrawFilledBox(65 + iShieldBarPadding, 15 + iShieldBarPadding, iDrawingBarWidth, HUD_SHIELDBAR_HEIGHT - iShieldBarPadding * 2 - 1, sBarColor.r, sBarColor.g, sBarColor.b, sBarColor.a);
 			}
 
 			//Draw ammo info

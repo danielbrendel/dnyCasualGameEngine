@@ -22,6 +22,7 @@ namespace Game {
 		pConsole->AddLine(L"Loading map: " + wszMap);
 
 		this->m_bShowIntermission = false;
+		this->m_bGamePause = false;
 
 		//Free old resources
 
@@ -302,7 +303,7 @@ namespace Game {
 	void CGame::OnKeyEvent(int vKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
 		//Called for key events
-
+		
 		if (vKey == g_oInputMgr.GetKeyBindingCode(L"MENU")) {
 			if (!bDown) {
 				if (this->m_bGameStarted) {
@@ -315,7 +316,7 @@ namespace Game {
 				return;
 			}
 		}
-
+		
 		if ((vKey == g_oInputMgr.GetKeyBindingCode(L"SAVEGAME")) && (!bDown)) {
 			size_t uiPlayerScript = this->FindScript(L"player");
 			bool bResult = false;
@@ -335,7 +336,7 @@ namespace Game {
 			BEGIN_PARAMS(vArgs);
 			PUSH_DWORD(vKey);
 			PUSH_BYTE(bDown);
-
+			
 			pScriptingInt->CallScriptMethod(playerEntity.hScript, playerEntity.pObject, "void OnKeyPress(int vKey, bool bDown)", &vArgs, nullptr, Scripting::FA_VOID);
 		} else {
 			this->m_oMenu.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);

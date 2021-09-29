@@ -66,7 +66,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	void OnProcess()
 	{
 		//Process movement
-		
+
 		if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
 			Ent_Move(this, 10, MOVE_FORWARD);
 		} 

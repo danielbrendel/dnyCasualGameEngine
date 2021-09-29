@@ -294,8 +294,6 @@ bool R_DrawLine(const Vector&in start, const Vector&in end, const Color&in color
 bool R_DrawSprite(const SpriteHandle hSprite, const Vector&in pos, int iFrame, float fRotation, const Vector &in vRotPos, float fScale1, float fScale2, bool bUseCustomColorMask, const Color&in color)
 //Draw a string on the screen.
 bool R_DrawString(const FontHandle font, const string&in szText, const Vector&in pos, const Color&in color)
-//Add a HUD message
-void R_AddHudMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)
 //Check if the required position is inside the view in order to be drawn
 bool R_ShouldDraw(const Vector &in vMyPos, const Vector &in vMySize)
 //Get the relative drawing positions of absolute world positions according to the view
@@ -383,6 +381,8 @@ void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMax
 void HUD_SetAmmoDisplayItem(const string &in szIdent)
 //Check whether HUD is currently enabled or not
 bool HUD_IsEnabled()
+//Add a HUD info message
+void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)
 ```
 
 ## AngelScript internals:

@@ -886,7 +886,6 @@ namespace Entity {
 			{ "bool R_DrawLine(const Vector&in start, const Vector&in end, const Color&in color)", &APIFuncs::DrawLine },
 			{ "bool R_DrawSprite(const SpriteHandle hSprite, const Vector&in pos, int iFrame, float fRotation, const Vector &in vRotPos, float fScale1, float fScale2, bool bUseCustomColorMask, const Color&in color)", &APIFuncs::DrawSprite },
 			{ "bool R_DrawString(const FontHandle font, const string&in szText, const Vector&in pos, const Color&in color)", &APIFuncs::DrawString },
-			{ "void R_AddHudMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },
 			{ "bool R_ShouldDraw(const Vector &in vMyPos, const Vector &in vMySize)", APIFuncs::ShouldDraw },
 			{ "void R_GetDrawingPosition(const Vector &in vMyPos, const Vector &in vMySize, Vector &out)", &APIFuncs::GetDrawingPosition },
 			{ "FontHandle R_GetDefaultFont()", &APIFuncs::GetDefaultFont },
@@ -930,6 +929,7 @@ namespace Entity {
 			{ "void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)", APIFuncs::UpdateHUDAmmoItem },
 			{ "void HUD_SetAmmoDisplayItem(const string &in szIdent)", APIFuncs::SetHUDAmmoDisplayItem },
 			{ "bool HUD_IsEnabled()", APIFuncs::IsHUDEnabled },
+			{ "void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

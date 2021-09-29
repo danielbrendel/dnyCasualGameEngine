@@ -13,7 +13,7 @@ class CLaserEntity : IScriptedEntity
 	
 	CLaserEntity()
     {
-		this.m_vecSize = Vector(60, 99);
+		this.m_vecSize = Vector(50, 35);
 		this.m_fSpeed = 35.0;
 		this.m_bRemove = false;
     }
@@ -140,7 +140,7 @@ class CLaserEntity : IScriptedEntity
 	//This vector is used for drawing the selection box
 	Vector& GetSize()
 	{
-		return this.m_vecPos;
+		return this.m_vecSize;
 	}
 	
 	//Return save game properties

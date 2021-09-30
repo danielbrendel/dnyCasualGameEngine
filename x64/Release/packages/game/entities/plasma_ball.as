@@ -1,7 +1,20 @@
+/*
+	Casual Game Engine: Casual Pixel Warrior
+	
+	A game for Casual Game Engine
+	
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
 
 string g_szPackagePath = "";
 const uint32 PLASMA_BALL_DAMAGE = 25;
 
+/* Plasma ball entity */
 class CPlasmaBall : IScriptedEntity
 {
 	Vector m_vecPos;
@@ -109,7 +122,7 @@ class CPlasmaBall : IScriptedEntity
 				ref.OnDamage(PLASMA_BALL_DAMAGE);
 				
 				SoundHandle hHit = S_QuerySound(GetPackagePath() + "sound\\plasma_hit.wav");
-				S_PlaySound(hHit, 10);
+				S_PlaySound(hHit, S_GetCurrentVolume());
 			}
 		}
 	}

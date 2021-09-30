@@ -1,6 +1,20 @@
+/*
+	Casual Game Engine: Casual Pixel Warrior
+	
+	A game for Casual Game Engine
+	
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 #include "weapon_gun.as"
 #include "../../.common/entities/explosion.as"
 
+/* Tank entity */
 class CTankEntity : IScriptedEntity
 {
 	Vector m_vecPos;
@@ -52,7 +66,7 @@ class CTankEntity : IScriptedEntity
 			return;
 		
 		//Play fire sound
-		S_PlaySound(this.m_hFireSound, 10);
+		S_PlaySound(this.m_hFireSound, S_GetCurrentVolume());
 		
 		Vector shotPos = Vector(this.m_vecPos[0] + this.m_vecSize[0] / 2, this.m_vecPos[1] + this.m_vecSize[1] / 2);
 		shotPos[0] += int(sin(this.m_fHeadRot + 0.014) * 50);
@@ -62,6 +76,8 @@ class CTankEntity : IScriptedEntity
 		CGunEntity@ gun = CGunEntity();
 		Ent_SpawnEntity("weapon_gun", @gun, shotPos);
 		gun.SetRotation(this.m_fHeadRot);
+		gun.SetOwner(@this);
+		gun.SetExplosionFlag(true);
 	}
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument

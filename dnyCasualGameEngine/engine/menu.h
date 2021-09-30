@@ -1255,14 +1255,18 @@ namespace Menu {
 
 				FindClose(hFileSearch);
 			}
+
+			int iAboutContentHeight = 0;
 			
 			//Select first entry
 			if (this->m_vPackages.size() > 0) {
 				this->m_uiSelectedPackage = 0;
+
+				iAboutContentHeight = (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1];
 			}
 
 			this->m_oButton.SetText(L"Play!");
-			this->m_oButton.SetPosition(Entity::Vector(250, 200 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
+			this->m_oButton.SetPosition(Entity::Vector(250, 200 + iAboutContentHeight));
 			this->m_oButton.SetSize(Entity::Vector(130, 35));
 			this->m_oButton.SetOwner(this);
 			this->m_oButton.SetTextColor(Entity::Color(250, 250, 250, 255));
@@ -1271,7 +1275,7 @@ namespace Menu {
 			this->m_oButton.SetHoverColor(Entity::Color(143, 235, 155, 150));
 
 			this->m_oImageListView.SetOwner(this);
-			this->m_oImageListView.SetPosition(Entity::Vector(250, 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
+			this->m_oImageListView.SetPosition(Entity::Vector(250, 200 + 45 + iAboutContentHeight));
 			this->m_oImageListView.SetSize(Entity::Vector(700, 400));
 			this->m_oImageListView.SetImageGap(10);
 			this->m_oImageListView.SetImageSize(Entity::Vector(195, 90));
@@ -1280,7 +1284,7 @@ namespace Menu {
 			this->m_oImageListView.UpdateDimensions();
 
 			this->m_oBrowse.SetText(L"Browse Workshop");
-			this->m_oBrowse.SetPosition(Entity::Vector(450, 200 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1]));
+			this->m_oBrowse.SetPosition(Entity::Vector(450, 200 + iAboutContentHeight));
 			this->m_oBrowse.SetSize(Entity::Vector(150, 35));
 			this->m_oBrowse.SetOwner(this);
 			this->m_oBrowse.SetTextColor(Entity::Color(250, 250, 250, 255));
@@ -1300,6 +1304,11 @@ namespace Menu {
 
 			const int iStartPosX = 250;
 			const int iStartPosY = 200;
+
+			//Draw hint if there are no packages found
+			if (this->m_vPackages.size() == 0) {
+				pRenderer->DrawString(pDefaultFont, L"No mods found", iStartPosX, iStartPosY, 200, 200, 200, 255);
+			}
 
 			//Draw selected package preview
 			if ((this->m_uiSelectedPackage != std::string::npos) && (this->m_uiSelectedPackage < this->m_vPackages.size())) {
@@ -1321,8 +1330,15 @@ namespace Menu {
 			}
 
 			//Draw navigation
-			pRenderer->DrawSprite(this->m_hBackward, 250, 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350, 0, 0.0f);
-			pRenderer->DrawSprite(this->m_hForward, 300, 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350, 0, 0.0f);
+			if (this->m_vPackages.size() > 0) {
+				int iAboutContentHeight = 0;
+				if (this->m_vPackages.size() > 0) {
+					iAboutContentHeight = (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1];
+				}
+
+				pRenderer->DrawSprite(this->m_hBackward, 250, 200 + 45 + iAboutContentHeight + 350, 0, 0.0f);
+				pRenderer->DrawSprite(this->m_hForward, 300, 200 + 45 + iAboutContentHeight + 350, 0, 0.0f);
+			}
 		}
 
 		virtual void Release(void)

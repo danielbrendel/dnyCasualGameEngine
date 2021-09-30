@@ -1,9 +1,97 @@
+/*
+	Casual Game Engine: Casual Pixel Warrior
+	
+	A game for Casual Game Engine
+	
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
 
 string g_szPackagePath = "";
 
 #include "weapon_laser.as"
+#include "weapon_gun.as"
 #include "../../.common/entities/explosion.as"
 #include "tankcls.as"
+
+/* Player animation manager */
+class CPlayerAnimation {
+	array<SpriteHandle> m_arrSprites;
+	Timer m_tmrSwitch;
+	int m_iCurrentIndex;
+	Vector m_vecPos;
+	float m_fRotation;
+	bool m_bDrawCustomColor;
+	Color m_sDrawingColor;
+	
+	CPlayerAnimation()
+	{
+	}
+	
+	CPlayerAnimation(string file, int count, const Vector &in dims)
+	{
+		//Initialize component
+	
+		this.m_iCurrentIndex = 0;
+		this.m_bDrawCustomColor = false;
+	
+		for (int i = 0; i < count; i++) {
+			this.m_arrSprites.insertLast(R_LoadSprite(GetPackagePath() + file + formatInt(i) + ".png", 1, dims[0], dims[1], 1, true));
+		}
+		
+		this.m_tmrSwitch.SetDelay(100);
+		this.m_tmrSwitch.Reset();
+		this.m_tmrSwitch.SetActive(true);
+	}
+	
+	void Process()
+	{
+		//Process switching
+		
+		this.m_tmrSwitch.Update();
+		if (this.m_tmrSwitch.IsElapsed()) {
+			this.m_tmrSwitch.Reset();
+			
+			this.m_iCurrentIndex++;
+			if (this.m_iCurrentIndex >= int(this.m_arrSprites.length())) {
+				this.m_iCurrentIndex = 0;
+			}
+		}
+	}
+	
+	void Draw()
+	{
+		//Draw current sprite
+		
+		R_DrawSprite(this.m_arrSprites[this.m_iCurrentIndex], this.m_vecPos, 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, this.m_bDrawCustomColor, this.m_sDrawingColor);
+	}
+	
+	void SetPosition(const Vector &in vec)
+	{
+		//Update current position
+		
+		this.m_vecPos = vec;
+	}
+	
+	void SetRotation(float fRot)
+	{
+		//Update rotation
+		
+		this.m_fRotation = fRot;
+	}
+	
+	void CustomDrawing(bool shallDraw, const Color& in col)
+	{
+		//Set custom drawing
+		
+		this.m_bDrawCustomColor = shallDraw;
+		this.m_sDrawingColor = col;
+	}
+}
 
 const int BTN_FORWARD = (1 << 0);
 const int BTN_BACKWARD = (1 << 1);
@@ -13,12 +101,15 @@ const int BTN_TURNLEFT = (1 << 4);
 const int BTN_TURNRIGHT = (1 << 5);
 const int BTN_SPEED = (1 << 6);
 const int BTN_ATTACK = (1 << 7);
+const int WEAPON_HANDGUN = 1;
+const int WEAPON_RIFLE = 2;
+const int WEAPON_SHOTGUN = 3;
+/* Player entity manager */
 class CPlayerEntity : IScriptedEntity, IPlayerEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
-	SpriteHandle m_hSprite;
 	float m_fRotation;
 	uint32 m_uiButtons;
 	uint32 m_uiHealth;
@@ -26,13 +117,29 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	Timer m_tmrAttack;
 	Timer m_tmrFlicker;
 	uint32 m_uiFlickerCount;
+	CPlayerAnimation@ m_animIdleHandgun;
+	CPlayerAnimation@ m_animMoveHandgun;
+	CPlayerAnimation@ m_animShootHandgun;
+	CPlayerAnimation@ m_animIdleRifle;
+	CPlayerAnimation@ m_animMoveRifle;
+	CPlayerAnimation@ m_animShootRifle;
+	CPlayerAnimation@ m_animIdleShotgun;
+	CPlayerAnimation@ m_animMoveShotgun;
+	CPlayerAnimation@ m_animShootShotgun;
+	bool m_bMoving;
+	bool m_bShooting;
+	int m_iCurrentWeapon;
+	SpriteHandle m_hSprite;
 	
 	CPlayerEntity()
     {
 		this.m_uiButtons = 0;
 		this.m_uiHealth = 100;
-		this.m_vecSize = Vector(59, 52);
+		this.m_vecSize = Vector(64, 64);
 		this.m_uiFlickerCount = 0;
+		this.m_bMoving = false;
+		this.m_bShooting = false;
+		this.m_iCurrentWeapon = WEAPON_HANDGUN;
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
@@ -40,7 +147,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	{
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
-		this.m_hSprite = R_LoadSprite(g_szPackagePath + "gfx\\mech.png", 1, 59, 52, 1, true);
+		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\player\\handgun\\idle\\survivor-idle_handgun_0.png", 1, 64, 64, 1, true);
+		@this.m_animIdleHandgun = CPlayerAnimation("gfx\\player\\handgun\\idle\\survivor-idle_handgun_", 20, Vector(64, 64));
+		@this.m_animMoveHandgun = CPlayerAnimation("gfx\\player\\handgun\\move\\survivor-move_handgun_", 20, Vector(64, 64));
+		@this.m_animShootHandgun = CPlayerAnimation("gfx\\player\\handgun\\shoot\\survivor-shoot_handgun_", 3, Vector(64, 64));
+		@this.m_animIdleRifle = CPlayerAnimation("gfx\\player\\rifle\\idle\\survivor-idle_rifle_", 20, Vector(64, 64));
+		@this.m_animMoveRifle = CPlayerAnimation("gfx\\player\\rifle\\move\\survivor-move_rifle_", 20, Vector(64, 64));
+		@this.m_animShootRifle = CPlayerAnimation("gfx\\player\\rifle\\shoot\\survivor-shoot_rifle_", 3, Vector(64, 64));
+		@this.m_animIdleShotgun = CPlayerAnimation("gfx\\player\\shotgun\\idle\\survivor-idle_shotgun_", 20, Vector(64, 64));
+		@this.m_animMoveShotgun = CPlayerAnimation("gfx\\player\\shotgun\\move\\survivor-move_shotgun_", 20, Vector(64, 64));
+		@this.m_animShootShotgun = CPlayerAnimation("gfx\\player\\shotgun\\shoot\\survivor-shoot_shotgun_", 3, Vector(64, 64));
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
 		this.m_tmrMayDamage.SetActive(true);
@@ -67,20 +183,27 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	{
 		//Process movement
 
+		this.m_bMoving = false;
+		this.m_bShooting = false;
+
 		if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
 			Ent_Move(this, 10, MOVE_FORWARD);
+			this.m_bMoving = true;
 		} 
 		
 		if ((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD) {
 			Ent_Move(this, 10, MOVE_BACKWARD);
+			this.m_bMoving = true;
 		} 
 		
 		if ((this.m_uiButtons & BTN_MOVELEFT) == BTN_MOVELEFT) {
 			Ent_Move(this, 10, MOVE_LEFT);
+			this.m_bMoving = true;
 		} 
 		
 		if ((this.m_uiButtons & BTN_MOVERIGHT) == BTN_MOVERIGHT) {
 			Ent_Move(this, 10, MOVE_RIGHT);
+			this.m_bMoving = true;
 		} 
 
 		if ((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT) {
@@ -95,19 +218,53 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 
 		//Process attacking
 		if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
+			this.m_bShooting = true;
 			this.m_tmrAttack.Update();
 			if (this.m_tmrAttack.IsElapsed()) {
 				this.m_tmrAttack.Reset();
 				
-				CLaserEntity @laser = CLaserEntity();
-				
-				Vector vecLaserPos = Vector(this.m_vecPos[0] + 59 / 2, this.m_vecPos[1] + 52 / 2);
-				laser.SetRotation(this.m_fRotation);
-				
-				Ent_SpawnEntity("weapon_laser", @laser, vecLaserPos);
-				
-				SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
-				S_PlaySound(hSound, 10);
+				if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
+					CGunEntity @gun = CGunEntity();
+					
+					Vector vecGunPos = Vector(this.m_vecPos[0] + 64 / 2, this.m_vecPos[1] + 64 / 2);
+					gun.SetRotation(this.GetRotation());
+					gun.SetOwner(@this);
+					
+					Ent_SpawnEntity("weapon_gun", @gun, vecGunPos);
+					
+					SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\handgun.wav");
+					S_PlaySound(hSound, S_GetCurrentVolume());
+				} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+					CLaserEntity @laser = CLaserEntity();
+
+					laser.SetRotation(this.GetRotation());
+					
+					Ent_SpawnEntity("weapon_laser", @laser, this.m_vecPos);
+					
+					SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
+					S_PlaySound(hSound, S_GetCurrentVolume());
+				} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+					for (int i = 0; i < 3; i++) {
+						CGunEntity @gun = CGunEntity();
+					
+						Vector vecGunPos = Vector(this.m_vecPos[0] + 64 / 2, this.m_vecPos[1] + 64 / 2);
+						float fGunRot = this.GetRotation();
+						
+						if (i == 0) {
+							fGunRot -= 0.2;
+						} else if (i == 2) {
+							fGunRot += 0.2;
+						}
+						
+						gun.SetRotation(fGunRot);
+						gun.SetOwner(@this);
+						
+						Ent_SpawnEntity("weapon_gun", @gun, vecGunPos);
+					}
+					
+					SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\shotgun.wav");
+					S_PlaySound(hSound, S_GetCurrentVolume());
+				}
 			}
 		}
 		
@@ -125,6 +282,33 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 					this.m_tmrFlicker.SetActive(false);
 					this.m_uiFlickerCount = 0;
 				}
+			}
+		}
+		
+		//Process animation
+		if (this.m_bShooting) {
+			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
+				this.m_animShootHandgun.Process();
+			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+				this.m_animShootRifle.Process();
+			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+				this.m_animShootShotgun.Process();
+			}
+		} else if (this.m_bMoving) {
+			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
+				this.m_animMoveHandgun.Process();
+			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+				this.m_animMoveRifle.Process();
+			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+				this.m_animMoveShotgun.Process();
+			}
+		} else {
+			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
+				this.m_animIdleHandgun.Process();
+			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+				this.m_animIdleRifle.Process();
+			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+				this.m_animIdleShotgun.Process();
 			}
 		}
 	}
@@ -145,7 +329,58 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		
 		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
 		
-		R_DrawSprite(this.m_hSprite, Vector(Wnd_GetWindowCenterX() - 59 / 2, Wnd_GetWindowCenterY() - 52 / 2), 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, bDrawCustomColor, sDrawingColor);
+		if (this.m_bShooting) {
+			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
+				this.m_animShootHandgun.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animShootHandgun.SetRotation(this.m_fRotation);
+				this.m_animShootHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animShootHandgun.Draw();
+			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+				this.m_animShootRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animShootRifle.SetRotation(this.m_fRotation);
+				this.m_animShootRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animShootRifle.Draw();
+			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+				this.m_animShootShotgun.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animShootShotgun.SetRotation(this.m_fRotation);
+				this.m_animShootShotgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animShootShotgun.Draw();
+			}
+		} else if (this.m_bMoving) {
+			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
+				this.m_animMoveHandgun.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animMoveHandgun.SetRotation(this.m_fRotation);
+				this.m_animMoveHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animMoveHandgun.Draw();
+			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+				this.m_animMoveRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animMoveRifle.SetRotation(this.m_fRotation);
+				this.m_animMoveRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animMoveRifle.Draw();
+			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+				this.m_animMoveShotgun.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animMoveShotgun.SetRotation(this.m_fRotation);
+				this.m_animMoveShotgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animMoveShotgun.Draw();
+			}
+		} else {
+			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
+				this.m_animIdleHandgun.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animIdleHandgun.SetRotation(this.m_fRotation);
+				this.m_animIdleHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animIdleHandgun.Draw();
+			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+				this.m_animIdleRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animIdleRifle.SetRotation(this.m_fRotation);
+				this.m_animIdleRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animIdleRifle.Draw();
+			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+				this.m_animIdleShotgun.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
+				this.m_animIdleShotgun.SetRotation(this.m_fRotation);
+				this.m_animIdleShotgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
+				this.m_animIdleShotgun.Draw();
+			}
+		}
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -211,13 +446,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	//Return the rotation. This is actually not used by the host application, but might be useful to other entities
 	float GetRotation()
 	{
-		return this.m_fRotation;
+		return this.m_fRotation + 6.30 / 4;
 	}
 	
 	//Set new rotation
 	void SetRotation(float fRot)
 	{
-		this.m_fRotation = fRot;
+		this.m_fRotation = fRot + 6.30 / 4;
 	}
 	
 	//Set health
@@ -315,6 +550,17 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 				}
 			}
 		}
+		
+		if (vKey == GetKeyBinding("SLOT1")) {
+			this.m_iCurrentWeapon = WEAPON_HANDGUN;
+			HUD_SetAmmoDisplayItem("handgun");
+		} else if (vKey == GetKeyBinding("SLOT2")) {
+			this.m_iCurrentWeapon = WEAPON_RIFLE;
+			HUD_SetAmmoDisplayItem("laser");
+		} else if (vKey == GetKeyBinding("SLOT3")) {
+			this.m_iCurrentWeapon = WEAPON_SHOTGUN;
+			HUD_SetAmmoDisplayItem("shotgun");
+		}
 	}
 	
 	//Called for mouse presses
@@ -353,9 +599,15 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	Ent_SpawnEntity(szIdent, @player, vecPos);
 	player.SetRotation(fRot);
 	
-	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\laserhud.png");
-	HUD_UpdateAmmoItem("laser", 1000, 5000);
-	HUD_SetAmmoDisplayItem("laser");
+	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
+	HUD_UpdateAmmoItem("handgun", 100, 0);
+	HUD_SetAmmoDisplayItem("handgun");
+	
+	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
+	HUD_UpdateAmmoItem("laser", 0, 100);
+	
+	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
+	HUD_UpdateAmmoItem("shotgun", 0, 100);
 }
 
 //Restore game state

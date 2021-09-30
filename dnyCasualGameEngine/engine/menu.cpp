@@ -44,13 +44,15 @@ namespace Menu {
 			this->m_oBrowse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
 
-		if ((iMouseKey == 1) && (!bDown)) {
-			if ((this->m_vecMousePos[0] > 250) && (this->m_vecMousePos[0] < 250 + 50) && (this->m_vecMousePos[1] > 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350) && (this->m_vecMousePos[1] < 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350 + 50)) {
-				this->m_oImageListView.ScrollDown();
-			}
+		if (this->m_vPackages.size() > 0) {
+			if ((iMouseKey == 1) && (!bDown)) {
+				if ((this->m_vecMousePos[0] > 250) && (this->m_vecMousePos[0] < 250 + 50) && (this->m_vecMousePos[1] > 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350) && (this->m_vecMousePos[1] < 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350 + 50)) {
+					this->m_oImageListView.ScrollDown();
+				}
 
-			if ((this->m_vecMousePos[0] > 300) && (this->m_vecMousePos[0] < 300 + 50) && (this->m_vecMousePos[1] > 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350) && (this->m_vecMousePos[1] < 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350 + 50)) {
-				this->m_oImageListView.ScrollUp();
+				if ((this->m_vecMousePos[0] > 300) && (this->m_vecMousePos[0] < 300 + 50) && (this->m_vecMousePos[1] > 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350) && (this->m_vecMousePos[1] < 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350 + 50)) {
+					this->m_oImageListView.ScrollUp();
+				}
 			}
 		}
 	}

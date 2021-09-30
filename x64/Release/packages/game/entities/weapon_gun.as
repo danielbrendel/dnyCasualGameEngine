@@ -1,7 +1,21 @@
+/*
+	Casual Game Engine: Casual Pixel Warrior
+	
+	A game for Casual Game Engine
+	
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 #include "../../.common/entities/explosion.as"
 
 const uint32 GUN_SHOT_DAMAGE = 35;
 
+/* Gun entity  */
 class CGunEntity : IScriptedEntity
 {
 	Vector m_vecPos;
@@ -12,12 +26,16 @@ class CGunEntity : IScriptedEntity
 	float m_fSpeed;
 	bool m_bRemove;
 	Timer m_tmrAlive;
+	IScriptedEntity@ m_pOwner;
+	bool m_bExplode;
 	
 	CGunEntity()
     {
-		this.m_vecSize = Vector(60, 99);
+		this.m_vecSize = Vector(5, 5);
 		this.m_fSpeed = 35.0;
 		this.m_bRemove = false;
+		@this.m_pOwner = null;
+		this.m_bExplode = false;
     }
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
@@ -30,17 +48,19 @@ class CGunEntity : IScriptedEntity
 		this.m_tmrAlive.SetActive(true);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(0, 0), Vector(60, 99));
+		bbox.AddBBoxItem(Vector(0, 0), Vector(5, 5));
 		this.m_oModel.Alloc();
-		this.m_oModel.SetCenter(Vector(60 / 2, 99 / 2));
+		this.m_oModel.SetCenter(Vector(5 / 2, 5 / 2));
 		this.m_oModel.Initialize2(bbox, this.m_hShot);
 	}
 	
 	//Called when the entity gets released
 	void OnRelease()
 	{
-		CExplosionEntity @expl = CExplosionEntity();
-		Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
+		if (this.m_bExplode) {
+			CExplosionEntity @expl = CExplosionEntity();
+			Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff
@@ -92,11 +112,10 @@ class CGunEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (ref.GetName() == "player") {
+		if (@ref != @this.m_pOwner) {
 			ref.OnDamage(GUN_SHOT_DAMAGE);
+			this.m_bRemove = true;
 		}
-		
-		this.m_bRemove = true;
 	}
 	
 	//Called when entity gets damaged
@@ -151,5 +170,17 @@ class CGunEntity : IScriptedEntity
 	string GetSaveGameProperties()
 	{
 		return "";
+	}
+	
+	//Set owner
+	void SetOwner(IScriptedEntity@ pOwner)
+	{
+		@this.m_pOwner = @pOwner;
+	}
+	
+	//Set explosion flag
+	void SetExplosionFlag(bool value)
+	{
+		this.m_bExplode = value;
 	}
 }

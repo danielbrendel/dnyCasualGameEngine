@@ -1,5 +1,19 @@
+/*
+	Casual Game Engine: Casual Pixel Warrior
+	
+	A game for Casual Game Engine
+	
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 #include "../../.common/entities/explosion.as"
 
+/* Laser entity */
 class CLaserEntity : IScriptedEntity
 {
 	Vector m_vecPos;
@@ -28,9 +42,9 @@ class CLaserEntity : IScriptedEntity
 		this.m_tmrAlive.SetActive(true);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(0, 0), Vector(60, 99));
+		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
 		this.m_oModel.Alloc();
-		this.m_oModel.SetCenter(Vector(60 / 2, 99 / 2));
+		this.m_oModel.SetCenter(Vector(50 / 2, 35 / 2));
 		this.m_oModel.Initialize2(bbox, this.m_hLaser);
 	}
 	

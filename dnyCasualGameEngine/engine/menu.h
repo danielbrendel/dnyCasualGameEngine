@@ -516,7 +516,11 @@ namespace Menu {
 
 			size_t uiLoopMax = (this->m_uiDrawingIndex < this->m_vItems.size() - this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY) ? this->m_uiDrawingIndex + this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY : this->m_vItems.size();
 
-			for (size_t i = this->m_uiDrawingIndex; i < uiLoopMax; i++) {
+			for (size_t i = this->m_uiDrawingIndex; i < this->m_uiDrawingIndex + this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY; i++) {
+				if (i >= this->m_vItems.size()) {
+					continue;
+				}
+
 				int countx = (int)((i - this->m_uiDrawingIndex) % this->m_uiItemDisplayCountX);
 				int county = (int)((i - this->m_uiDrawingIndex) / this->m_uiItemDisplayCountY);
 				int xpos = this->m_vecPos[0] + (countx * (this->m_iImageGap * 2 + this->m_vecImageSize[0]));
@@ -560,13 +564,32 @@ namespace Menu {
 			//Handle mouse wheel event
 			
 			if (!bForward) {
-				if (this->m_uiDrawingIndex < this->m_vItems.size() - this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY) {
-					this->m_uiDrawingIndex++;
-				}
+				this->ScrollUp();
 			} else {
-				if (this->m_uiDrawingIndex > 0) {
-					this->m_uiDrawingIndex--;
-				}
+				this->ScrollDown();
+			}
+		}
+
+		void ScrollUp(void)
+		{
+			//Scroll up
+
+			int iTopValue = (int)this->m_vItems.size() - (int)this->m_uiItemDisplayCountX * (int)this->m_uiItemDisplayCountY;
+			if (iTopValue < 0) {
+				iTopValue = 0;
+			}
+
+			if (this->m_uiDrawingIndex < (size_t)iTopValue) {
+				this->m_uiDrawingIndex++;
+			}
+		}
+
+		void ScrollDown(void)
+		{
+			//Scroll down
+
+			if (this->m_uiDrawingIndex > 0) {
+				this->m_uiDrawingIndex--;
 			}
 		}
 
@@ -921,18 +944,32 @@ namespace Menu {
 			//Handle mouse wheel event
 
 			if (!bForward) {
-				int iTopValue = (int)this->m_vItems.size() - (int)this->m_uiItemDisplayCountY;
-				if (iTopValue < 0) {
-					iTopValue = 0;
-				}
-
-				if (this->m_uiDrawingIndex < (size_t)iTopValue) {
-					this->m_uiDrawingIndex++;
-				}
+				this->ScrollUp();
 			} else {
-				if (this->m_uiDrawingIndex > 0) {
-					this->m_uiDrawingIndex--;
-				}
+				this->ScrollDown();
+			}
+		}
+
+		void ScrollUp(void)
+		{
+			//Scroll list up
+
+			int iTopValue = (int)this->m_vItems.size() - (int)this->m_uiItemDisplayCountY;
+			if (iTopValue < 0) {
+				iTopValue = 0;
+			}
+
+			if (this->m_uiDrawingIndex < (size_t)iTopValue) {
+				this->m_uiDrawingIndex++;
+			}
+		}
+
+		void ScrollDown(void)
+		{
+			//Scroll list down
+
+			if (this->m_uiDrawingIndex > 0) {
+				this->m_uiDrawingIndex--;
 			}
 		}
 
@@ -954,6 +991,9 @@ namespace Menu {
 		CListBox m_oSaveGames;
 		CButton m_oLoad;
 		DxSound::HDXSOUND m_hSelect;
+		DxRenderer::HD3DSPRITE m_hUp;
+		DxRenderer::HD3DSPRITE m_hDown;
+		Entity::Vector m_vecMousePos;
 
 		void AcquireSavedGameStates(void)
 		{
@@ -1004,6 +1044,9 @@ namespace Menu {
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
 		{
 			//Initialize component
+
+			this->m_hUp = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\up.png", 1, 50, 50, 1, false);
+			this->m_hDown = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\down.png", 1, 50, 50, 1, false);
 
 			this->m_oPlay.SetText(L"Start new game");
 			this->m_oPlay.SetPosition(Entity::Vector(250, 200));
@@ -1085,6 +1128,9 @@ namespace Menu {
 			this->m_oSaveGames.Draw();
 			this->m_oLoad.Draw();
 
+			pRenderer->DrawSprite(this->m_hUp, 265 + 604, 300 + 300 / 2 - 50 / 2 - 10, 0, 0.0f);
+			pRenderer->DrawSprite(this->m_hDown, 265 + 604, 300 + 300 / 2 - 50 / 2 + 50 - 10, 0, 0.0f);
+
 			pRenderer->DrawString(pDefaultFont, L"Saved games", 265, 279, 200, 200, 200, 150);
 
 			if (this->m_oSaveGames.GetCount() == 0) {
@@ -1097,9 +1143,23 @@ namespace Menu {
 		{
 			//Handle mouse events
 
+			if (!iMouseKey) {
+				this->m_vecMousePos = Entity::Vector(x, y);
+			}
+
 			this->m_oPlay.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSaveGames.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oLoad.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+
+			if ((iMouseKey == 1) && (!bDown)) {
+				if ((this->m_vecMousePos[0] > 265 + 604) && (this->m_vecMousePos[0] < 265 + 604 + 50) && (this->m_vecMousePos[1] > 300 + 300 / 2 - 50 / 2 - 10) && (this->m_vecMousePos[1] < 300 + 300 / 2 - 50 / 2 - 10 + 50)) {
+					this->m_oSaveGames.ScrollDown();
+				}
+
+				if ((this->m_vecMousePos[0] > 265 + 604) && (this->m_vecMousePos[0] < 265 + 604 + 50) && (this->m_vecMousePos[1] > 300 + 300 / 2 - 50 / 2 + 50 - 10) && (this->m_vecMousePos[1] < 300 + 300 / 2 - 50 / 2 + 50 - 10 + 50)) {
+					this->m_oSaveGames.ScrollUp();
+				}
+			}
 		}
 
 		virtual void OnMouseWheelEvent(short wDistance, bool bForward)
@@ -1132,6 +1192,9 @@ namespace Menu {
 		CButton m_oButton;
 		CImageListView m_oImageListView;
 		CButton m_oBrowse;
+		DxRenderer::HD3DSPRITE m_hBackward;
+		DxRenderer::HD3DSPRITE m_hForward;
+		Entity::Vector m_vecMousePos;
 	public:
 		CPackageMenu() : m_uiSelectedPackage(std::string::npos) {}
 		~CPackageMenu() {}
@@ -1161,6 +1224,10 @@ namespace Menu {
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
 		{
 			//Initialize packages
+
+			//Load navigation sprites
+			this->m_hBackward = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\backward.png", 1, 50, 50, 1, false);
+			this->m_hForward = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\forward.png", 1, 50, 50, 1, false);
 
 			WIN32_FIND_DATA sFindData = { 0 };
 
@@ -1243,14 +1310,21 @@ namespace Menu {
 					pRenderer->DrawString(pDefaultFont, this->m_vPackages[this->m_uiSelectedPackage].vAboutContent[i], iStartPosX, iStartPosY + (int)i * iDefaultFontSize[1], 200, 200, 200, 150);
 				}
 
+				//Draw play button
 				this->m_oButton.Draw();
 			}
 
+			//Draw listview
 			this->m_oImageListView.Draw();
 
+			//Draw Workshop browse button if required
 			if (pAppSteamID->iValue != 0) {
 				this->m_oBrowse.Draw();
 			}
+
+			//Draw navigation
+			pRenderer->DrawSprite(this->m_hBackward, 250, 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350, 0, 0.0f);
+			pRenderer->DrawSprite(this->m_hForward, 300, 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350, 0, 0.0f);
 		}
 
 		virtual void Release(void)

@@ -33,11 +33,25 @@ namespace Menu {
 
 	void CPackageMenu::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
 	{
+		if (!iMouseKey) {
+			this->m_vecMousePos = Entity::Vector(x, y);
+		}
+
 		this->m_oButton.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		this->m_oImageListView.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 
 		if (pAppSteamID->iValue != 0) {
 			this->m_oBrowse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
+
+		if ((iMouseKey == 1) && (!bDown)) {
+			if ((this->m_vecMousePos[0] > 250) && (this->m_vecMousePos[0] < 250 + 50) && (this->m_vecMousePos[1] > 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350) && (this->m_vecMousePos[1] < 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350 + 50)) {
+				this->m_oImageListView.ScrollDown();
+			}
+
+			if ((this->m_vecMousePos[0] > 300) && (this->m_vecMousePos[0] < 300 + 50) && (this->m_vecMousePos[1] > 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350) && (this->m_vecMousePos[1] < 200 + 45 + (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1] + 350 + 50)) {
+				this->m_oImageListView.ScrollUp();
+			}
 		}
 	}
 

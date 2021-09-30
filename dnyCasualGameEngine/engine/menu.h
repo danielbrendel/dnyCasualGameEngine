@@ -514,8 +514,6 @@ namespace Menu {
 			
 			this->m_uiHoverItem = std::string::npos;
 
-			size_t uiLoopMax = (this->m_uiDrawingIndex < this->m_vItems.size() - this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY) ? this->m_uiDrawingIndex + this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY : this->m_vItems.size();
-
 			for (size_t i = this->m_uiDrawingIndex; i < this->m_uiDrawingIndex + this->m_uiItemDisplayCountX * this->m_uiItemDisplayCountY; i++) {
 				if (i >= this->m_vItems.size()) {
 					continue;

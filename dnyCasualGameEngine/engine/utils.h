@@ -28,6 +28,7 @@ namespace Utils {
 	std::vector<std::wstring> ReadFileLines(const std::wstring& wszFile);
 	std::vector<std::string> Split(const std::string& szInput, const std::string& szSplit);
 	std::vector<std::wstring> SplitW(const std::wstring& wszInput, const std::wstring& wszSplit);
+	std::string ReplaceString(const std::string& szString, const std::string& szFind, const std::string& szNew);
 	std::vector<std::wstring> ListFilesByExt(const std::wstring& wszBaseDir, const wchar_t** pFileList, const size_t uiListLen);
 	bool RemoveEntireDirectory(const std::wstring& wszDirectory);
 	bool CopyEntireDirectory(const std::wstring& wszFrom, const std::wstring& wszTo);

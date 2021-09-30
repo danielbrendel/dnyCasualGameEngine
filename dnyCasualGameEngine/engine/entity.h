@@ -559,7 +559,7 @@ namespace Entity {
 		void OnRelease(void)
 		{
 			//Inform class instance of event
-
+			
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "void OnRelease()", nullptr, nullptr);
 		}
 
@@ -764,13 +764,16 @@ namespace Entity {
 		void Release(void)
 		{
 			//Release resources
-
+			
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
 				this->m_vEnts[i]->OnRelease();
 				delete this->m_vEnts[i];
 			}
 
 			this->m_vEnts.clear();
+
+			this->m_sPlayerEntity.hScript = 0;
+			this->m_sPlayerEntity.pObject = nullptr;
 		}
 
 		//Entity querying
@@ -1374,6 +1377,13 @@ namespace Entity {
 			//Write package name
 
 			return this->WriteAttribute("package", szPackage);
+		}
+
+		bool WriteFromPath(const std::string& szPath)
+		{
+			//Write frompath attribute
+
+			return this->WriteAttribute("frompath", szPath);
 		}
 
 		bool WriteMap(const std::string& szMap)

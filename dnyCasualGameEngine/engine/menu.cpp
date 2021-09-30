@@ -35,7 +35,10 @@ namespace Menu {
 	{
 		this->m_oButton.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		this->m_oImageListView.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
-		this->m_oBrowse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+
+		if (pAppSteamID->iValue != 0) {
+			this->m_oBrowse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+		}
 	}
 
 	void CPackageMenu::OnButtonClick(class CButton* pButton)

@@ -1248,7 +1248,9 @@ namespace Menu {
 
 			this->m_oImageListView.Draw();
 
-			this->m_oBrowse.Draw();
+			if (pAppSteamID->iValue != 0) {
+				this->m_oBrowse.Draw();
+			}
 		}
 
 		virtual void Release(void)

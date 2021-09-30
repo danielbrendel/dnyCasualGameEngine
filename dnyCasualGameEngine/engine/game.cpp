@@ -35,7 +35,7 @@ namespace Game {
 		Entity::oScriptedEntMgr.Release();
 
 		//Execute package map file
-		if (!pConfigMgr->Execute(wszBasePath + L"packages\\" + this->m_sPackage.wszPakName + L"\\maps\\" + wszMap)) {
+		if (!pConfigMgr->Execute(this->GetPackagePath() + L"maps\\" + wszMap)) {
 			pConsole->AddLine(L"Failed to execute package map script");
 			return false;
 		}
@@ -48,7 +48,7 @@ namespace Game {
 		}
 
 		//Set map background
-		return pRenderer->SetBackgroundPicture(wszBasePath + L"\\packages\\" + this->m_sPackage.wszPakName + L"\\gfx\\" + this->m_sMap.wszBackground);
+		return pRenderer->SetBackgroundPicture(this->GetPackagePath() + L"gfx\\" + this->m_sMap.wszBackground);
 	}
 
 	void CGame::Process(void)
@@ -79,7 +79,7 @@ namespace Game {
 					
 					const std::vector<Entity::CSaveGameReader::save_game_entry_s>& vList = this->m_oSaveGameReader.GetDataVector();
 					for (size_t i = 0; i < vList.size(); i++) {
-						if ((vList[i].szIdent == "package") || (vList[i].szIdent == "map")) {
+						if ((vList[i].szIdent == "package") || (vList[i].szIdent == "frompath") || (vList[i].szIdent == "map")) {
 							continue;
 						}
 

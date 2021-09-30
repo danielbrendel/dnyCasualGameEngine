@@ -86,7 +86,7 @@ namespace Entity {
 					Game::pGame->ShowGameOver();
 					return;
 				}
-
+				
 				this->m_vEnts[i]->OnRelease();
 				delete this->m_vEnts[i];
 				this->m_vEnts.erase(this->m_vEnts.begin() + i);
@@ -833,6 +833,7 @@ namespace Entity {
 		ADD_CLASSB(asBEHAVE_DESTRUCT, "void f()", asMETHOD(CSaveGameWriter, Destruct), hClasses);
 		ADD_CLASSF("bool BeginSaveGame()", asMETHOD(CSaveGameWriter, BeginSaveGame), hClasses);
 		ADD_CLASSF("bool WritePackage(const string &in szPackage)", asMETHOD(CSaveGameWriter, WritePackage), hClasses);
+		ADD_CLASSF("bool WriteFromPath(const string &in szFromPath)", asMETHOD(CSaveGameWriter, WriteFromPath), hClasses);
 		ADD_CLASSF("bool WriteMap(const string &in szMap)", asMETHOD(CSaveGameWriter, WriteMap), hClasses);
 		ADD_CLASSF("bool WriteAttribute(const string &in szName, const string &in szValue)", asMETHOD(CSaveGameWriter, WriteAttribute), hClasses);
 		ADD_CLASSF("void EndSaveGame()", asMETHOD(CSaveGameWriter, EndSaveGame), hClasses);

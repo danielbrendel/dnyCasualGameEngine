@@ -1,7 +1,9 @@
 #include "scriptint.h"
-#include <scriptbuilder\scriptbuilder.h>
 #include <scriptstdstring\scriptstdstring.h>
 #include <scriptmath\scriptmath.h>
+#include "utils.h"
+#include "vars.h"
+#include "game.h"
 
 /*
 	Casual Game Engine (dnyCasualGameEngine) developed by Daniel Brendel
@@ -86,7 +88,10 @@ namespace Scripting {
 			return SI_INVALID_ID;
 
 		CScriptBuilder oScriptBuilder;
-		
+
+		//Set include callback
+		oScriptBuilder.SetIncludeCallback(&ScriptInt_IncludeCallback, nullptr);
+			
 		//Start new module
 		if (AS_FAILED(oScriptBuilder.StartNewModule(this->m_pScriptEngine, szScriptName.c_str())))
 			return SI_INVALID_ID;
@@ -429,7 +434,7 @@ namespace Scripting {
 	bool CScriptInt::RegisterTypeDef(const std::string& szType, const std::string& szAlias)
 	{
 		//Register new typedef
-
+		
 		return (!AS_FAILED(this->m_pScriptEngine->RegisterTypedef(szAlias.c_str(), szType.c_str())));
 	}
 
@@ -779,5 +784,27 @@ namespace Scripting {
 		//Register interface method
 
 		return (!(AS_FAILED(this->m_pScriptEngine->RegisterInterfaceMethod(szIfName.c_str(), szTypedef.c_str()))));
+	}
+
+	int ScriptInt_IncludeCallback(const char* include, const char* from, CScriptBuilder* builder, void* userParam)
+	{
+		//Called for include directives
+
+		std::string szInclude = std::string(include);
+	
+		if (szInclude.find("${COMMON}") != std::string::npos) {
+			//Replace common directive variable
+			szInclude = Utils::ReplaceString(szInclude, "${COMMON}", Utils::ConvertToAnsiString(wszBasePath) + "packages\\.common");
+		} else {
+			if (std::string(from).find(Utils::ReplaceString(Utils::ConvertToAnsiString(wszBasePath), "\\", "/") + "packages/.common") == 0) { //Provide path to scripts from common path context
+				szInclude = Utils::ConvertToAnsiString(wszBasePath) + "packages\\.common\\entities\\" + szInclude;
+			} else { //Provide absolute path to relative includes from package path
+				szInclude = Utils::ConvertToAnsiString(Game::pGame->GetPackagePath()) + "entities\\" + szInclude;
+			}
+		}
+
+		builder->AddSectionFromFile(szInclude.c_str());
+
+		return 0;
 	}
 }

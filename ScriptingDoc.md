@@ -13,6 +13,9 @@ __Version__: 1.0
 * CVarHandle: A handle to a CVar (control/config variable, 64 Bit)
 * DamageValue: Value containing a damage value. 0 * 255 (1 Byte)
 
+## Special variables
+* ${COMMON} : Used for include directives to dynamically query the common path
+
 ## Enums:
 ### MovementDir:
 * MOVE_FORWARD: Move in forward direction
@@ -173,6 +176,7 @@ void Close() //Close the file
 SaveGameWriter() //Default constructor
 bool BeginSaveGame() //Begin writing to save game file
 bool WritePackage(const string &in szPackage) //Write package name to file
+bool WriteFromPath(const string &in szFromPath) //Write frompath attribute to file
 bool WriteMap(const string &in szMap) //Write map to file
 bool WriteAttribute(const string &in szName, const string &in szValue) //Write any data key-pair value that belongs to a state to be saved
 void EndSaveGame() //Finish file writing

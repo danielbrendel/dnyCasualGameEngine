@@ -13,6 +13,7 @@
 
 #include "shared.h"
 #include <angelscript.h>
+#include <scriptbuilder\scriptbuilder.h>
 #include <scriptarray\scriptarray.h>
 
 //Convenience macros
@@ -84,6 +85,8 @@ namespace Scripting {
 		};
 	};
 
+	int ScriptInt_IncludeCallback(const char* include, const char* from, CScriptBuilder* builder, void* userParam);
+
 	/* Scripting interface component */
 	class CScriptInt {
 	private:
@@ -94,6 +97,8 @@ namespace Scripting {
 		std::vector<si_enum_s> m_vEnums;
 		std::vector<si_struct_s> m_vStructs;
 		std::vector<si_class_s> m_vClasses;
+
+		friend int ScriptInt_IncludeCallback(const char* include, const char* from, CScriptBuilder* builder, void* userParam);
 	public:
 		CScriptInt() : m_bInitialized(false) {}
 		CScriptInt(const std::string& szScriptDir, void* pCallbackFunction);

@@ -133,7 +133,7 @@ class CLaserEntity : IScriptedEntity
 		this.m_vecPos = vecPos;
 	}
 	
-	//Return the rotation. This is actually not used by the host application, but might be useful to other entities
+	//Return the rotation.
 	float GetRotation()
 	{
 		return this.m_fRotation;
@@ -145,7 +145,7 @@ class CLaserEntity : IScriptedEntity
 		this.m_fRotation = fRot;
 	}
 	
-	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
+	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
 		return "weapon_laser";

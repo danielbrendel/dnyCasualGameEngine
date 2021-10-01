@@ -20,6 +20,7 @@ namespace Utils {
 	std::string ExtractFileExt(const std::string& szFile);
 	std::wstring ExtractFileExt(const std::wstring& wszFile);
 	std::wstring ExtractFileName(const std::wstring& wszFile);
+	std::string ExtractFileNameA(const std::string& szFile);
 	std::wstring ExtractFilePath(const std::wstring& wszFile);
 	bool FileExists(const std::wstring& wszFileName);
 	bool DirExists(const std::wstring& wszDirName);

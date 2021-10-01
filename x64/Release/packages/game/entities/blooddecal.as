@@ -109,7 +109,7 @@ class CBloodSplash : IScriptedEntity
 	{
 	}
 	
-	//Return the rotation. This is actually not used by the host application, but might be useful to other entities
+	//Return the rotation.
 	float GetRotation()
 	{
 		return 0.0;
@@ -126,7 +126,7 @@ class CBloodSplash : IScriptedEntity
 		return 0;
 	}
 	
-	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
+	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
 		return "blooddecal";

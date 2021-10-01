@@ -89,6 +89,7 @@ int GetFormat() //Get format of the sprite
 ### BoundingBox (Used to define the bounding box of a model):
 ```angelscript
 BoundingBox() //Default constructor
+BoundingBox=BoundingBox //Basically used to copy the entire data to the other Model object instance
 bool Alloc() //Allocate memory needed for using the object instance
 void AddBBoxItem(const Vector& in, const Vector& in) //Add a bbox item. 
 	First Vector is the relative position of the item and the second Vector 
@@ -120,7 +121,7 @@ void Release() //Release the temp sprite. Use this when you don't need the sprit
 Model() //Default constructor
 Model(const string &in) //Construct with providing a relative file name to the model file
 Model(const string &in, bool b) //Same as above, but you can define if a custom size shall be used
-Model=Model //Basically used to copy the entire data to a new Model object instance
+Model=Model //Basically used to copy the entire data to the other Model object instance
 bool Initialize(const string&in szMdlFile, bool bForceCustomSize) //Initialize the model. Same as the second custom constructor above.
 bool Initialize2(const BoundingBox& in, SpriteHandle hSprite) //This is to be used with an already existing sprite file and a Bounding Box.
 void Release() //Release the Model data. Use this when shutting down or not using the Model anymore

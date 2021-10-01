@@ -11,42 +11,62 @@
 	Released under the MIT license
 */
 
-/* Health item entity */
-const int ITEM_HEALTH_ADDITION = 25;
-class CItemHealth : IScriptedEntity
+/* Ammo base item entity */
+class CItemAmmoBase : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
+	float m_fRotation;
 	Model m_oModel;
+	string m_szSprite;
+	string m_szWeapon;
 	SpriteHandle m_hSprite;
-	array<SpriteHandle> m_arrHeart;
-	int m_iSpriteIndex;
-	Timer m_tmrSpriteSwitch;
+	float m_fSize;
+	Timer m_tmrAnim;
 	bool m_bActive;
 	Timer m_tmrActive;
 	SoundHandle m_hReceive;
 	SoundHandle m_hActivate;
+	uint m_uiSupplyCount;
 	
-	CItemHealth()
+	CItemAmmoBase()
     {
 		this.m_vecSize = Vector(32, 32);
-		this.m_iSpriteIndex = 0;
 		this.m_bActive = true;
+		this.m_fRotation = 0.0;
+		this.m_fSize = 0.00;
+		this.m_uiSupplyCount = 100;
+		this.m_szWeapon = "";
     }
+	
+	//Set sprite
+	void SetSprite(const string &in szSprite)
+	{
+		this.m_szSprite = szSprite;
+	}
+	
+	//Set amount of supply this entity gives
+	void SetSupplyCount(uint uiCount)
+	{
+		this.m_uiSupplyCount = uiCount;
+	}
+	
+	//Set weapon identifier
+	void SetWeapon(const string &in szWeapon)
+	{
+		this.m_szWeapon = szWeapon;
+	}
 	
 	//Called when the entity gets spawned. The position on the screen is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\health\\frame-1.png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, true);
-		for (int i = 1; i < 9; i++) {
-			this.m_arrHeart.insertLast(R_LoadSprite(GetPackagePath() + "gfx\\health\\frame-" + formatInt(i) + ".png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, true));
-		}
-		this.m_hReceive = S_QuerySound(GetPackagePath() + "sound\\health_receive.wav");
-		this.m_hActivate = S_QuerySound(GetPackagePath() + "sound\\health_activate.wav");
-		this.m_tmrSpriteSwitch.SetDelay(100);
-		this.m_tmrSpriteSwitch.Reset();
-		this.m_tmrSpriteSwitch.SetActive(true);
+		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\" + this.m_szSprite, 1, this.m_vecSize[0], this.m_vecSize[1], 1, true);
+		this.m_hReceive = S_QuerySound(GetPackagePath() + "sound\\ammo_receive.wav");
+		this.m_hActivate = S_QuerySound(GetPackagePath() + "sound\\ammo_activate.wav");
+		this.m_tmrAnim.SetDelay(100);
+		this.m_tmrAnim.Reset();
+		this.m_tmrAnim.SetActive(true);
 		this.m_tmrActive.SetDelay(30000);
 		this.m_tmrActive.Reset();
 		this.m_tmrActive.SetActive(false);
@@ -66,13 +86,18 @@ class CItemHealth : IScriptedEntity
 	void OnProcess()
 	{
 		//Process sprite switching
-		this.m_tmrSpriteSwitch.Update();
-		if (this.m_tmrSpriteSwitch.IsElapsed()) {
-			this.m_tmrSpriteSwitch.Reset();
+		this.m_tmrAnim.Update();
+		if (this.m_tmrAnim.IsElapsed()) {
+			this.m_tmrAnim.Reset();
 			
-			this.m_iSpriteIndex++;
-			if (this.m_iSpriteIndex >= 8) {
-				this.m_iSpriteIndex = 0;
+			this.m_fRotation += 0.10;
+			if (this.m_fRotation >= 6.30) {
+				this.m_fRotation = 0.00;
+			}
+			
+			this.m_fSize += 0.10;
+			if (this.m_fSize >= 1.20) {
+				this.m_fSize = 0.00;
 			}
 		}
 		
@@ -97,7 +122,7 @@ class CItemHealth : IScriptedEntity
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
 		if (this.m_bActive) {
-			R_DrawSprite(this.m_arrHeart[this.m_iSpriteIndex], vOut, 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+			R_DrawSprite(this.m_hSprite, vOut, 0, this.m_fRotation, Vector(-1, -1), 1.00 + this.m_fSize, 1.00 + this.m_fSize, false, Color(0, 0, 0, 0));
 		}
 	}
 	
@@ -133,7 +158,7 @@ class CItemHealth : IScriptedEntity
 	{
 		if ((this.m_bActive) && (ref.GetName() == "player")) {
 			ICollectingEntity@ collectingEntity = cast<ICollectingEntity>(ref);
-			collectingEntity.AddHealth(ITEM_HEALTH_ADDITION);
+			collectingEntity.AddAmmo(this.m_szWeapon, this.m_uiSupplyCount);
 			
 			this.m_bActive = false;
 			this.m_tmrActive.Reset();
@@ -165,12 +190,13 @@ class CItemHealth : IScriptedEntity
 	//Return the rotation.
 	float GetRotation()
 	{
-		return 0.0;
+		return this.m_fRotation;
 	}
 	
 	//Set rotation
 	void SetRotation(float fRot)
 	{
+		this.m_fRotation = fRot;
 	}
 	
 	//Called for querying the damage value for this entity
@@ -182,7 +208,7 @@ class CItemHealth : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "blooddecal";
+		return "item_ammo";
 	}
 	
 	//This vector is used for drawing the selection box
@@ -198,11 +224,4 @@ class CItemHealth : IScriptedEntity
 			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
 			Sav_CreateProperty("rot", formatFloat(this.GetRotation()));
 	}
-}
-
-//Create health entity
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
-{
-	CItemHealth @health = CItemHealth();
-	Ent_SpawnEntity(szIdent, @health, vecPos);
 }

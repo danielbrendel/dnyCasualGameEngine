@@ -84,6 +84,25 @@ namespace Utils {
 		return wszResult;
 	}
 
+	std::string ExtractFileNameA(const std::string& szFile)
+	{
+		//Extract file name (Ansi strings)
+
+		std::string szName;
+		std::string szResult;
+
+		for (size_t i = szFile.length() - 1; i >= 0; i--) {
+			if ((szFile[i] == '/') || (szFile[i] == '\\')) break;
+			szName += szFile[i];
+		}
+
+		for (size_t i = 0; i < szName.length(); i++) {
+			szResult += szName[(szName.length() - 1) - i];
+		}
+
+		return szResult;
+	}
+
 	std::wstring ExtractFilePath(const std::wstring& wszFile)
 	{
 		//Extract file path

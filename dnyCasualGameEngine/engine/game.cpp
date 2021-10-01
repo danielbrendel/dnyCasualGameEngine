@@ -449,7 +449,7 @@ namespace Game {
 			sColor = Console::ConColor(250, 0, 0);
 		}
 
-		std::string szErrMsg = "[AngelScript][" + szMsgType + "] " + std::string(msg->section) + " (" + std::to_string(msg->row) + ":" + std::to_string(msg->col) + "): " + msg->message + "\n";
+		std::string szErrMsg = "[AngelScript][" + szMsgType + "] " + Utils::ExtractFileNameA(std::string(msg->section)) + " (" + std::to_string(msg->row) + ":" + std::to_string(msg->col) + "): " + msg->message + "\n";
 
 		if (pConsole) {
 			pConsole->AddLine(Utils::ConvertToWideString(szErrMsg), sColor);

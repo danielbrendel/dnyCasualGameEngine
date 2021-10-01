@@ -268,6 +268,10 @@ namespace Entity {
 		{
 			//Copy data from other bbox
 
+			if (!this->m_pvBBoxItems) {
+				this->Alloc();
+			}
+
 			this->m_pvBBoxItems->clear();
 
 			for (size_t i = 0; i < ref.Count(); i++) {

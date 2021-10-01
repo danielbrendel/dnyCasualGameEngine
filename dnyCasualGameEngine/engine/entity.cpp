@@ -776,6 +776,7 @@ namespace Entity {
 		REG_CLASSV("BoundingBox", sizeof(CBoundingBox), hClasses);
 		ADD_CLASSB(asBEHAVE_CONSTRUCT, "void f()", asMETHOD(CBoundingBox, Construct), hClasses);
 		ADD_CLASSB(asBEHAVE_DESTRUCT, "void f()", asMETHOD(CBoundingBox, Destruct), hClasses);
+		ADD_CLASSF("void opAssign(const BoundingBox &in)", asMETHODPR(CBoundingBox, operator=, (const CBoundingBox&), void), hClasses);
 		ADD_CLASSF("bool Alloc()", asMETHOD(CBoundingBox, Alloc), hClasses);
 		ADD_CLASSF("void AddBBoxItem(const Vector& in, const Vector& in)", asMETHOD(CBoundingBox, AddBBoxItem), hClasses);
 		ADD_CLASSF("bool IsCollided(const Vector& in, const Vector& in, const BoundingBox& in)", asMETHOD(CBoundingBox, IsCollided), hClasses);

@@ -1,5 +1,19 @@
+/*
+	Casual Game Engine Common
+	
+	Common package which can be used by games and mods
+	
+	(C) 2021 by Daniel Brendel
+
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
 #include "decal.as"
 
+/* Explosion entity */
 class CExplosionEntity : IScriptedEntity
 {
 	Vector m_vecPos;

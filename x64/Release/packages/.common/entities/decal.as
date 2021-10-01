@@ -1,4 +1,17 @@
+/*
+	Casual Game Engine Common
+	
+	Common package which can be used by games and mods
+	
+	(C) 2021 by Daniel Brendel
 
+	Contact: dbrendel1988<at>gmail<dot>com
+	GitHub: https://github.com/danielbrendel/
+
+	Released under the MIT license
+*/
+
+/* Decal entity */
 class CDecalEntity : IScriptedEntity
 {
 	Vector m_vecPos;
@@ -16,7 +29,7 @@ class CDecalEntity : IScriptedEntity
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\decal.png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, false);
+		this.m_hSprite = R_LoadSprite(GetCommonPath() + "gfx\\decal.png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, false);
 		this.m_oLifeTime.SetDelay(120000);
 		this.m_oLifeTime.Reset();
 		this.m_oLifeTime.SetActive(true);
@@ -37,6 +50,11 @@ class CDecalEntity : IScriptedEntity
 	//Entity can draw everything in default order here
 	void OnDraw()
 	{
+	}
+	
+	//Draw on top
+	void OnDrawOnTop()
+	{
 		if (!R_ShouldDraw(this.m_vecPos, this.m_vecSize))
 			return;
 			
@@ -44,11 +62,6 @@ class CDecalEntity : IScriptedEntity
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
 		R_DrawSprite(this.m_hSprite, vOut, 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
-	}
-	
-	//Draw on top
-	void OnDrawOnTop()
-	{
 	}
 	
 	//Indicate whether this entity shall be removed by the game

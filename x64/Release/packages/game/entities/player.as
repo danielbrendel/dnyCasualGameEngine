@@ -224,46 +224,58 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_tmrAttack.Reset();
 				
 				if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
-					CGunEntity @gun = CGunEntity();
-					
-					Vector vecGunPos = Vector(this.m_vecPos[0] + 64 / 2, this.m_vecPos[1] + 64 / 2);
-					gun.SetRotation(this.GetRotation());
-					gun.SetOwner(@this);
-					
-					Ent_SpawnEntity("weapon_gun", @gun, vecGunPos);
-					
-					SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\handgun.wav");
-					S_PlaySound(hSound, S_GetCurrentVolume());
-				} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
-					CLaserEntity @laser = CLaserEntity();
-
-					laser.SetRotation(this.GetRotation());
-					
-					Ent_SpawnEntity("weapon_laser", @laser, this.m_vecPos);
-					
-					SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
-					S_PlaySound(hSound, S_GetCurrentVolume());
-				} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
-					for (int i = 0; i < 3; i++) {
+					if (HUD_GetAmmoItemCurrent("handgun") > 0) {
 						CGunEntity @gun = CGunEntity();
-					
+						
 						Vector vecGunPos = Vector(this.m_vecPos[0] + 64 / 2, this.m_vecPos[1] + 64 / 2);
-						float fGunRot = this.GetRotation();
-						
-						if (i == 0) {
-							fGunRot -= 0.2;
-						} else if (i == 2) {
-							fGunRot += 0.2;
-						}
-						
-						gun.SetRotation(fGunRot);
+						gun.SetRotation(this.GetRotation());
 						gun.SetOwner(@this);
 						
 						Ent_SpawnEntity("weapon_gun", @gun, vecGunPos);
+						
+						HUD_UpdateAmmoItem("handgun", HUD_GetAmmoItemCurrent("handgun") - 1, HUD_GetAmmoItemMax("handgun"));
+						
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\handgun.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
 					}
-					
-					SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\shotgun.wav");
-					S_PlaySound(hSound, S_GetCurrentVolume());
+				} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+					if (HUD_GetAmmoItemCurrent("laser") > 0) {
+						CLaserEntity @laser = CLaserEntity();
+
+						laser.SetRotation(this.GetRotation());
+						
+						Ent_SpawnEntity("weapon_laser", @laser, this.m_vecPos);
+						
+						HUD_UpdateAmmoItem("laser", HUD_GetAmmoItemCurrent("laser") - 1, HUD_GetAmmoItemMax("laser"));
+						
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+					}
+				} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
+					if (HUD_GetAmmoItemCurrent("shotgun") > 0) {
+						for (int i = 0; i < 3; i++) {
+							CGunEntity @gun = CGunEntity();
+						
+							Vector vecGunPos = Vector(this.m_vecPos[0] + 64 / 2, this.m_vecPos[1] + 64 / 2);
+							float fGunRot = this.GetRotation();
+							
+							if (i == 0) {
+								fGunRot -= 0.2;
+							} else if (i == 2) {
+								fGunRot += 0.2;
+							}
+							
+							gun.SetRotation(fGunRot);
+							gun.SetOwner(@this);
+							
+							Ent_SpawnEntity("weapon_gun", @gun, vecGunPos);
+						}
+						
+						HUD_UpdateAmmoItem("shotgun", HUD_GetAmmoItemCurrent("shotgun") - 1, HUD_GetAmmoItemMax("shotgun"));
+						
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\shotgun.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+					}
 				}
 			}
 		}
@@ -625,10 +637,10 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	HUD_SetAmmoDisplayItem("handgun");
 	
 	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
-	HUD_UpdateAmmoItem("laser", 0, 100);
+	HUD_UpdateAmmoItem("laser", 10, 100);
 	
 	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
-	HUD_UpdateAmmoItem("shotgun", 0, 100);
+	HUD_UpdateAmmoItem("shotgun", 5, 100);
 }
 
 //Restore game state

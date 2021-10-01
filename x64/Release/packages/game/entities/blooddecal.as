@@ -50,11 +50,6 @@ class CBloodSplash : IScriptedEntity
 	//Entity can draw everything in default order here
 	void OnDraw()
 	{
-	}
-	
-	//Draw on top
-	void OnDrawOnTop()
-	{
 		if (!R_ShouldDraw(this.m_vecPos, this.m_vecSize))
 			return;
 			
@@ -62,6 +57,11 @@ class CBloodSplash : IScriptedEntity
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
 		R_DrawSprite(this.m_hSprite, vOut, 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+	}
+	
+	//Draw on top
+	void OnDrawOnTop()
+	{
 	}
 	
 	//Indicate whether this entity shall be removed by the game

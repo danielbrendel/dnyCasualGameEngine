@@ -42,7 +42,7 @@ class CItemHealth : IScriptedEntity
 		for (int i = 1; i < 9; i++) {
 			this.m_arrHeart.insertLast(R_LoadSprite(GetPackagePath() + "gfx\\health\\frame-" + formatInt(i) + ".png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, true));
 		}
-		this.m_hReceive = S_QuerySound(GetPackagePath() + "sound\\health_receive.wav");
+		this.m_hReceive = S_QuerySound(GetPackagePath() + "sound\\health_pickup.wav");
 		this.m_hActivate = S_QuerySound(GetPackagePath() + "sound\\health_activate.wav");
 		this.m_tmrSpriteSwitch.SetDelay(100);
 		this.m_tmrSpriteSwitch.Reset();

@@ -62,7 +62,7 @@ class CItemAmmoBase : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\" + this.m_szSprite, 1, this.m_vecSize[0], this.m_vecSize[1], 1, true);
-		this.m_hReceive = S_QuerySound(GetPackagePath() + "sound\\ammo_receive.wav");
+		this.m_hReceive = S_QuerySound(GetPackagePath() + "sound\\ammo_pickup.wav");
 		this.m_hActivate = S_QuerySound(GetPackagePath() + "sound\\ammo_activate.wav");
 		this.m_tmrAnim.SetDelay(100);
 		this.m_tmrAnim.Reset();

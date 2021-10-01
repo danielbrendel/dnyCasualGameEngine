@@ -105,7 +105,7 @@ const int WEAPON_HANDGUN = 1;
 const int WEAPON_RIFLE = 2;
 const int WEAPON_SHOTGUN = 3;
 /* Player entity manager */
-class CPlayerEntity : IScriptedEntity, IPlayerEntity
+class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
@@ -461,6 +461,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 		this.m_uiHealth = health;
 	}
 	
+	//Get health
+	uint GetHealth()
+	{
+		return this.m_uiHealth;
+	}
+	
 	//Return a name string here, e.g. the class name or instance name. This is used when DAMAGE_NOTSQUAD is defined as damage-type, but can also be useful to other entities
 	string GetName()
 	{
@@ -587,6 +593,20 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity
 	int GetPlayerScore()
 	{
 		return 0;
+	}
+	
+	//Add health
+	void AddHealth(uint health)
+	{
+		this.m_uiHealth += health;
+		if (this.m_uiHealth > 100) {
+			this.m_uiHealth = 100;
+		}
+	}
+	
+	//Add ammo
+	void AddAmmo(const string &in ident, uint amount)
+	{
 	}
 }
 

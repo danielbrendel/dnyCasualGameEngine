@@ -271,7 +271,7 @@ class CHeadcrabEntity : IScriptedEntity
 	}
 }
 
-
+//Create headcrab entity
 void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
 {
 	CHeadcrabEntity @headcrab = CHeadcrabEntity();

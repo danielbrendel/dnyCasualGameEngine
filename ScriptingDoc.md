@@ -194,8 +194,6 @@ void Close() //Finish file reading
 ### IScriptedEntity:
 * Used to implement game entities
 ```angelscript
-//Default constructor
-IScriptedEntity()
 //Called when the entity gets spawned. The position on the screen is passed as argument
 void OnSpawn(const Vector& in vec)
 //Called when the entity gets released
@@ -236,8 +234,6 @@ string GetSaveGameProperties()
 ### IPlayerEntity:
 * Used to implement player specific behaviors
 ```angelscript
-//Default constructor
-IPlayerEntity()
 //Called for key pressing events
 void OnKeyPress(int vKey, bool bDown)
 //Called for mouse events
@@ -246,6 +242,15 @@ void OnMousePress(int key, bool bDown)
 void OnUpdateCursor(const Vector &in pos)
 //Used to return the current player score
 int GetPlayerScore()
+```
+
+### ICollectingEntity
+* Used to implement methods for entities that can collect things
+```angelscript
+//Add health to entity
+void AddHealth(uint health)
+//Add ammo to entity
+void AddAmmo(const string &in ident, uint amount)
 ```
 
 ## Script callbacks
@@ -381,6 +386,10 @@ void HUD_UpdateHealth(size_t value)
 void HUD_AddAmmoItem(const string &in szIdent, const string &in szSprite)
 //Update specific HUD ammo item
 void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)
+//Get current ammo amount of item
+size_t HUD_GetAmmoItemCurrent(const string &in szIdent)
+//Get max ammo amount of item
+size_t HUD_GetAmmoItemMax(const string &in szIdent)
 //Specify ammo item to display
 void HUD_SetAmmoDisplayItem(const string &in szIdent)
 //Check whether HUD is currently enabled or not

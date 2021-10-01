@@ -1758,6 +1758,32 @@ namespace Entity {
 			}
 		}
 
+		size_t GetAmmoItemCurrent(const std::wstring& wszIdent)
+		{
+			//Get current ammo value of item
+
+			for (size_t i = 0; i < this->m_vItems.size(); i++) {
+				if (this->m_vItems[i].wszIdent == wszIdent) {
+					return this->m_vItems[i].uiCurAmmo;
+				}
+			}
+
+			return 0;
+		}
+
+		size_t GetAmmoItemMax(const std::wstring& wszIdent)
+		{
+			//Get max ammo value of item
+
+			for (size_t i = 0; i < this->m_vItems.size(); i++) {
+				if (this->m_vItems[i].wszIdent == wszIdent) {
+					return this->m_vItems[i].uiMaxAmmo;
+				}
+			}
+
+			return 0;
+		}
+
 		void SetEnableStatus(bool value)
 		{
 			//Set enable status value

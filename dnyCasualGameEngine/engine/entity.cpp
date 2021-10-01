@@ -582,6 +582,16 @@ namespace Entity {
 			Game::pGame->GetHUD()->UpdateAmmoItem(Utils::ConvertToWideString(szIdent), uiCurAmmo, uiMaxAmmo);
 		}
 
+		size_t GetHUDAmmoItemCurrent(const std::string& szIdent)
+		{
+			return Game::pGame->GetHUD()->GetAmmoItemCurrent(Utils::ConvertToWideString(szIdent));
+		}
+
+		size_t GetHUDAmmoItemMax(const std::string& szIdent)
+		{
+			return Game::pGame->GetHUD()->GetAmmoItemMax(Utils::ConvertToWideString(szIdent));
+		}
+
 		void SetHUDAmmoDisplayItem(const std::string& szIdent)
 		{
 			Game::pGame->GetHUD()->SetAmmoDisplayItem(Utils::ConvertToWideString(szIdent));
@@ -873,6 +883,10 @@ namespace Entity {
 		REG_IFM("IPlayerEntity", "void OnUpdateCursor(const Vector &in pos)");
 		REG_IFM("IPlayerEntity", "int GetPlayerScore()");
 
+		REG_IF("ICollectingEntity");
+		REG_IFM("ICollectingEntity", "void AddHealth(uint health)");
+		REG_IFM("ICollectingEntity", "void AddAmmo(const string &in ident, uint amount)");
+
 		//Register scripting API
 
 		struct script_api_func_s {
@@ -936,6 +950,8 @@ namespace Entity {
 			{ "void HUD_UpdateHealth(size_t value)", APIFuncs::UpdateHUDHealth },
 			{ "void HUD_AddAmmoItem(const string &in szIdent, const string &in szSprite)", APIFuncs::AddHUDAmmoItem },
 			{ "void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)", APIFuncs::UpdateHUDAmmoItem },
+			{ "size_t HUD_GetAmmoItemCurrent(const string &in szIdent)", APIFuncs::GetHUDAmmoItemCurrent },
+			{ "size_t HUD_GetAmmoItemMax(const string &in szIdent)", APIFuncs::GetHUDAmmoItemMax },
 			{ "void HUD_SetAmmoDisplayItem(const string &in szIdent)", APIFuncs::SetHUDAmmoDisplayItem },
 			{ "bool HUD_IsEnabled()", APIFuncs::IsHUDEnabled },
 			{ "void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },

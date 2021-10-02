@@ -1846,6 +1846,26 @@ namespace Menu {
 		CComboBox m_oResolutions;
 		CCheckbox m_oFullscreen;
 		CButton m_btnSave;
+		std::vector<std::wstring> m_vResolutions;
+
+		void ReadResolutions(void)
+		{
+			//Read resultion data from file
+
+			std::wifstream hFile;
+			hFile.open(wszBasePath + L"resolutions.txt");
+			if (hFile.is_open()) {
+				wchar_t wszInputBuffer[1024];
+
+				while (!hFile.eof()) {
+					hFile.getline(wszInputBuffer, sizeof(wszInputBuffer), '\n');
+
+					this->m_vResolutions.push_back(wszInputBuffer);
+				}
+
+				hFile.close();
+			}
+		}
 
 		void SaveGfxSettings(void)
 		{
@@ -1879,7 +1899,7 @@ namespace Menu {
 		{
 			//Initialize component
 
-			static std::wstring awszResolutions[] = {L"640x480", L"800x600", L"1024x768"};
+			this->ReadResolutions();
 
 			this->m_oResolutions.SetFillColor(Entity::Color(50, 50, 50, 150));
 			this->m_oResolutions.SetFrameColor(Entity::Color(255, 255, 255, 150));
@@ -1889,10 +1909,10 @@ namespace Menu {
 			this->m_oResolutions.SetTextColor(Entity::Color(200, 200, 200, 255));
 			this->m_oResolutions.SetWidth(200);
 
-			for (size_t i = 0; i < _countof(awszResolutions); i++) {
-				this->m_oResolutions.AddItem(awszResolutions[i]);
+			for (size_t i = 0; i < this->m_vResolutions.size(); i++) {
+				this->m_oResolutions.AddItem(this->m_vResolutions[i]);
 
-				if (std::to_wstring(pWindow->GetResolutionX()) + L"x" + std::to_wstring(pWindow->GetResolutionY()) == awszResolutions[i]) {
+				if (std::to_wstring(pWindow->GetResolutionX()) + L"x" + std::to_wstring(pWindow->GetResolutionY()) == this->m_vResolutions[i]) {
 					this->m_oResolutions.SetSelectedItem(i);
 				}
 			}
@@ -1925,7 +1945,9 @@ namespace Menu {
 			this->m_oResolutions.Draw();
 			this->m_btnSave.Draw();
 
-			pRenderer->DrawString(pDefaultFont, L"Note: Saving graphic settings will trigger an application restart", 250, 340, 150, 150, 0, 255);
+			if (!this->m_oResolutions.IsOpen()) {
+				pRenderer->DrawString(pDefaultFont, L"Note: Saving graphic settings will trigger an application restart", 250, 340, 150, 150, 0, 255);
+			}
 		}
 
 		virtual void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

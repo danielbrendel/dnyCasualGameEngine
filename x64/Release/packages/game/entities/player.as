@@ -249,6 +249,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						CLaserEntity @laser = CLaserEntity();
 
 						laser.SetRotation(this.GetRotation());
+						laser.SetOwner(@this);
 						
 						Ent_SpawnEntity("weapon_laser", @laser, this.m_vecPos);
 						

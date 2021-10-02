@@ -13,7 +13,7 @@
 
 #include "../../.common/entities/explosion.as"
 
-const uint32 GUN_SHOT_DAMAGE = 35;
+const uint32 GUN_SHOT_DAMAGE = 10;
 
 /* Gun entity  */
 class CGunEntity : IScriptedEntity

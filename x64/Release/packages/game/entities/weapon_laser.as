@@ -13,6 +13,8 @@
 
 #include "../../.common/entities/explosion.as"
 
+const uint32 LASER_SHOT_DAMAGE = 20;
+
 /* Laser entity */
 class CLaserEntity : IScriptedEntity
 {
@@ -24,12 +26,20 @@ class CLaserEntity : IScriptedEntity
 	float m_fSpeed;
 	bool m_bRemove;
 	Timer m_tmrAlive;
+	IScriptedEntity@ m_pOwner;
+	
+	//Set owner
+	void SetOwner(IScriptedEntity@ pOwner)
+	{
+		@this.m_pOwner = @pOwner;
+	}
 	
 	CLaserEntity()
     {
 		this.m_vecSize = Vector(50, 35);
 		this.m_fSpeed = 35.0;
 		this.m_bRemove = false;
+		@this.m_pOwner = null;
     }
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
@@ -106,6 +116,22 @@ class CLaserEntity : IScriptedEntity
 	{
 		if (ref.GetName() != "player") {
 			this.m_bRemove = true;
+			
+			ref.OnDamage(LASER_SHOT_DAMAGE);
+			
+			if (ref.NeedsRemoval()) {
+				if (@this.m_pOwner == @Ent_GetPlayerEntity()) {
+					IPlayerEntity@ casted = cast<IPlayerEntity>(this.m_pOwner);
+					
+					if (ref.GetName() == "headcrab") {
+						casted.AddPlayerScore(1);
+					} else if (ref.GetName() == "tank") {
+						casted.AddPlayerScore(10);
+					} else {
+						casted.AddPlayerScore(1);
+					}
+				}
+			}
 		}
 	}
 	

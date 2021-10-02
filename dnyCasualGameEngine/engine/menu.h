@@ -1631,6 +1631,12 @@ namespace Menu {
 		CKeyBinding m_oStrafeRight;
 		CKeyBinding m_oAttack;
 		CKeyBinding m_oUse;
+		CKeyBinding m_oThrow;
+		CKeyBinding m_oSlot1;
+		CKeyBinding m_oSlot2;
+		CKeyBinding m_oSlot3;
+		CKeyBinding m_oSlot4;
+		CKeyBinding m_oSlot5;
 		CKeyBinding m_oMenu;
 		CKeyBinding m_oQuickSave;
 		CKeyBinding m_oConsole;
@@ -1649,6 +1655,12 @@ namespace Menu {
 			g_oInputMgr.SetKeyBindingCode(L"MOVE_RIGHT", this->m_oStrafeRight.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"ATTACK", this->m_oAttack.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"USE", this->m_oUse.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"THROW", this->m_oThrow.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"SLOT1", this->m_oSlot1.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"SLOT2", this->m_oSlot2.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"SLOT3", this->m_oSlot3.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"SLOT4", this->m_oSlot4.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"SLOT5", this->m_oSlot5.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"MENU", this->m_oMenu.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"SAVEGAME", this->m_oQuickSave.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"CONSOLE", this->m_oConsole.GetVkey());
@@ -1665,6 +1677,12 @@ namespace Menu {
 				hFile << L"bind " + std::to_wstring(this->m_oStrafeRight.GetVkey()) + L" \"" + this->m_oStrafeRight.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oAttack.GetVkey()) + L" \"" + this->m_oAttack.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oUse.GetVkey()) + L" \"" + this->m_oUse.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oThrow.GetVkey()) + L" \"" + this->m_oThrow.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oSlot1.GetVkey()) + L" \"" + this->m_oSlot1.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oSlot2.GetVkey()) + L" \"" + this->m_oSlot2.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oSlot3.GetVkey()) + L" \"" + this->m_oSlot3.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oSlot4.GetVkey()) + L" \"" + this->m_oSlot4.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oSlot5.GetVkey()) + L" \"" + this->m_oSlot5.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oMenu.GetVkey()) + L" \"" + this->m_oMenu.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oQuickSave.GetVkey()) + L" \"" + this->m_oQuickSave.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oConsole.GetVkey()) + L" \"" + this->m_oConsole.GetCommand() + L"\"" << std::endl;
@@ -1685,6 +1703,12 @@ namespace Menu {
 			this->m_oStrafeRight.SetVkey(68);
 			this->m_oAttack.SetVkey(32);
 			this->m_oUse.SetVkey(69);
+			this->m_oThrow.SetVkey(71);
+			this->m_oSlot1.SetVkey(49);
+			this->m_oSlot2.SetVkey(50);
+			this->m_oSlot3.SetVkey(51);
+			this->m_oSlot4.SetVkey(52);
+			this->m_oSlot5.SetVkey(53);
 			this->m_oMenu.SetVkey(27);
 			this->m_oQuickSave.SetVkey(113);
 			this->m_oConsole.SetVkey(112);
@@ -1737,27 +1761,57 @@ namespace Menu {
 			this->m_oUse.SetVkey(g_oInputMgr.GetKeyBindingCode(L"USE"));
 			this->m_oUse.SetPosition(Entity::Vector(550, 300));
 
+			this->m_oThrow.Initialize(0, 0, nullptr);
+			this->m_oThrow.SetCommand(L"THROW");
+			this->m_oThrow.SetVkey(g_oInputMgr.GetKeyBindingCode(L"THROW"));
+			this->m_oThrow.SetPosition(Entity::Vector(550, 350));
+
+			this->m_oSlot1.Initialize(0, 0, nullptr);
+			this->m_oSlot1.SetCommand(L"SLOT1");
+			this->m_oSlot1.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT1"));
+			this->m_oSlot1.SetPosition(Entity::Vector(250, 550));
+
+			this->m_oSlot2.Initialize(0, 0, nullptr);
+			this->m_oSlot2.SetCommand(L"SLOT2");
+			this->m_oSlot2.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT2"));
+			this->m_oSlot2.SetPosition(Entity::Vector(550, 550));
+
+			this->m_oSlot3.Initialize(0, 0, nullptr);
+			this->m_oSlot3.SetCommand(L"SLOT3");
+			this->m_oSlot3.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT3"));
+			this->m_oSlot3.SetPosition(Entity::Vector(250, 600));
+
+			this->m_oSlot4.Initialize(0, 0, nullptr);
+			this->m_oSlot4.SetCommand(L"SLOT4");
+			this->m_oSlot4.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT4"));
+			this->m_oSlot4.SetPosition(Entity::Vector(550, 600));
+
+			this->m_oSlot5.Initialize(0, 0, nullptr);
+			this->m_oSlot5.SetCommand(L"SLOT5");
+			this->m_oSlot5.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT5"));
+			this->m_oSlot5.SetPosition(Entity::Vector(250, 650));
+
 			this->m_oMenu.Initialize(0, 0, nullptr);
 			this->m_oMenu.SetCommand(L"MENU");
 			this->m_oMenu.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MENU"));
-			this->m_oMenu.SetPosition(Entity::Vector(550, 350));
+			this->m_oMenu.SetPosition(Entity::Vector(550, 400));
 
 			this->m_oQuickSave.Initialize(0, 0, nullptr);
 			this->m_oQuickSave.SetCommand(L"SAVEGAME");
 			this->m_oQuickSave.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SAVEGAME"));
-			this->m_oQuickSave.SetPosition(Entity::Vector(550, 400));
+			this->m_oQuickSave.SetPosition(Entity::Vector(550, 450));
 
 			this->m_oConsole.Initialize(0, 0, nullptr);
 			this->m_oConsole.SetCommand(L"CONSOLE");
 			this->m_oConsole.SetVkey(g_oInputMgr.GetKeyBindingCode(L"CONSOLE"));
-			this->m_oConsole.SetPosition(Entity::Vector(550, 450));
+			this->m_oConsole.SetPosition(Entity::Vector(550, 500));
 
 			this->m_btnSave.SetOwner(this);
 			this->m_btnSave.SetFillColor(Entity::Color(50, 135, 0, 150));
 			this->m_btnSave.SetFrameColor(Entity::Color(250, 250, 250, 150));
 			this->m_btnSave.SetHoverColor(Entity::Color(76, 155, 0, 150));
 			this->m_btnSave.SetTextColor(Entity::Color(250, 250, 250, 150));
-			this->m_btnSave.SetPosition(Entity::Vector(250, 600));
+			this->m_btnSave.SetPosition(Entity::Vector(250, 730));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
 			this->m_btnSave.SetText(L"Save");
 
@@ -1766,7 +1820,7 @@ namespace Menu {
 			this->m_btnRestoreDefaults.SetFrameColor(Entity::Color(0, 0, 0, 150));
 			this->m_btnRestoreDefaults.SetHoverColor(Entity::Color(250, 250, 250, 150));
 			this->m_btnRestoreDefaults.SetTextColor(Entity::Color(0, 0, 0, 150));
-			this->m_btnRestoreDefaults.SetPosition(Entity::Vector(500, 600));
+			this->m_btnRestoreDefaults.SetPosition(Entity::Vector(500, 730));
 			this->m_btnRestoreDefaults.SetSize(Entity::Vector(200, 35));
 			this->m_btnRestoreDefaults.SetText(L"Reset defaults");
 
@@ -1785,6 +1839,12 @@ namespace Menu {
 			this->m_oStrafeRight.Draw();
 			this->m_oAttack.Draw();
 			this->m_oUse.Draw();
+			this->m_oThrow.Draw();
+			this->m_oSlot1.Draw();
+			this->m_oSlot2.Draw();
+			this->m_oSlot3.Draw();
+			this->m_oSlot4.Draw();
+			this->m_oSlot5.Draw();
 			this->m_oMenu.Draw();
 			this->m_oQuickSave.Draw();
 			this->m_oConsole.Draw();
@@ -1805,6 +1865,12 @@ namespace Menu {
 			this->m_oStrafeRight.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oAttack.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oUse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oThrow.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot1.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot2.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot3.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot4.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot5.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oQuickSave.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oConsole.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
@@ -1825,6 +1891,12 @@ namespace Menu {
 			this->m_oStrafeRight.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oAttack.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oUse.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oThrow.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot1.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot2.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot3.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot4.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oSlot5.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oMenu.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oQuickSave.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oConsole.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);

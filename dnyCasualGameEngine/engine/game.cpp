@@ -47,8 +47,13 @@ namespace Game {
 			pAchievements->PublishAchievementAndStatProgress();
 		}
 
+		std::wstring wszBackgroundFile = this->m_sPackage.wszPakPath + L"\\gfx\\" + this->m_sMap.wszBackground;
+		if (!Utils::FileExists(wszBackgroundFile)) {
+			wszBackgroundFile = wszBasePath + L"packages\\.common\\gfx\\" + this->m_sMap.wszBackground;
+		}
+
 		//Set map background
-		return pRenderer->SetBackgroundPicture(this->GetPackagePath() + L"gfx\\" + this->m_sMap.wszBackground);
+		return pRenderer->SetBackgroundPicture(wszBackgroundFile);
 	}
 
 	void CGame::Process(void)

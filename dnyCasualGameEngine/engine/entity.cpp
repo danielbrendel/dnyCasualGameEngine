@@ -54,6 +54,11 @@ namespace Entity {
 		//Inform entities
 
 		for (size_t i = 0; i < this->m_vEnts.size(); i++) {
+			//Skip dormant entities
+			if (this->IsEntityDormant(this->m_vEnts[i])) {
+				continue;
+			}
+
 			//Let entity process
 			this->m_vEnts[i]->OnProcess();
 

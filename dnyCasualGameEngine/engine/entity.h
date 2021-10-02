@@ -739,6 +739,40 @@ namespace Entity {
 	private:
 		std::vector<CScriptedEntity*> m_vEnts;
 		playerentity_s m_sPlayerEntity;
+
+		bool IsEntityDormant(CScriptedEntity* pEntity)
+		{
+			//Check if entity is considered being dormant
+
+			const int C_DISTANCE_ADDITION = 200;
+
+			//Get player position
+			Vector* vecPlayerPos = nullptr;
+			pScriptingInt->CallScriptMethod(this->m_sPlayerEntity.hScript, this->m_sPlayerEntity.pObject, "Vector& GetPosition()", nullptr, &vecPlayerPos, Scripting::FA_OBJECT);
+
+			if (vecPlayerPos) {
+				Vector vecEntityPos = pEntity->GetPosition();
+	
+				//Calculate distance between player and entity
+				int iDistance = vecPlayerPos->Distance(vecEntityPos);
+				int iDormantDistance = 0;
+
+				//Select greater resolution dimension
+				if (pWindow->GetResolutionX() > pWindow->GetResolutionY()) {
+					iDormantDistance = pWindow->GetResolutionX() / 2;
+				} else {
+					iDormantDistance = pWindow->GetResolutionY() / 2;
+				}
+
+				//Add constant value to let max value be outside of screen
+				iDormantDistance += C_DISTANCE_ADDITION;
+
+				//Return indication if player to entity distance is greater than dormant range
+				return iDistance > iDormantDistance;
+			}
+
+			return true;
+		}
 	public:
 		CScriptedEntsMgr() {}
 		~CScriptedEntsMgr() { this->Release(); }
@@ -752,7 +786,9 @@ namespace Entity {
 			//Inform entities
 
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
-				this->m_vEnts[i]->OnDraw();
+				if (!this->IsEntityDormant(this->m_vEnts[i])) {
+					this->m_vEnts[i]->OnDraw();
+				}
 			}
 		}
 
@@ -761,7 +797,9 @@ namespace Entity {
 			//Inform entities
 
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
-				this->m_vEnts[i]->OnDrawOnTop();
+				if (!this->IsEntityDormant(this->m_vEnts[i])) {
+					this->m_vEnts[i]->OnDrawOnTop();
+				}
 			}
 		}
 

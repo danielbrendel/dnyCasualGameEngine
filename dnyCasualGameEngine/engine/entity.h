@@ -1120,8 +1120,11 @@ namespace Entity {
 				return;
 			}
 
+			const int C_GOAL_POS_ADDITION = 10;
+
 			//Check if player is collided with goal entity
-			if (((*vecPosition)[0] >= this->m_vecPosition[0]) && ((*vecPosition)[0] <= this->m_vecPosition[0] + this->m_vecSize[0]) && ((*vecPosition)[1] >= this->m_vecPosition[1]) && ((*vecPosition)[1] <= this->m_vecPosition[1] + this->m_vecSize[1])) {
+			if (((((*vecPosition)[0] >= this->m_vecPosition[0] + this->m_vecSize[0] / 2 - (this->m_vecSize[0] / 2) / 2) && ((*vecPosition)[0] <= this->m_vecPosition[0] + this->m_vecSize[0] - (this->m_vecSize[0] / 2 - (this->m_vecSize[0] / 2) / 2)) && ((*vecPosition)[1] >= this->m_vecPosition[1] + this->m_vecSize[1] / 2 - (this->m_vecSize[1] / 2) / 2) && ((*vecPosition)[1] <= this->m_vecPosition[1] + this->m_vecSize[1] - (this->m_vecSize[0] / 2 - (this->m_vecSize[0] / 2) / 2))))
+				|| (((*vecPosition)[0] + (*vecSize)[0] - ((*vecSize)[0] / 2 - ((*vecSize)[0] / 2) / 2) >= this->m_vecPosition[0] + this->m_vecSize[0] / 2 - (this->m_vecSize[0] / 2) / 2) && ((*vecPosition)[0] + (*vecSize)[0] - ((*vecSize)[0] / 2 - ((*vecSize)[0] / 2) / 2) <= this->m_vecPosition[0] + this->m_vecSize[0] - (this->m_vecSize[0] / 2 - (this->m_vecSize[0] / 2) / 2)) && ((*vecPosition)[1] + (*vecSize)[1] - ((*vecSize)[1] / 2 - ((*vecSize)[1] / 2) / 2) >= this->m_vecPosition[1] + this->m_vecSize[0] / 2 - (this->m_vecSize[0] / 2) / 2) && ((*vecPosition)[1] + (*vecSize)[1] - ((*vecSize)[1] / 2 - ((*vecSize)[1] / 2) / 2) <= this->m_vecPosition[1] + this->m_vecSize[1] - (this->m_vecSize[0] / 2 - (this->m_vecSize[0] / 2) / 2)))) {
 				if (!this->m_bGoalReached) {
 					this->m_bGoalReached = true;
 				}

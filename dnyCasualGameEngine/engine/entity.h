@@ -1675,6 +1675,7 @@ namespace Entity {
 		}
 	};
 
+	/* Player HUD manager */
 	const int HUD_FONT_SIZE_WIDTH = 15;
 	const int HUD_FONT_SIZE_HEIGHT = 20;
 	class CHud {
@@ -1702,6 +1703,32 @@ namespace Entity {
 		DxRenderer::d3dfont_s* m_pFont;
 		DxRenderer::HD3DSPRITE m_hBar;
 		bool m_bEnable;
+
+		bool AmmoItemExists(const std::wstring& wszIdent)
+		{
+			//Check if ammo item already exists
+
+			for (size_t i = 0; i < this->m_vAmmoItems.size(); i++) {
+				if (this->m_vAmmoItems[i].wszIdent == wszIdent) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		bool CollectableExists(const std::wstring& wszIdent)
+		{
+			//Check if collectable already exists
+
+			for (size_t i = 0; i < this->m_vCollectables.size(); i++) {
+				if (this->m_vCollectables[i].wszIdent == wszIdent) {
+					return true;
+				}
+			}
+
+			return false;
+		}
 	public:
 		CHud() : m_uiDisplayItem(std::string::npos), m_bEnable(true)
 		{
@@ -1722,6 +1749,10 @@ namespace Entity {
 		{
 			//Add new ammo item
 
+			if (this->AmmoItemExists(wszIdent)) {
+				return;
+			}
+
 			ammo_item_s sItem;
 
 			pRenderer->GetSpriteInfo(wszSprite, sItem.sInfo);
@@ -1735,6 +1766,10 @@ namespace Entity {
 		void AddCollectable(const std::wstring& wszIdent, const std::wstring& wszSprite, bool bDrawAlways)
 		{
 			//Add a collectable
+
+			if (this->CollectableExists(wszIdent)) {
+				return;
+			}
 
 			collectable_s sItem;
 

@@ -57,7 +57,7 @@ class CItemAmmoBase : IScriptedEntity
 		this.m_szWeapon = szWeapon;
 	}
 	
-	//Called when the entity gets spawned. The position on the screen is passed as argument
+	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
@@ -197,12 +197,6 @@ class CItemAmmoBase : IScriptedEntity
 	void SetRotation(float fRot)
 	{
 		this.m_fRotation = fRot;
-	}
-	
-	//Called for querying the damage value for this entity
-	DamageValue GetDamageValue()
-	{
-		return 0;
 	}
 	
 	//Return a name string here, e.g. the class name or instance name.

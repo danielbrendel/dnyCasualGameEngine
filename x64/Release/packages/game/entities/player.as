@@ -15,6 +15,7 @@ string g_szPackagePath = "";
 
 #include "weapon_laser.as"
 #include "weapon_gun.as"
+#include "weapon_grenade.as"
 #include "../../.common/entities/explosion.as"
 #include "tankcls.as"
 
@@ -101,6 +102,7 @@ const int BTN_TURNLEFT = (1 << 4);
 const int BTN_TURNRIGHT = (1 << 5);
 const int BTN_SPEED = (1 << 6);
 const int BTN_ATTACK = (1 << 7);
+const int BTN_THROW = (1 << 8);
 const int WEAPON_HANDGUN = 1;
 const int WEAPON_RIFLE = 2;
 const int WEAPON_SHOTGUN = 3;
@@ -130,6 +132,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	bool m_bShooting;
 	int m_iCurrentWeapon;
 	SpriteHandle m_hSprite;
+	bool m_bMayThrow;
 	
 	CPlayerEntity()
     {
@@ -140,9 +143,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_bMoving = false;
 		this.m_bShooting = false;
 		this.m_iCurrentWeapon = WEAPON_HANDGUN;
+		this.m_bMayThrow = true;
     }
 	
-	//Called when the entity gets spawned. The position on the screen is passed as argument
+	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
@@ -276,6 +280,22 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\shotgun.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
 					}
+				}
+			}
+		}
+		
+		if ((this.m_uiButtons & BTN_THROW) == BTN_THROW) {
+			if (this.m_bMayThrow) {
+				this.m_bMayThrow = false;
+				
+				if (HUD_GetCollectableCount("grenade") > 0) {
+					CGrenadeEntity @grenade = CGrenadeEntity();
+					grenade.SetOwner(this);
+					grenade.SetRotation(this.GetRotation());
+					
+					Ent_SpawnEntity("weapon_grenade", @grenade, this.m_vecPos);
+					
+					HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") - 1);
 				}
 			}
 		}
@@ -569,6 +589,20 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 		
+		if (vKey == GetKeyBinding("THROW")) {
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_THROW) == BTN_THROW)) {
+					this.m_uiButtons |= BTN_THROW;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_THROW) == BTN_THROW) {
+					this.m_uiButtons &= ~BTN_THROW;
+				}
+				
+				this.m_bMayThrow = true;
+			}
+		}
+		
 		if (vKey == GetKeyBinding("SLOT1")) {
 			this.m_iCurrentWeapon = WEAPON_HANDGUN;
 			HUD_SetAmmoDisplayItem("handgun");
@@ -619,7 +653,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Add ammo
 	void AddAmmo(const string &in ident, uint amount)
 	{
-		HUD_UpdateAmmoItem(ident, HUD_GetAmmoItemCurrent(ident) + amount, HUD_GetAmmoItemMax(ident));
+		if (ident != "grenade") {
+			HUD_UpdateAmmoItem(ident, HUD_GetAmmoItemCurrent(ident) + amount, HUD_GetAmmoItemMax(ident));
+		} else {
+			HUD_UpdateCollectable(ident, HUD_GetCollectableCount(ident) + amount);
+		}
 	}
 }
 
@@ -641,6 +679,9 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	
 	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
 	HUD_UpdateAmmoItem("shotgun", 5, 100);
+	
+	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
+	HUD_UpdateCollectable("grenade", 5);
 }
 
 //Restore game state

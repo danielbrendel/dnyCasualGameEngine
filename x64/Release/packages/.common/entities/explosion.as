@@ -14,6 +14,7 @@
 #include "decal.as"
 
 /* Explosion entity */
+const uint C_DEFAULT_GRENADE_DAMAGE = 20;
 class CExplosionEntity : IScriptedEntity
 {
 	Vector m_vecPos;
@@ -23,14 +24,32 @@ class CExplosionEntity : IScriptedEntity
 	int m_iFrameCount;
 	SpriteHandle m_hSprite;
 	SoundHandle m_hSound;
+	bool m_bDamageAble;
+	uint m_uiDamage;
+	IScriptedEntity@ m_pOwner;
 	
 	CExplosionEntity()
     {
 		this.m_vecSize = Vector(32, 32);
 		this.m_iFrameCount = 0;
+		this.m_bDamageAble = false;
+		@this.m_pOwner = null;
     }
 	
-	//Called when the entity gets spawned. The position on the screen is passed as argument
+	//Set damageable data
+	void SetDamageable(bool flag, uint damage = C_DEFAULT_GRENADE_DAMAGE)
+	{
+		this.m_bDamageAble = flag;
+		this.m_uiDamage = damage;
+	}
+	
+	//Set owner
+	void SetOwner(IScriptedEntity@ pOwner)
+	{
+		@this.m_pOwner = pOwner;
+	}
+	
+	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
@@ -44,7 +63,7 @@ class CExplosionEntity : IScriptedEntity
 		Ent_SpawnEntity("decal", @dcl, this.m_vecPos);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(14, 14), Vector(100, 100));
+		bbox.AddBBoxItem(Vector(15, 15), Vector(100, 100));
 		this.m_oModel.Alloc();
 		this.m_oModel.Initialize2(bbox, this.m_hSprite);
 	}
@@ -90,7 +109,7 @@ class CExplosionEntity : IScriptedEntity
 	//Indicate if entity can be collided
 	bool IsCollidable()
 	{
-		return false;
+		return this.m_bDamageAble;
 	}
 	
 	//Called when the entity recieves damage
@@ -106,6 +125,13 @@ class CExplosionEntity : IScriptedEntity
 	//Called for entity collisions
 	void OnCollided(IScriptedEntity@ ref)
 	{
+		if (@this.m_pOwner != null) {
+			if (@ref == @this.m_pOwner) {
+				return;
+			}
+		}
+		
+		ref.OnDamage(this.m_uiDamage);
 	}
 	
 	//Called for recieving the model data for this entity. This is only used for
@@ -135,12 +161,6 @@ class CExplosionEntity : IScriptedEntity
 	//Set rotation
 	void SetRotation(float fRot)
 	{
-	}
-	
-	//Called for querying the damage value for this entity
-	DamageValue GetDamageValue()
-	{
-		return 1;
 	}
 	
 	//Return a name string here, e.g. the class name or instance name.

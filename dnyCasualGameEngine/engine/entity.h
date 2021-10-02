@@ -1687,8 +1687,17 @@ namespace Entity {
 			size_t uiMaxAmmo;
 		};
 
+		struct collectable_s {
+			std::wstring wszIdent;
+			D3DXIMAGE_INFO sInfo;
+			DxRenderer::HD3DSPRITE hSprite;
+			size_t uiCurCount;
+			bool bDrawAlways;
+		};
+
 		size_t m_uiHealth;
-		std::vector<ammo_item_s> m_vItems;
+		std::vector<ammo_item_s> m_vAmmoItems;
+		std::vector< collectable_s> m_vCollectables;
 		size_t m_uiDisplayItem;
 		DxRenderer::d3dfont_s* m_pFont;
 		DxRenderer::HD3DSPRITE m_hBar;
@@ -1717,21 +1726,49 @@ namespace Entity {
 
 			pRenderer->GetSpriteInfo(wszSprite, sItem.sInfo);
 
-			
 			sItem.wszIdent = wszIdent;
 			sItem.hSprite = pRenderer->LoadSprite(wszSprite, 1, sItem.sInfo.Width, sItem.sInfo.Height, 1, false);
 
-			this->m_vItems.push_back(sItem);
+			this->m_vAmmoItems.push_back(sItem);
+		}
+
+		void AddCollectable(const std::wstring& wszIdent, const std::wstring& wszSprite, bool bDrawAlways)
+		{
+			//Add a collectable
+
+			collectable_s sItem;
+
+			pRenderer->GetSpriteInfo(wszSprite, sItem.sInfo);
+
+			sItem.wszIdent = wszIdent;
+			sItem.hSprite = pRenderer->LoadSprite(wszSprite, 1, sItem.sInfo.Width, sItem.sInfo.Height, 1, false);
+			sItem.uiCurCount = 0;
+			sItem.bDrawAlways = bDrawAlways;
+
+			this->m_vCollectables.push_back(sItem);
 		}
 
 		void UpdateAmmoItem(const std::wstring& wszIdent, size_t uiCurAmmo, size_t uiMaxAmmo)
 		{
 			//Update ammo item
 
-			for (size_t i = 0; i < this->m_vItems.size(); i++) {
-				if (this->m_vItems[i].wszIdent == wszIdent) {
-					this->m_vItems[i].uiCurAmmo = uiCurAmmo;
-					this->m_vItems[i].uiMaxAmmo = uiMaxAmmo;
+			for (size_t i = 0; i < this->m_vAmmoItems.size(); i++) {
+				if (this->m_vAmmoItems[i].wszIdent == wszIdent) {
+					this->m_vAmmoItems[i].uiCurAmmo = uiCurAmmo;
+					this->m_vAmmoItems[i].uiMaxAmmo = uiMaxAmmo;
+
+					break;
+				}
+			}
+		}
+
+		void UpdateCollectable(const std::wstring& wszIdent, size_t uiCurCount)
+		{
+			//Update collectable item
+
+			for (size_t i = 0; i < this->m_vCollectables.size(); i++) {
+				if (this->m_vCollectables[i].wszIdent == wszIdent) {
+					this->m_vCollectables[i].uiCurCount = uiCurCount;
 
 					break;
 				}
@@ -1744,8 +1781,8 @@ namespace Entity {
 
 			this->m_uiDisplayItem = std::string::npos;
 
-			for (size_t i = 0; i < this->m_vItems.size(); i++) {
-				if (this->m_vItems[i].wszIdent == wszIdent) {
+			for (size_t i = 0; i < this->m_vAmmoItems.size(); i++) {
+				if (this->m_vAmmoItems[i].wszIdent == wszIdent) {
 					this->m_uiDisplayItem = i;
 					break;
 				}
@@ -1786,19 +1823,30 @@ namespace Entity {
 			}
 
 			//Draw ammo info
-			if ((this->m_uiDisplayItem != std::string::npos) && (this->m_uiDisplayItem < this->m_vItems.size())) {
-				std::wstring wszCurAmmo = std::to_wstring(this->m_vItems[this->m_uiDisplayItem].uiCurAmmo);
-				std::wstring wszMaxAmmo = std::to_wstring(this->m_vItems[this->m_uiDisplayItem].uiMaxAmmo);
+			if ((this->m_uiDisplayItem != std::string::npos) && (this->m_uiDisplayItem < this->m_vAmmoItems.size())) {
+				std::wstring wszCurAmmo = std::to_wstring(this->m_vAmmoItems[this->m_uiDisplayItem].uiCurAmmo);
+				std::wstring wszMaxAmmo = std::to_wstring(this->m_vAmmoItems[this->m_uiDisplayItem].uiMaxAmmo);
 
-				int iAmmoInfoStartX = pWindow->GetResolutionX() - this->m_vItems[this->m_uiDisplayItem].sInfo.Width - (int)wszCurAmmo.length() * HUD_FONT_SIZE_WIDTH - HUD_FONT_SIZE_WIDTH - (int)wszMaxAmmo.length() * HUD_FONT_SIZE_WIDTH - 20;
+				int iAmmoInfoStartX = pWindow->GetResolutionX() - this->m_vAmmoItems[this->m_uiDisplayItem].sInfo.Width - (int)wszCurAmmo.length() * HUD_FONT_SIZE_WIDTH - HUD_FONT_SIZE_WIDTH - (int)wszMaxAmmo.length() * HUD_FONT_SIZE_WIDTH - 20;
 
-				pRenderer->DrawSprite(this->m_vItems[this->m_uiDisplayItem].hSprite, iAmmoInfoStartX, 5, 0, 0.0f);
+				pRenderer->DrawSprite(this->m_vAmmoItems[this->m_uiDisplayItem].hSprite, iAmmoInfoStartX, 5, 0, 0.0f);
 				
-				pRenderer->DrawString(this->m_pFont, wszCurAmmo, iAmmoInfoStartX + this->m_vItems[this->m_uiDisplayItem].sInfo.Width + 5, 5 + this->m_vItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 255);
+				pRenderer->DrawString(this->m_pFont, wszCurAmmo, iAmmoInfoStartX + this->m_vAmmoItems[this->m_uiDisplayItem].sInfo.Width + 5, 5 + this->m_vAmmoItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 255);
 
-				if (this->m_vItems[this->m_uiDisplayItem].uiMaxAmmo > 0) {
-					pRenderer->DrawString(this->m_pFont, L"/", iAmmoInfoStartX + this->m_vItems[this->m_uiDisplayItem].sInfo.Width + 5 + (int)wszCurAmmo.length() * HUD_FONT_SIZE_WIDTH, 5 + this->m_vItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 150);
-					pRenderer->DrawString(this->m_pFont, wszMaxAmmo, iAmmoInfoStartX + this->m_vItems[this->m_uiDisplayItem].sInfo.Width + 5 + ((int)wszCurAmmo.length() + 1) * HUD_FONT_SIZE_WIDTH, 5 + this->m_vItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 150);
+				if (this->m_vAmmoItems[this->m_uiDisplayItem].uiMaxAmmo > 0) {
+					pRenderer->DrawString(this->m_pFont, L"/", iAmmoInfoStartX + this->m_vAmmoItems[this->m_uiDisplayItem].sInfo.Width + 5 + (int)wszCurAmmo.length() * HUD_FONT_SIZE_WIDTH, 5 + this->m_vAmmoItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 150);
+					pRenderer->DrawString(this->m_pFont, wszMaxAmmo, iAmmoInfoStartX + this->m_vAmmoItems[this->m_uiDisplayItem].sInfo.Width + 5 + ((int)wszCurAmmo.length() + 1) * HUD_FONT_SIZE_WIDTH, 5 + this->m_vAmmoItems[this->m_uiDisplayItem].sInfo.Height / 2 - HUD_FONT_SIZE_HEIGHT / 2, 200, 200, 200, 150);
+				}
+			}
+
+			//Draw collectables
+			for (size_t i = 0; i < this->m_vCollectables.size(); i++) {
+				if (this->m_vCollectables[i].bDrawAlways) {
+					const int C_ADDED_GAP = 20;
+					std::wstring wszStrCurCount = std::to_wstring(this->m_vCollectables[i].uiCurCount);
+					
+					pRenderer->DrawSprite(this->m_vCollectables[i].hSprite, ((int)i * (this->m_vCollectables[i].sInfo.Width + ((int)wszStrCurCount.length() * iDefaultFontSize[0]) + C_ADDED_GAP)), pWindow->GetResolutionY() - 43, 0, 0.0f);
+					pRenderer->DrawString(pDefaultFont, wszStrCurCount, ((int)i * (this->m_vCollectables[i].sInfo.Width + ((int)wszStrCurCount.length() * iDefaultFontSize[0]) + C_ADDED_GAP) + this->m_vCollectables[i].sInfo.Width), pWindow->GetResolutionY() - 43, 200, 200, 200, 255);
 				}
 			}
 		}
@@ -1807,9 +1855,9 @@ namespace Entity {
 		{
 			//Get current ammo value of item
 
-			for (size_t i = 0; i < this->m_vItems.size(); i++) {
-				if (this->m_vItems[i].wszIdent == wszIdent) {
-					return this->m_vItems[i].uiCurAmmo;
+			for (size_t i = 0; i < this->m_vAmmoItems.size(); i++) {
+				if (this->m_vAmmoItems[i].wszIdent == wszIdent) {
+					return this->m_vAmmoItems[i].uiCurAmmo;
 				}
 			}
 
@@ -1820,9 +1868,22 @@ namespace Entity {
 		{
 			//Get max ammo value of item
 
-			for (size_t i = 0; i < this->m_vItems.size(); i++) {
-				if (this->m_vItems[i].wszIdent == wszIdent) {
-					return this->m_vItems[i].uiMaxAmmo;
+			for (size_t i = 0; i < this->m_vAmmoItems.size(); i++) {
+				if (this->m_vAmmoItems[i].wszIdent == wszIdent) {
+					return this->m_vAmmoItems[i].uiMaxAmmo;
+				}
+			}
+
+			return 0;
+		}
+
+		size_t GetCollectableCount(const std::wstring& wszIdent)
+		{
+			//Get amount of current items of a collectable
+
+			for (size_t i = 0; i < this->m_vCollectables.size(); i++) {
+				if (this->m_vCollectables[i].wszIdent == wszIdent) {
+					return this->m_vCollectables[i].uiCurCount;
 				}
 			}
 

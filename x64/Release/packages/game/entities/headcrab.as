@@ -16,7 +16,7 @@
 const float C_HEADCRAB_DEFAULT_SPEED = 8;
 const int C_HEADCRAB_REACT_RANGE = 250;
 const int C_HEADGRAB_ATTACK_RANGE = 50;
-const DamageValue C_HEADGRAB_DAMAGE_VALUE = 5;
+const uint C_HEADGRAB_DAMAGE_VALUE = 5;
 
 /* Headcrab entity */
 class CHeadcrabEntity : IScriptedEntity
@@ -88,11 +88,11 @@ class CHeadcrabEntity : IScriptedEntity
 	
 	CHeadcrabEntity()
     {
-		this.m_uiHealth = 100;
+		this.m_uiHealth = 50;
 		this.m_vecSize = Vector(59, 52);
     }
 	
-	//Called when the entity gets spawned. The position on the screen is passed as argument
+	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;

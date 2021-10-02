@@ -582,9 +582,19 @@ namespace Entity {
 			Game::pGame->GetHUD()->AddAmmoItem(Utils::ConvertToWideString(szIdent), Utils::ConvertToWideString(szSprite));
 		}
 
+		void AddHUDCollectable(const std::string& szIdent, const std::string& szSprite, bool bDrawAlways)
+		{
+			Game::pGame->GetHUD()->AddCollectable(Utils::ConvertToWideString(szIdent), Utils::ConvertToWideString(szSprite), bDrawAlways);
+		}
+
 		void UpdateHUDAmmoItem(const std::string& szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)
 		{
 			Game::pGame->GetHUD()->UpdateAmmoItem(Utils::ConvertToWideString(szIdent), uiCurAmmo, uiMaxAmmo);
+		}
+
+		void UpdateHUDCollectable(const std::string& szIdent, size_t uiCurCount)
+		{
+			Game::pGame->GetHUD()->UpdateCollectable(Utils::ConvertToWideString(szIdent), uiCurCount);
 		}
 
 		size_t GetHUDAmmoItemCurrent(const std::string& szIdent)
@@ -595,6 +605,11 @@ namespace Entity {
 		size_t GetHUDAmmoItemMax(const std::string& szIdent)
 		{
 			return Game::pGame->GetHUD()->GetAmmoItemMax(Utils::ConvertToWideString(szIdent));
+		}
+
+		size_t GetHUDCollectableCount(const std::string& szIdent)
+		{
+			return Game::pGame->GetHUD()->GetCollectableCount(Utils::ConvertToWideString(szIdent));
 		}
 
 		void SetHUDAmmoDisplayItem(const std::string& szIdent)
@@ -707,7 +722,6 @@ namespace Entity {
 		REG_TYPEDEF("uint64", "FontHandle");
 		REG_TYPEDEF("uint64", "SoundHandle");
 		REG_TYPEDEF("uint64", "CVarHandle");
-		REG_TYPEDEF("uint8", "DamageValue");
 
 		//Register enum
 		Scripting::HSIENUM hEnum;
@@ -955,9 +969,12 @@ namespace Entity {
 			{ "void HUD_SetEnableStatus(bool value)", APIFuncs::SetHUDEnableStatus },
 			{ "void HUD_UpdateHealth(size_t value)", APIFuncs::UpdateHUDHealth },
 			{ "void HUD_AddAmmoItem(const string &in szIdent, const string &in szSprite)", APIFuncs::AddHUDAmmoItem },
+			{ "void HUD_AddCollectable(const string &in szIdent, const string &in szSprite, bool bDrawAlways)", APIFuncs::AddHUDCollectable },
 			{ "void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)", APIFuncs::UpdateHUDAmmoItem },
+			{ "void HUD_UpdateCollectable(const string &in szIdent, size_t uiCurCount)", APIFuncs::UpdateHUDCollectable },
 			{ "size_t HUD_GetAmmoItemCurrent(const string &in szIdent)", APIFuncs::GetHUDAmmoItemCurrent },
 			{ "size_t HUD_GetAmmoItemMax(const string &in szIdent)", APIFuncs::GetHUDAmmoItemMax },
+			{ "size_t HUD_GetCollectableCount(const string &in szIdent)", APIFuncs::GetHUDCollectableCount },
 			{ "void HUD_SetAmmoDisplayItem(const string &in szIdent)", APIFuncs::SetHUDAmmoDisplayItem },
 			{ "bool HUD_IsEnabled()", APIFuncs::IsHUDEnabled },
 			{ "void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },

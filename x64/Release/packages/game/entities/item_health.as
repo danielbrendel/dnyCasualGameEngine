@@ -34,7 +34,7 @@ class CItemHealth : IScriptedEntity
 		this.m_bActive = true;
     }
 	
-	//Called when the entity gets spawned. The position on the screen is passed as argument
+	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
@@ -171,12 +171,6 @@ class CItemHealth : IScriptedEntity
 	//Set rotation
 	void SetRotation(float fRot)
 	{
-	}
-	
-	//Called for querying the damage value for this entity
-	DamageValue GetDamageValue()
-	{
-		return 0;
 	}
 	
 	//Return a name string here, e.g. the class name or instance name.

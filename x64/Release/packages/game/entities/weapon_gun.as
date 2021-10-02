@@ -38,7 +38,7 @@ class CGunEntity : IScriptedEntity
 		this.m_bExplode = false;
     }
 	
-	//Called when the entity gets spawned. The position on the screen is passed as argument
+	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;

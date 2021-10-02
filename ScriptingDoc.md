@@ -11,7 +11,6 @@ __Version__: 1.0
 * SoundHandle: A handle to a sound (64 Bit)
 * FontHandle: A handle to a font (64 Bit)
 * CVarHandle: A handle to a CVar (control/config variable, 64 Bit)
-* DamageValue: Value containing a damage value. 0 * 255 (1 Byte)
 
 ## Special variables
 * ${COMMON} : Used for include directives to dynamically query the common path
@@ -385,12 +384,18 @@ void HUD_SetEnableStatus(bool value)
 void HUD_UpdateHealth(size_t value)
 //Add new HUD ammo item
 void HUD_AddAmmoItem(const string &in szIdent, const string &in szSprite)
+//Add new collectable item
+void HUD_AddCollectable(const string &in szIdent, const string &in szSprite, bool bDrawAlways)
 //Update specific HUD ammo item
 void HUD_UpdateAmmoItem(const string &in szIdent, size_t uiCurAmmo, size_t uiMaxAmmo)
+//Update specific collectable item
+void HUD_UpdateCollectable(const string &in szIdent, size_t uiCurCount)
 //Get current ammo amount of item
 size_t HUD_GetAmmoItemCurrent(const string &in szIdent)
 //Get max ammo amount of item
 size_t HUD_GetAmmoItemMax(const string &in szIdent)
+//Get current amount of items of a collectable
+size_t HUD_GetCollectableCount(const string &in szIdent)
 //Specify ammo item to display
 void HUD_SetAmmoDisplayItem(const string &in szIdent)
 //Check whether HUD is currently enabled or not

@@ -37,7 +37,7 @@ class CTankEntity : IScriptedEntity
 	CTankEntity()
     {
 		this.m_vecSize = Vector(64, 64);
-		this.m_uiHealth = 100;
+		this.m_uiHealth = 90;
 		this.m_bRemove = false;
     }
 	
@@ -80,7 +80,7 @@ class CTankEntity : IScriptedEntity
 		gun.SetExplosionFlag(true);
 	}
 	
-	//Called when the entity gets spawned. The position on the screen is passed as argument
+	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;

@@ -240,6 +240,8 @@ void OnKeyPress(int vKey, bool bDown)
 void OnMousePress(int key, bool bDown)
 //Called for getting current cursor position
 void OnUpdateCursor(const Vector &in pos)
+//Add to player score
+void AddPlayerScore(int amount)
 //Used to return the current player score
 int GetPlayerScore()
 ```

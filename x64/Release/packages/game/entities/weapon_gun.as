@@ -114,6 +114,21 @@ class CGunEntity : IScriptedEntity
 	{
 		if (@ref != @this.m_pOwner) {
 			ref.OnDamage(GUN_SHOT_DAMAGE);
+			
+			if (ref.NeedsRemoval()) {
+				if (@this.m_pOwner == @Ent_GetPlayerEntity()) {
+					IPlayerEntity@ casted = cast<IPlayerEntity>(this.m_pOwner);
+					
+					if (ref.GetName() == "headcrab") {
+						casted.AddPlayerScore(1);
+					} else if (ref.GetName() == "tank") {
+						casted.AddPlayerScore(10);
+					} else {
+						casted.AddPlayerScore(1);
+					}
+				}
+			}
+			
 			this.m_bRemove = true;
 		}
 	}

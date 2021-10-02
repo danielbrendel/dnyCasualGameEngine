@@ -133,6 +133,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	int m_iCurrentWeapon;
 	SpriteHandle m_hSprite;
 	bool m_bMayThrow;
+	int m_iScore;
 	
 	CPlayerEntity()
     {
@@ -144,6 +145,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_bShooting = false;
 		this.m_iCurrentWeapon = WEAPON_HANDGUN;
 		this.m_bMayThrow = true;
+		this.m_iScore = 0;
     }
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
@@ -632,13 +634,20 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
 			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
 			Sav_CreateProperty("rot", formatFloat(this.m_fRotation)) +
-			Sav_CreateProperty("health", formatInt(this.m_uiHealth));
+			Sav_CreateProperty("health", formatInt(this.m_uiHealth)) +
+			Sav_CreateProperty("score", formatInt(this.m_iScore));
+	}
+	
+	//Add to player score
+	void AddPlayerScore(int amount)
+	{
+		this.m_iScore += amount;
 	}
 	
 	//Called for returning the current score
 	int GetPlayerScore()
 	{
-		return 0;
+		return this.m_iScore;
 	}
 	
 	//Add health
@@ -706,6 +715,14 @@ void RestoreState(const string &in szIdent, const string &in szValue)
 				} else if (ent.GetName() == "tank") {
 					CTankEntity@ casted = cast<CTankEntity>(ent);
 					casted.SetHealth(parseInt(health));
+				}
+			}
+			
+			string score = Sav_GetValueFromProperties(szValue, "score");
+			if (score != "") {
+				if (ent.GetName() == "player") {
+					CPlayerEntity@ casted = cast<CPlayerEntity>(ent);
+					casted.AddPlayerScore(parseInt(score));
 				}
 			}
 		}

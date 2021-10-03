@@ -692,6 +692,9 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	
 	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
 	HUD_UpdateCollectable("grenade", 5);
+	
+	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
+	HUD_UpdateCollectable("coins", 0);
 }
 
 //Restore game state

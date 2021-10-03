@@ -993,6 +993,26 @@ namespace Menu {
 		DxRenderer::HD3DSPRITE m_hDown;
 		Entity::Vector m_vecMousePos;
 
+		std::string RemoveFileExtension(const std::string& szName)
+		{
+			//Provide file name without extension
+			
+			size_t uiDot = std::string::npos;
+
+			for (size_t i = szName.length(); i >= 0; i--) {
+				if (szName[i] == '.') {
+					uiDot = i;
+					break;
+				}
+			}
+
+			if (uiDot == std::string::npos) {
+				return szName;
+			}
+
+			return szName.substr(0, uiDot);
+		}
+
 		void AcquireSavedGameStates(void)
 		{
 			//Acquire all saved game states
@@ -1024,7 +1044,7 @@ namespace Menu {
 						Entity::CSaveGameReader reader;
 						reader.OpenSaveGameFile(Utils::ConvertToAnsiString(std::wstring(sFindData.cFileName)));
 						reader.AcquireSaveGameData();
-						wszDisplayText = Utils::ConvertToWideString(reader.GetDataItem("package") + " | " + reader.GetDataItem("map") + " | ") + std::wstring(wszBuffer);
+						wszDisplayText = Utils::ConvertToWideString(reader.GetDataItem("package") + " | " + this->RemoveFileExtension(reader.GetDataItem("map")) + " | ") + std::wstring(wszBuffer);
 						wszDataContent = std::wstring(sFindData.cFileName);
 						reader.Close();
 
@@ -1111,7 +1131,7 @@ namespace Menu {
 			Entity::CSaveGameReader reader;
 			reader.OpenSaveGameFile(Utils::ConvertToAnsiString(wszFile));
 			reader.AcquireSaveGameData();
-			wszDisplayText = Utils::ConvertToWideString(reader.GetDataItem("package") + " | " + reader.GetDataItem("map") + " | ") + std::wstring(wszDateAndTime);
+			wszDisplayText = Utils::ConvertToWideString(reader.GetDataItem("package") + " | " + this->RemoveFileExtension(reader.GetDataItem("map")) + " | ") + std::wstring(wszDateAndTime);
 			wszDataContent = std::wstring(wszFile);
 			reader.Close();
 

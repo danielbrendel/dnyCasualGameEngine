@@ -762,5 +762,7 @@ namespace Game {
 		Menu::CMenu* GetMenu(void) { return &this->m_oMenu; }
 		//Get HUD object
 		Entity::CHud* GetHUD(void) { return this->m_pHud; }
+		//Indicate if game is started
+		bool IsGameStarted(void) { return this->m_bGameStarted; }
 	};
 }

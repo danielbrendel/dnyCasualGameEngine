@@ -233,6 +233,10 @@ namespace Entity {
 
 		bool PlaySound_(DxSound::HDXSOUND hSound, long lVolume)
 		{
+			if (!Game::pGame->IsGameStarted()) {
+				return false;
+			}
+
 			return pSound->Play(hSound, lVolume, 0);
 		}
 

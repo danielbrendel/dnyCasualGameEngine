@@ -202,6 +202,9 @@ namespace Game {
 	{
 		//Stop game and cleanup
 
+		//Indicate game not started anymore
+		this->m_bGameStarted = false;
+
 		//Release solid sprites
 		for (size_t i = 0; i < this->m_vSolidSprites.size(); i++) {
 			this->m_vSolidSprites[i].Release();
@@ -225,9 +228,8 @@ namespace Game {
 			this->m_pGoalEntity = nullptr;
 		}
 
-		//Reset indicator
+		//Reset indicators
 		this->m_bShowIntermission = false;
-		this->m_bGameStarted = false;
 		this->m_bGameOver = false;
 		this->m_bInGameLoadingProgress = false;
 		this->m_bLoadSavedGame = false;

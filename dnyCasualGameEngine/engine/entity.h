@@ -1029,8 +1029,9 @@ namespace Entity {
 			this->m_vSprites.clear();
 		}
 
-		//Getter
+		//Getters
 		const bool IsWall(void) const { return this->m_bWall; }
+		const Vector& GetPosition(void) { return this->m_vecPos; }
 	};
 
 	/* Goal entity class */

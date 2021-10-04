@@ -718,10 +718,10 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	HUD_SetAmmoDisplayItem("handgun");
 	
 	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
-	HUD_UpdateAmmoItem("laser", 10, 100);
+	HUD_UpdateAmmoItem("laser", 15, 100);
 	
 	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
-	HUD_UpdateAmmoItem("shotgun", 5, 100);
+	HUD_UpdateAmmoItem("shotgun", 10, 100);
 	
 	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
 	HUD_UpdateCollectable("grenade", 5);

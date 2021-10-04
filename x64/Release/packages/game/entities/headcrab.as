@@ -33,9 +33,11 @@ class CHeadcrabEntity : IScriptedEntity
 	Timer m_oShaking;
 	Timer m_oWalkSound;
 	Timer m_oAttack;
+	Timer m_tmrFlicker;
 	bool m_bGotEnemy;
 	float m_fShakeRot;
 	float m_fSpeed;
+	uint m_uiFlickerCount;
 	SoundHandle m_hWalkSound;
 	SoundHandle m_hPainSound;
 	SoundHandle m_hAttackSound;
@@ -90,6 +92,7 @@ class CHeadcrabEntity : IScriptedEntity
     {
 		this.m_uiHealth = 50;
 		this.m_vecSize = Vector(59, 52);
+		this.m_uiFlickerCount = 0;
     }
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
@@ -116,6 +119,9 @@ class CHeadcrabEntity : IScriptedEntity
 		this.m_oAttack.SetDelay(1000);
 		this.m_oAttack.Reset();
 		this.m_oAttack.SetActive(true);
+		this.m_tmrFlicker.SetDelay(250);
+		this.m_tmrFlicker.Reset();
+		this.m_tmrFlicker.SetActive(false);
 		this.m_hWalkSound = S_QuerySound(GetPackagePath() + "sound\\hc_walk.wav");
 		this.m_hPainSound = S_QuerySound(GetPackagePath() + "sound\\hc_hurt.wav");
 		this.m_hAttackSound = S_QuerySound(GetPackagePath() + "sound\\hc_attack.wav");
@@ -166,6 +172,19 @@ class CHeadcrabEntity : IScriptedEntity
 			
 			Ent_Move(this, this.m_fSpeed, MOVE_FORWARD);
 		}
+		
+		if (this.m_tmrFlicker.IsActive()) {
+			this.m_tmrFlicker.Update();
+			if (this.m_tmrFlicker.IsElapsed()) {
+				this.m_tmrFlicker.Reset();
+				
+				this.m_uiFlickerCount++;
+				if (this.m_uiFlickerCount >= 6) {
+					this.m_tmrFlicker.SetActive(false);
+					this.m_uiFlickerCount = 0;
+				}
+			}
+		}
 	}
 	
 	//Entity can draw everything in default order here
@@ -182,7 +201,10 @@ class CHeadcrabEntity : IScriptedEntity
 		Vector vOut;
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
-		R_DrawSprite(this.m_hSprite, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
+		bool bCustomColor = (this.m_tmrFlicker.IsActive()) && (this.m_uiFlickerCount % 2 == 0);
+		
+		R_DrawSprite(this.m_hSprite, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, bCustomColor, sDrawingColor);
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -210,6 +232,10 @@ class CHeadcrabEntity : IScriptedEntity
 		} else {
 			this.m_uiHealth -= damageValue;
 		}
+		
+		this.m_tmrFlicker.Reset();
+		this.m_tmrFlicker.SetActive(true);
+		this.m_uiFlickerCount = 0;
 	}
 	
 	//Called for recieving the model data for this entity. This is only used for

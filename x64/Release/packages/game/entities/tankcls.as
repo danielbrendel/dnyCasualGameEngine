@@ -231,13 +231,6 @@ class CTankEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (ref.GetName() == "weapon_laser") {
-			this.OnDamage(10);
-			
-			this.m_tmrFlicker.Reset();
-			this.m_tmrFlicker.SetActive(true);
-			this.m_uiFlickerCount = 0;
-		}
 	}
 	
 	//Called when entity gets damaged
@@ -248,6 +241,10 @@ class CTankEntity : IScriptedEntity
 		} else {
 			this.m_uiHealth -= damageValue;
 		}
+		
+		this.m_tmrFlicker.Reset();
+		this.m_tmrFlicker.SetActive(true);
+		this.m_uiFlickerCount = 0;
 		
 		if (this.m_uiHealth == 0) {
 			this.m_bRemove = true;

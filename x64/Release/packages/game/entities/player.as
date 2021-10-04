@@ -118,6 +118,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	Timer m_tmrMayDamage;
 	Timer m_tmrAttack;
 	Timer m_tmrFlicker;
+	Timer m_tmrSteps;
+	array<SoundHandle> m_arrSteps;
 	uint32 m_uiFlickerCount;
 	CPlayerAnimation@ m_animIdleHandgun;
 	CPlayerAnimation@ m_animMoveHandgun;
@@ -163,6 +165,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		@this.m_animIdleShotgun = CPlayerAnimation("gfx\\player\\shotgun\\idle\\survivor-idle_shotgun_", 20, Vector(64, 64));
 		@this.m_animMoveShotgun = CPlayerAnimation("gfx\\player\\shotgun\\move\\survivor-move_shotgun_", 20, Vector(64, 64));
 		@this.m_animShootShotgun = CPlayerAnimation("gfx\\player\\shotgun\\shoot\\survivor-shoot_shotgun_", 3, Vector(64, 64));
+		for (int i = 1; i < 9; i++) {
+			this.m_arrSteps.insertLast(S_QuerySound(GetPackagePath() + "sound\\steps\\stepdirt_" + formatInt(i) + ".wav"));
+		}
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
 		this.m_tmrMayDamage.SetActive(true);
@@ -172,6 +177,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrFlicker.SetDelay(250);
 		this.m_tmrFlicker.Reset();
 		this.m_tmrFlicker.SetActive(false);
+		this.m_tmrSteps.SetDelay(500);
+		this.m_tmrSteps.Reset();
+		this.m_tmrSteps.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -191,6 +199,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		this.m_bMoving = false;
 		this.m_bShooting = false;
+
+		//Handle button flags
 
 		if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
 			Ent_Move(this, 10, MOVE_FORWARD);
@@ -218,6 +228,18 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		if ((this.m_uiButtons & BTN_TURNRIGHT) == BTN_TURNRIGHT) {
 			this.m_fRotation -= 0.05f;
+		}
+		
+		//Activate or deactivate step sound timer depending on movement status
+		if (this.m_bMoving) {
+			if (!this.m_tmrSteps.IsActive()) {
+				this.m_tmrSteps.Reset();
+				this.m_tmrSteps.SetActive(true);
+			}
+		} else {
+			if (this.m_tmrSteps.IsActive()) {
+				this.m_tmrSteps.SetActive(false);
+			}
 		}
 		
 		HUD_UpdateHealth(this.m_uiHealth);
@@ -317,6 +339,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 					this.m_tmrFlicker.SetActive(false);
 					this.m_uiFlickerCount = 0;
 				}
+			}
+		}
+		
+		//Process step sound handling
+		if (this.m_tmrSteps.IsActive()) {
+			this.m_tmrSteps.Update();
+			if (this.m_tmrSteps.IsElapsed()) {
+				this.m_tmrSteps.Reset();
+				
+				S_PlaySound(this.m_arrSteps[Util_Random(1, 8)], S_GetCurrentVolume());
 			}
 		}
 		

@@ -13,64 +13,61 @@
 
 #include "../../.common/entities/explosion.as"
 
-const uint32 GUN_SHOT_DAMAGE = 10;
+const uint32 BOLT_SHOT_DAMAGE = 30;
 
-/* Gun entity  */
-class CGunEntity : IScriptedEntity
+/* Bolt entity  */
+class CBoltEntity : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
-	SpriteHandle m_hShot;
+	Timer m_oFrameTime;
+	SpriteHandle m_hSprite;
+	int m_iFrameCounter;
 	float m_fRotation;
-	float m_fSpeed;
-	bool m_bRemove;
-	Timer m_tmrAlive;
-	IScriptedEntity@ m_pOwner;
-	bool m_bExplode;
+	float m_fRange;
+	IScriptedEntity@ m_pTarget;
 	
-	CGunEntity()
+	CBoltEntity()
     {
-		this.m_vecSize = Vector(5, 5);
-		this.m_fSpeed = 35.0;
-		this.m_bRemove = false;
-		@this.m_pOwner = null;
-		this.m_bExplode = false;
+		this.m_iFrameCounter = 0;
+		this.m_fRotation = 0.0;
+		this.m_vecSize = Vector(32, 256);
+		@m_pTarget = null;
     }
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hShot = R_LoadSprite(GetPackagePath() + "gfx\\gunshot.png", 1, 3, 12, 1, true);
-		this.m_tmrAlive.SetDelay(10000);
-		this.m_tmrAlive.Reset();
-		this.m_tmrAlive.SetActive(true);
-		BoundingBox bbox;
-		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(0, 0), Vector(5, 5));
+		Vector vTargetPos = this.m_pTarget.GetPosition();
+		Vector vTargetCenter = this.m_pTarget.GetModel().GetCenter();
+		Vector vAbsTargetPos = Vector(vTargetPos[0] + vTargetCenter[0], vTargetPos[1] + vTargetCenter[1]);
+		this.m_fRange = float(Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 5).Distance(vAbsTargetPos)) / 300;
+		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\lightning.png", 8, 32, 256, 8, false);
+		this.m_oFrameTime.SetDelay(10);
+		this.m_oFrameTime.Reset();
+		this.m_oFrameTime.SetActive(true);
 		this.m_oModel.Alloc();
-		this.m_oModel.SetCenter(Vector(5 / 2, 5 / 2));
-		this.m_oModel.Initialize2(bbox, this.m_hShot);
 	}
 	
 	//Called when the entity gets released
 	void OnRelease()
 	{
-		if (this.m_bExplode) {
-			CExplosionEntity @expl = CExplosionEntity();
-			Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
-		}
 	}
 	
 	//Process entity stuff
 	void OnProcess()
 	{
-		Ent_Move(this, this.m_fSpeed, MOVE_FORWARD);
-		
-		this.m_tmrAlive.Update();
-		if (this.m_tmrAlive.IsElapsed()) {
-			this.m_bRemove = true;
+		this.m_oFrameTime.Update();
+		if (this.m_oFrameTime.IsElapsed()) {
+			this.m_oFrameTime.Reset();
+			this.m_iFrameCounter++;
+			if (this.m_iFrameCounter >= 8) {
+				this.m_oFrameTime.SetActive(false);
+				
+				this.m_pTarget.OnDamage(BOLT_SHOT_DAMAGE);
+			}
 		}
 	}
 	
@@ -88,49 +85,29 @@ class CGunEntity : IScriptedEntity
 		Vector vOut;
 		R_GetDrawingPosition(this.m_vecPos, this.m_vecSize, vOut);
 		
-		R_DrawSprite(this.m_hShot, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		R_DrawSprite(this.m_hSprite, vOut, this.m_iFrameCounter, this.m_fRotation, Vector(16, 0), 0.75, this.m_fRange, false, Color(0, 0, 0, 0));
 	}
 	
 	//Called for wall collisions
 	void OnWallCollided()
 	{
-		this.m_bRemove = true;
 	}
 	
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{
-		return this.m_bRemove;
+		return this.m_iFrameCounter >= 8;
 	}
 	
 	//Indicate whether this entity is collidable
 	bool IsCollidable()
 	{
-		return true;
+		return false;
 	}
 	
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (@ref != @this.m_pOwner) {
-			ref.OnDamage(GUN_SHOT_DAMAGE);
-			
-			if (ref.NeedsRemoval()) {
-				if (@this.m_pOwner == @Ent_GetPlayerEntity()) {
-					IPlayerEntity@ casted = cast<IPlayerEntity>(this.m_pOwner);
-					
-					if (ref.GetName() == "headcrab") {
-						casted.AddPlayerScore(1);
-					} else if (ref.GetName() == "tank") {
-						casted.AddPlayerScore(10);
-					} else {
-						casted.AddPlayerScore(1);
-					}
-				}
-			}
-			
-			this.m_bRemove = true;
-		}
 	}
 	
 	//Called when entity gets damaged
@@ -172,7 +149,7 @@ class CGunEntity : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "weapon_gun";
+		return "weapon_bolt";
 	}
 	
 	//This vector is used for drawing the selection box
@@ -187,15 +164,9 @@ class CGunEntity : IScriptedEntity
 		return "";
 	}
 	
-	//Set owner
-	void SetOwner(IScriptedEntity@ pOwner)
+	//Set target entity
+	void SetTarget(IScriptedEntity@ pEntity)
 	{
-		@this.m_pOwner = @pOwner;
-	}
-	
-	//Set explosion flag
-	void SetExplosionFlag(bool value)
-	{
-		this.m_bExplode = value;
+		@this.m_pTarget = pEntity;
 	}
 }

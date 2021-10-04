@@ -184,6 +184,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
 		this.m_oModel.Alloc();
+		this.m_oModel.SetCenter(Vector(32, 32));
 		this.m_oModel.Initialize2(bbox, this.m_hSprite);
 	}
 	

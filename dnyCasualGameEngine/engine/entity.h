@@ -1044,12 +1044,14 @@ namespace Entity {
 		CTimer m_tmrFrameChange;
 		std::wstring m_wszGoal;
 		bool m_bGoalReached;
+		bool m_bActivated;
 	public:
 		CGoalEntity()
 		{
 			//Initialize entity
 
 			this->m_bGoalReached = false;
+			this->m_bActivated = true;
 			this->m_vecSize = Vector(128, 128);
 			this->m_iCurrentFrame = 0;
 
@@ -1089,6 +1091,13 @@ namespace Entity {
 			this->m_wszGoal = wszGoal;
 		}
 
+		void SetActivationStatus(bool value)
+		{
+			//Set activation status
+
+			this->m_bActivated = value;
+		}
+
 		//Indicate if goal reached
 		bool IsGoalReached(void) const { return this->m_bGoalReached; }
 
@@ -1099,6 +1108,9 @@ namespace Entity {
 		void Process(void)
 		{
 			//Process entity
+
+			if (!this->m_bActivated)
+				return;
 
 			this->m_tmrFrameChange.Update();
 			if (this->m_tmrFrameChange.Elapsed()) {

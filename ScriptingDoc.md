@@ -338,6 +338,8 @@ bool Ent_IsValid(IScriptedEntity@ pEntity)
 size_t Ent_GetId(IScriptedEntity@ pEntity)
 //Move the specified entity in the required direction with the given speed
 void Ent_Move(IScriptedEntity@ pThis, float fSpeed, MovementDir dir)
+//Set activation status of the goal entity
+void Ent_SetGoalActivationStatus(bool bStatus)
 //List all sprites of a directory relative to the directory of the package.
 bool Util_ListSprites(const string& in, FuncFileListing @cb)
 //List all sounds of a directory relative to the directory of the package

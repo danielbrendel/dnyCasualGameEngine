@@ -295,6 +295,14 @@ namespace Entity {
 			}
 		}
 
+		void SetGoalActivationStatus(bool bStatus)
+		{
+			CGoalEntity* pGoalEntity = Game::pGame->GetGoalEntity();
+			if (pGoalEntity) {
+				Game::pGame->GetGoalEntity()->SetActivationStatus(bStatus);
+			}
+		}
+
 		size_t GetEntityCount()
 		{
 			return oScriptedEntMgr.GetEntityCount();
@@ -665,6 +673,9 @@ namespace Entity {
 	{
 		//Draw entity sprite
 
+		if (!this->m_bActivated)
+			return;
+
 		//Check if is inside screen
 		if (!APIFuncs::ShouldDraw(this->m_vecPosition, this->m_vecSize))
 			return;
@@ -950,6 +961,7 @@ namespace Entity {
 			{ "bool Ent_IsValid(IScriptedEntity@ pEntity)", &APIFuncs::Ent_IsValid },
 			{ "size_t Ent_GetId(IScriptedEntity@ pEntity)", &APIFuncs::Ent_GetId },
 			{ "void Ent_Move(IScriptedEntity@ pThis, float fSpeed, MovementDir dir)", &APIFuncs::Ent_Move },
+			{ "void Ent_SetGoalActivationStatus(bool bStatus)", &APIFuncs::SetGoalActivationStatus },
 			{ "bool Util_ListSprites(const string& in, FuncFileListing @cb)", &APIFuncs::ListSprites },
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
 			{ "int Util_Random(int start, int end)", &APIFuncs::Random },

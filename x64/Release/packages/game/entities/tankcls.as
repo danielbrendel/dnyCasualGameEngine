@@ -12,7 +12,7 @@
 */
 
 #include "weapon_gun.as"
-#include "../../.common/entities/explosion.as"
+#include "explosion.as"
 
 /* Tank entity */
 class CTankEntity : IScriptedEntity

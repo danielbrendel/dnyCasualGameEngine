@@ -53,11 +53,11 @@ class CExplosionEntity : IScriptedEntity
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hSprite = R_LoadSprite(GetCommonPath() + "gfx\\explosion.png", 6, this.m_vecSize[0], this.m_vecSize[1], 6, false);
+		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\explosion.png", 6, this.m_vecSize[0], this.m_vecSize[1], 6, false);
 		this.m_oExplosion.SetDelay(100);
 		this.m_oExplosion.Reset();
 		this.m_oExplosion.SetActive(true);
-		this.m_hSound = S_QuerySound(GetCommonPath() + "sound\\explosion.wav");
+		this.m_hSound = S_QuerySound(GetPackagePath() + "sound\\explosion.wav");
 		S_PlaySound(this.m_hSound, 10);
 		CDecalEntity @dcl = CDecalEntity();
 		Ent_SpawnEntity("decal", @dcl, this.m_vecPos);

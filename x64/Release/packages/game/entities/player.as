@@ -16,7 +16,7 @@ string g_szPackagePath = "";
 #include "weapon_laser.as"
 #include "weapon_gun.as"
 #include "weapon_grenade.as"
-#include "../../.common/entities/explosion.as"
+#include "explosion.as"
 #include "tankcls.as"
 
 /* Player animation manager */

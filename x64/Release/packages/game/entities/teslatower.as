@@ -12,7 +12,7 @@
 */
 
 #include "weapon_bolt.as"
-#include "../../.common/entities/explosion.as"
+#include "explosion.as"
 
 /* Tesla tower entity */
 class CTeslaTower : IScriptedEntity

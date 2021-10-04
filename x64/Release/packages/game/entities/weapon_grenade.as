@@ -11,7 +11,7 @@
 	Released under the MIT license
 */
 
-#include "../../.common/entities/explosion.as"
+#include "explosion.as"
 
 /* Grenade entity */
 const uint C_GRENADE_DAMAGE = 64;

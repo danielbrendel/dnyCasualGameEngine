@@ -11,7 +11,7 @@
 	Released under the MIT license
 */
 
-#include "../../.common/entities/explosion.as"
+#include "explosion.as"
 
 const uint32 LASER_SHOT_DAMAGE = 20;
 

@@ -29,7 +29,7 @@ class CDecalEntity : IScriptedEntity
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hSprite = R_LoadSprite(GetCommonPath() + "gfx\\decal.png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, false);
+		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\decal.png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, false);
 		this.m_oLifeTime.SetDelay(120000);
 		this.m_oLifeTime.Reset();
 		this.m_oLifeTime.SetActive(true);

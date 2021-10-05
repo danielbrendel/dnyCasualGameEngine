@@ -120,6 +120,7 @@ namespace Game {
 		LONGLONG m_ilCurCount;
 		int m_iFrameRate;
 		int m_iFrames;
+		size_t m_uiSkipFrame;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -636,6 +637,7 @@ namespace Game {
 			this->m_bInGameLoadingProgress = true;
 			this->m_wszCurrentLoadingPackage = wszPackage;
 			this->m_wszCurrentLoadingFromPath = wszFromPath;
+			this->m_uiSkipFrame = 0;
 		}
 
 		void InitRestartGame(void)

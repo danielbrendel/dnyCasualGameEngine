@@ -13,6 +13,50 @@
 */
 
 namespace Menu {
+	std::vector<palette_s> vMenuPaletteItems;
+
+	void LoadPalette(void)
+	{
+		//Load palette from disk
+
+		std::wifstream hFile;
+		hFile.open(wszBasePath + L"palette.txt");
+		if (hFile.is_open()) {
+			wchar_t wszInputBuffer[2048] = { 0 };
+
+			while (!hFile.eof()) {
+				hFile.getline(wszInputBuffer, sizeof(wszInputBuffer), '\n');
+
+				if ((wszInputBuffer[0] == '#') || (wcslen(wszInputBuffer) == 0)) {
+					continue;
+				}
+
+				std::vector<std::wstring> vSplitData = Utils::SplitW(wszInputBuffer, L" ");
+				if (vSplitData.size() == 5) {
+					palette_s sData;
+					sData.wszItem = vSplitData[0];
+					sData.sColor = Entity::Color(_wtoi(vSplitData[1].c_str()), _wtoi(vSplitData[2].c_str()), _wtoi(vSplitData[3].c_str()), _wtoi(vSplitData[4].c_str()));
+					vMenuPaletteItems.push_back(sData);
+				}
+			}
+
+			hFile.close();
+		}
+	}
+
+	Entity::Color GetPaletteItem(const std::wstring& wszItem, Entity::Color colDefault)
+	{
+		//Get palette color data
+
+		for (size_t i = 0; i < vMenuPaletteItems.size(); i++) {
+			if (vMenuPaletteItems[i].wszItem == wszItem) {
+				return vMenuPaletteItems[i].sColor;
+			}
+		}
+
+		return colDefault;
+	}
+
 	void CPlayMenu::OnButtonClick(class CButton* pButton)
 	{
 		if (pButton == &this->m_oPlay) {

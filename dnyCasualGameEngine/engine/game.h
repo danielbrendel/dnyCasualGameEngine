@@ -503,6 +503,9 @@ namespace Game {
 				this->Release();
 				return false;
 			}
+
+			//Load color palette
+			Menu::LoadPalette();
 			
 			//Initialize menu
 			if (!this->m_oMenu.Initialize(pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue, &this->m_bGameStarted)) {

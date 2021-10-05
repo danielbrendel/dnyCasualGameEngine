@@ -348,6 +348,8 @@ bool Util_ListSprites(const string& in, FuncFileListing @cb)
 bool Util_ListSounds(const string& in, FuncFileListing @cb)
 //Return a random number between the given values
 int Util_Random(int start, int end)
+//Replace a token inside a string with a new token
+string Util_StrReplace(const string& in szSource, const string &in szTarget, const string &in szNew)
 //Create a property token with ident and value
 string Props_CreateProperty(const string &in ident, const string &in value)
 //Extract a value by ident from a property string

@@ -421,6 +421,11 @@ namespace Entity {
 			return (rand() % (end - start)) + start;
 		}
 
+		std::string StrReplace(const std::string& szString, const std::string& szFind, const std::string& szNew)
+		{
+			return Utils::ReplaceString(szString, szFind, szNew);
+		}
+
 		std::string GetPackageName(void)
 		{
 			return Utils::ConvertToAnsiString(Game::pGame->GetPackageName());
@@ -973,6 +978,7 @@ namespace Entity {
 			{ "bool Util_ListSprites(const string& in, FuncFileListing @cb)", &APIFuncs::ListSprites },
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
 			{ "int Util_Random(int start, int end)", &APIFuncs::Random },
+			{ "string Util_StrReplace(const string& in szSource, const string &in szTarget, const string &in szNew)", &APIFuncs::StrReplace },
 			{ "string Props_CreateProperty(const string &in ident, const string &in value)", &APIFuncs::CreateProperty },
 			{ "string Props_ExtractValue(const string &in properties, const string &in ident)", &APIFuncs::ExtractValueFromProperties },
 			{ "void Steam_SetAchievement(const string &in szName)", &APIFuncs::SetSteamAchievement },

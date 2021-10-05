@@ -435,7 +435,7 @@ namespace Game {
 	{
 		//Handler for unknown expressions
 
-		if (pConsole) {
+		if ((pConsole) && (szCmdName.length())) {
 			pConsole->AddLine(L"Unknown command: \"" + szCmdName + L"\"");
 		}
 	}

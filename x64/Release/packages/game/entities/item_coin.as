@@ -164,14 +164,14 @@ class CCoinItem : IScriptedEntity
 	//Return save game properties
 	string GetSaveGameProperties()
 	{
-		return Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
-			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
-			Sav_CreateProperty("rot", formatFloat(this.GetRotation()));
+		return Props_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+			Props_CreateProperty("y", formatInt(this.m_vecPos[1])) +
+			Props_CreateProperty("rot", formatFloat(this.GetRotation()));
 	}
 }
 
 //Create coin entity
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 {
 	CCoinItem @coin = CCoinItem();
 	Ent_SpawnEntity(szIdent, @coin, vecPos);

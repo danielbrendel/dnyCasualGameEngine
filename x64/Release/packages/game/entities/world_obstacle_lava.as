@@ -14,7 +14,7 @@
 #include "world_obstacle.as"
 
 //Create obstacle entity
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 {
 	CWorldObstacle @obstacle = CWorldObstacle();
 	obstacle.SetTexture("lava.png");

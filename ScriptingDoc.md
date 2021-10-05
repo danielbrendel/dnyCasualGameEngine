@@ -258,7 +258,7 @@ void AddAmmo(const string &in ident, uint amount)
 ## Script callbacks
 ```angelscript
 //Used to spawn the entity from within a map definition file. The entity needs to get spawned there via Ent_SpawnEntity
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 //Used to restore a game state. This is used in the context of loading a saved game
 void RestoreState(const string &in szIdent, const string &in szValue)
 //Used to save the current game state to disk
@@ -346,10 +346,10 @@ bool Util_ListSprites(const string& in, FuncFileListing @cb)
 bool Util_ListSounds(const string& in, FuncFileListing @cb)
 //Return a random number between the given values
 int Util_Random(int start, int end)
-//Create a save game property with ident and value
-string Sav_CreateProperty(const string &in ident, const string &in value)
-//Extract a value by ident from a save game property string
-string Sav_GetValueFromProperties(const string &in properties, const string &in ident)
+//Create a property token with ident and value
+string Props_CreateProperty(const string &in ident, const string &in value)
+//Extract a value by ident from a property string
+string Props_ExtractValue(const string &in properties, const string &in ident)
 //Unlock an achievement
 void Steam_SetAchievement(const string &in szName)
 //Set stat value (int)

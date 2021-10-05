@@ -664,12 +664,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Return save game properties
 	string GetSaveGameProperties()
 	{	
-		return Sav_CreateProperty("id", formatInt(Ent_GetId(@this))) + 
-			Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
-			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
-			Sav_CreateProperty("rot", formatFloat(this.m_fRotation)) +
-			Sav_CreateProperty("health", formatInt(this.m_uiHealth)) +
-			Sav_CreateProperty("score", formatInt(this.m_iScore));
+		return Props_CreateProperty("id", formatInt(Ent_GetId(@this))) + 
+			Props_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+			Props_CreateProperty("y", formatInt(this.m_vecPos[1])) +
+			Props_CreateProperty("rot", formatFloat(this.m_fRotation)) +
+			Props_CreateProperty("health", formatInt(this.m_uiHealth)) +
+			Props_CreateProperty("score", formatInt(this.m_iScore));
 	}
 	
 	//Add to player score
@@ -705,7 +705,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 }
 
 //Create the associated entity here
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 {
 	g_szPackagePath = szPath;
 	
@@ -733,18 +733,18 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 //Restore game state
 void RestoreState(const string &in szIdent, const string &in szValue)
 {
-	string id = Sav_GetValueFromProperties(szValue, "id");
+	string id = Props_ExtractValue(szValue, "id");
 	if (id != "") {
 		IScriptedEntity@ ent = Ent_GetEntityHandle(parseInt(id));
 		if (@ent != null) {
-			int x = parseInt(Sav_GetValueFromProperties(szValue, "x"));
-			int y = parseInt(Sav_GetValueFromProperties(szValue, "y"));
-			float rot = parseFloat(Sav_GetValueFromProperties(szValue, "rot"));
+			int x = parseInt(Props_ExtractValue(szValue, "x"));
+			int y = parseInt(Props_ExtractValue(szValue, "y"));
+			float rot = parseFloat(Props_ExtractValue(szValue, "rot"));
 			
 			ent.SetPosition(Vector(x, y));
 			ent.SetRotation(rot);
 			
-			string health = Sav_GetValueFromProperties(szValue, "health");
+			string health = Props_ExtractValue(szValue, "health");
 			if (health != "") {
 				if (ent.GetName() == "player") {
 					CPlayerEntity@ casted = cast<CPlayerEntity>(ent);
@@ -755,7 +755,7 @@ void RestoreState(const string &in szIdent, const string &in szValue)
 				}
 			}
 			
-			string score = Sav_GetValueFromProperties(szValue, "score");
+			string score = Props_ExtractValue(szValue, "score");
 			if (score != "") {
 				if (ent.GetName() == "player") {
 					CPlayerEntity@ casted = cast<CPlayerEntity>(ent);
@@ -764,9 +764,9 @@ void RestoreState(const string &in szIdent, const string &in szValue)
 			}
 		}
 	} else {
-		int x = parseInt(Sav_GetValueFromProperties(szValue, "x"));
-		int y = parseInt(Sav_GetValueFromProperties(szValue, "y"));
-		float rot = parseFloat(Sav_GetValueFromProperties(szValue, "rot"));
+		int x = parseInt(Props_ExtractValue(szValue, "x"));
+		int y = parseInt(Props_ExtractValue(szValue, "y"));
+		float rot = parseFloat(Props_ExtractValue(szValue, "rot"));
 	
 		if (szIdent == "decal") {
 			CDecalEntity @dcl = CDecalEntity();

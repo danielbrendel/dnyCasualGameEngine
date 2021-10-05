@@ -182,8 +182,8 @@ class CWorldObstacle : IScriptedEntity
 	//Return save game properties
 	string GetSaveGameProperties()
 	{
-		return Sav_CreateProperty("x", formatInt(this.m_vecPos[0])) +
-			Sav_CreateProperty("y", formatInt(this.m_vecPos[1])) +
-			Sav_CreateProperty("rot", formatFloat(this.GetRotation()));
+		return Props_CreateProperty("x", formatInt(this.m_vecPos[0])) +
+			Props_CreateProperty("y", formatInt(this.m_vecPos[1])) +
+			Props_CreateProperty("rot", formatFloat(this.GetRotation()));
 	}
 }

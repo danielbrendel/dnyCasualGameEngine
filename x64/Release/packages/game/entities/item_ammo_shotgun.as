@@ -31,7 +31,7 @@ class CItemAmmoShotgun : CItemAmmoBase
 }
 
 //Create ammo entity
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 {
 	CItemAmmoShotgun @ammo = CItemAmmoShotgun();
 	Ent_SpawnEntity(szIdent, @ammo, vecPos);

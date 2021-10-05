@@ -566,8 +566,9 @@ namespace Game {
 		int x = _wtoi(pConfigMgr->ExpressionItemValue(2).c_str());
 		int y = _wtoi(pConfigMgr->ExpressionItemValue(3).c_str());
 		float rot = (float)_wtof(pConfigMgr->ExpressionItemValue(4).c_str());
+		std::wstring wszProps = pConfigMgr->ExpressionItemValue(5);
 
-		pGame->SpawnEntity(wszEntityName, x, y, rot);
+		pGame->SpawnEntity(wszEntityName, x, y, rot, wszProps);
 	}
 
 	void Cmd_EnvGoal(void)

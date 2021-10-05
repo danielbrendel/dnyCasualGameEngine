@@ -441,12 +441,12 @@ namespace Entity {
 			return Game::pGame->GetKeyBinding(Utils::ConvertToWideString(szIdent));
 		}
 
-		std::string CreateSaveGameProperty(const std::string& szIdent, const std::string& szValue)
+		std::string CreateProperty(const std::string& szIdent, const std::string& szValue)
 		{
 			return szIdent + ":" + szValue + ";";
 		}
 
-		std::string GetSaveGameValueFromProperties(const std::string& szProperties, const std::string& szIdent)
+		std::string ExtractValueFromProperties(const std::string& szProperties, const std::string& szIdent)
 		{
 			//Extract value from property string by ident
 
@@ -967,8 +967,8 @@ namespace Entity {
 			{ "bool Util_ListSprites(const string& in, FuncFileListing @cb)", &APIFuncs::ListSprites },
 			{ "bool Util_ListSounds(const string& in, FuncFileListing @cb)", &APIFuncs::ListSounds },
 			{ "int Util_Random(int start, int end)", &APIFuncs::Random },
-			{ "string Sav_CreateProperty(const string &in ident, const string &in value)", &APIFuncs::CreateSaveGameProperty },
-			{ "string Sav_GetValueFromProperties(const string &in properties, const string &in ident)", &APIFuncs::GetSaveGameValueFromProperties },
+			{ "string Props_CreateProperty(const string &in ident, const string &in value)", &APIFuncs::CreateProperty },
+			{ "string Props_ExtractValue(const string &in properties, const string &in ident)", &APIFuncs::ExtractValueFromProperties },
 			{ "void Steam_SetAchievement(const string &in szName)", &APIFuncs::SetSteamAchievement },
 			{ "void Steam_SetStat(const string &in szName, int iValue)", &APIFuncs::SetSteamStatInt },
 			{ "void Steam_SetStat(const string &in szName, float fValue)", &APIFuncs::SetSteamStatFloat },

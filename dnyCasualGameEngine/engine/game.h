@@ -186,7 +186,7 @@ namespace Game {
 			return this->m_bGameStarted;
 		}
 
-		bool SpawnEntity(const std::wstring& wszName, int x, int y, float rot)
+		bool SpawnEntity(const std::wstring& wszName, int x, int y, float rot, const std::wstring& wszProps = L"")
 		{
 			//Spawn entity into world
 
@@ -226,12 +226,14 @@ namespace Game {
 			Entity::Vector vecPos(x, y);
 			std::string szIdent = Utils::ConvertToAnsiString(wszName);
 			std::string szPath = Utils::ConvertToAnsiString(this->m_sPackage.wszPakPath + L"\\");
+			std::string szProps = Utils::ConvertToAnsiString(wszProps);
 
 			BEGIN_PARAMS(vArgs);
 			PUSH_OBJECT(&vecPos);
 			PUSH_FLOAT(rot);
 			PUSH_OBJECT(&szIdent);
 			PUSH_OBJECT(&szPath);
+			PUSH_OBJECT(&szProps);
 			
 			bool bResult = pScriptingInt->CallScriptFunction(hScript, true, "CreateEntity", &vArgs, nullptr, Scripting::FA_VOID);
 

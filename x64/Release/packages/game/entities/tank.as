@@ -14,7 +14,7 @@
 #include "tankcls.as"
 
 //Create tank entity
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath)
+void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 {
 	CTankEntity @tank = CTankEntity();
 	Ent_SpawnEntity(szIdent, @tank, vecPos);

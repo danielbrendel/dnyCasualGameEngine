@@ -13,6 +13,8 @@
 
 #pragma warning(disable : 4996)
 
+#define GAMESPEED 1
+
 #include "renderer.h"
 #include "sound.h"
 #include "window.h"
@@ -115,6 +117,7 @@ namespace Game {
 		Entity::CHudInfoMessages m_oHudInfoMessages;
 		Entity::CHud* m_pHud;
 		bool m_bInAppRestart;
+		Entity::CTimer m_oGameSpeed;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -180,6 +183,10 @@ namespace Game {
 			}
 
 			pRenderer->SetBackgroundPicture(wszBackgroundFile);
+
+			this->m_oGameSpeed.SetDelay(GAMESPEED);
+			this->m_oGameSpeed.Reset();
+			this->m_oGameSpeed.SetActive(true);
 
 			this->m_bGameStarted = true;
 

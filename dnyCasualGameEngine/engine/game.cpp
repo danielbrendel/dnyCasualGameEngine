@@ -110,8 +110,13 @@ namespace Game {
 			}
 
 			if ((this->m_bGameStarted) && (!this->m_bGamePause)) {
-				//Process scripted entities
-				Entity::oScriptedEntMgr.Process();
+				this->m_oGameSpeed.Update(); //Update gamespeed timer
+				if (this->m_oGameSpeed.Elapsed()) {
+					//Process scripted entities
+					Entity::oScriptedEntMgr.Process();
+
+					this->m_oGameSpeed.Reset();
+				}
 
 				//Process goal entity
 				if (this->m_pGoalEntity) {

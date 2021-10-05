@@ -111,6 +111,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
+	Vector m_vecCursorPos;
 	Model m_oModel;
 	float m_fRotation;
 	uint32 m_uiButtons;
@@ -136,6 +137,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	SpriteHandle m_hSprite;
 	bool m_bMayThrow;
 	int m_iScore;
+	SpriteHandle m_hCrosshair;
+	Vector m_vecCrosshair;
 	
 	CPlayerEntity()
     {
@@ -148,7 +151,21 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_iCurrentWeapon = WEAPON_HANDGUN;
 		this.m_bMayThrow = true;
 		this.m_iScore = 0;
+		this.m_vecCrosshair = Vector(32, 32);
     }
+	
+	//Aim at screen view position
+	void AimAtScreenPoint(const Vector &in vecPos)
+	{
+		Vector vecScreenPos = Vector(Wnd_GetWindowCenterX(), Wnd_GetWindowCenterY());
+		vecScreenPos[0] = vecPos[0] - vecScreenPos[0];
+		vecScreenPos[1] = vecPos[1] - vecScreenPos[1];
+		
+		Vector vecWorldPos = Vector(this.m_vecPos[0] + vecScreenPos[0], this.m_vecPos[1] + vecScreenPos[1]);
+	
+		float flAngle = atan2(float(vecWorldPos[1] - this.m_vecPos[1]), float(vecWorldPos[0] - this.m_vecPos[0]));
+		this.SetRotation(flAngle + 6.30 / 1.36);
+	}
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
@@ -168,6 +185,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		for (int i = 1; i < 9; i++) {
 			this.m_arrSteps.insertLast(S_QuerySound(GetPackagePath() + "sound\\steps\\stepdirt_" + formatInt(i) + ".wav"));
 		}
+		this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
 		this.m_tmrMayDamage.SetActive(true);
@@ -449,6 +467,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animIdleShotgun.Draw();
 			}
 		}
+		
+		R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -654,11 +674,27 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for mouse presses
 	void OnMousePress(int key, bool bDown)
 	{
+		if (key == 1) {
+			if (bDown) {
+				if (!((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK)) {
+					this.m_uiButtons |= BTN_ATTACK;
+				}
+			} else {
+				if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
+					this.m_uiButtons &= ~BTN_ATTACK;
+				}
+			}
+		}
 	}
 	
 	//Called for getting current cursor position
 	void OnUpdateCursor(const Vector &in pos)
 	{
+		//Store cursor pos
+		this.m_vecCursorPos = pos;
+		
+		//Aim at cursor position
+		this.AimAtScreenPoint(this.m_vecCursorPos);
 	}
 	
 	//Return save game properties

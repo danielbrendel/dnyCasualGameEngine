@@ -310,6 +310,11 @@ namespace Entity {
 			return oScriptedEntMgr.GetEntityCount();
 		}
 
+		size_t GetEntityNameCount(const std::string& szName)
+		{
+			return oScriptedEntMgr.GetEntityNameCount(szName);
+		}
+
 		asIScriptObject* GetEntityHandle(size_t uiEntityId)
 		{
 			return oScriptedEntMgr.GetEntityHandle(uiEntityId);
@@ -957,6 +962,7 @@ namespace Entity {
 			{ "int Wnd_GetWindowCenterY()", &APIFuncs::GetWindowCenterY },
 			{ "bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in, bool bSpawn = true)", &APIFuncs::SpawnScriptedEntity },
 			{ "size_t Ent_GetEntityCount()", &APIFuncs::GetEntityCount },
+			{ "size_t Ent_GetEntityNameCount(const string &in szName)", &APIFuncs::GetEntityNameCount },
 			{ "IScriptedEntity@+ Ent_GetEntityHandle(size_t uiEntityId)", &APIFuncs::GetEntityHandle },
 			{ "IScriptedEntity@+ Ent_GetPlayerEntity()", &APIFuncs::GetPlayerEntity },
 			{ "IScriptedEntity@+ Ent_TraceLine(const Vector&in vStart, const Vector&in vEnd, IScriptedEntity@+ pIgnoredEnt)", &APIFuncs::EntityTrace },

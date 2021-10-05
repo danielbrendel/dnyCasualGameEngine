@@ -820,6 +820,18 @@ namespace Entity {
 
 		//Entity querying
 		size_t GetEntityCount() { return this->m_vEnts.size(); }
+		size_t GetEntityNameCount(const std::string& szName)
+		{
+			size_t uiResult = 0;
+
+			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
+				if (this->m_vEnts[i]->GetName() == szName) {
+					uiResult++;
+				}
+			}
+
+			return uiResult;
+		}
 		CScriptedEntity* GetEntity(size_t uiEntityId)
 		{
 			if (uiEntityId >= this->m_vEnts.size())

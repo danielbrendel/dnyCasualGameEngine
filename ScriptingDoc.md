@@ -325,6 +325,8 @@ int Wnd_GetWindowCenterY()
 bool Ent_SpawnEntity(const string &in, IScriptedEntity @obj, const Vector& in, bool bSpawn = true)
 //Get the amount of all existing entities.
 size_t Ent_GetEntityCount()
+//Get the amount of existing entities with the given name
+size_t Ent_GetEntityNameCount(const string &in szName)
 //Get a handle to a given entity using it's ID.
 IScriptedEntity@+ Ent_GetEntityHandle(size_t uiEntityId)
 //Get a handle to the player entity

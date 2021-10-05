@@ -1,7 +1,7 @@
 /*
-	Casual Game Engine Common
+	Casual Game Engine: Casual Pixel Warrior
 	
-	Common package which can be used by games and mods
+	A sample and test game for Casual Game Engine
 	
 	(C) 2021 by Daniel Brendel
 

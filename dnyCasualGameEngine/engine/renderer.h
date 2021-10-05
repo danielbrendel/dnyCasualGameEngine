@@ -104,6 +104,19 @@ namespace DxRenderer {
 
 			return GFX_INVALID_LIST_ID;
 		}
+
+		HD3DSPRITE FindSprite(const std::wstring& wszTexture, int iFrameCount, int iFrameWidth, int iFrameHeight, int iFramesPerLine)
+		{
+			//Find existing sprite
+
+			for (size_t i = 0; i < this->m_vSprites.size(); i++) {
+				if ((this->m_vSprites[i].wszFile == wszTexture) && (this->m_vSprites[i].iFrameCount == iFrameCount) && (this->m_vSprites[i].iFrameWidth == iFrameWidth) && (this->m_vSprites[i].iFrameHeight == iFrameHeight) && (this->m_vSprites[i].iFramesPerLine == iFramesPerLine)) {
+					return this->m_vSprites[i].pTexture;
+				}
+			}
+
+			return GFX_INVALID_SPRITE_ID;
+		}
 	public:
 		CDxRenderer() : m_hWnd(0), m_iWidth(0), m_iHeight(0), m_pInterface(nullptr), m_pDevice(nullptr), m_pBackBuffer(nullptr), m_pImageSurface(nullptr), m_pSpriteMgr(nullptr) {}
 		CDxRenderer(HWND hWnd, bool bWindowed, int iWidth, int iHeight, BYTE r, BYTE g, BYTE b, BYTE a) : CDxRenderer() { this->Initialize(hWnd, bWindowed, iWidth, iHeight, r, g, b, a); }
@@ -364,6 +377,12 @@ namespace DxRenderer {
 
 			if (!wszTexture.length())
 				return GFX_INVALID_SPRITE_ID;
+
+			//Handle case if sprite with that texture already exists
+			HD3DSPRITE hExists = this->FindSprite(wszTexture, iFrameCount, iFrameWidth, iFrameHeight, iFramesPerLine);
+			if (hExists != GFX_INVALID_SPRITE_ID) {
+				return hExists;
+			}
 
 			d3dsprite_s sSpriteData;	
 

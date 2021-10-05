@@ -14,6 +14,7 @@
 #include "shared.h"
 #include "vars.h"
 #include "entity.h"
+#include "input.h"
 
 /* Menu component */
 namespace Menu {
@@ -1526,9 +1527,10 @@ namespace Menu {
 		{
 			//Update current key value
 
-			wchar_t wCharacter = MapVirtualKey(vKey, MAPVK_VK_TO_CHAR);
+			//wchar_t wCharacter = MapVirtualKey(vKey, MAPVK_VK_TO_CHAR);
+			std::wstring wszKeyIdent = Input::GetKeyCharFromCode(vKey);
 
-			this->m_wszVKeyName = wCharacter;
+			this->m_wszVKeyName = wszKeyIdent;
 			this->m_vKey = vKey;
 		}
 
@@ -1715,23 +1717,23 @@ namespace Menu {
 		{
 			//Restore default key bindings
 
-			this->m_oMoveForward.SetVkey(87);
-			this->m_oMoveBackward.SetVkey(83);
-			this->m_oTurnLeft.SetVkey(39);
-			this->m_oTurnRight.SetVkey(37);
-			this->m_oStrafeLeft.SetVkey(65);
-			this->m_oStrafeRight.SetVkey(68);
-			this->m_oAttack.SetVkey(32);
-			this->m_oUse.SetVkey(69);
-			this->m_oThrow.SetVkey(71);
-			this->m_oSlot1.SetVkey(49);
-			this->m_oSlot2.SetVkey(50);
-			this->m_oSlot3.SetVkey(51);
-			this->m_oSlot4.SetVkey(52);
-			this->m_oSlot5.SetVkey(53);
-			this->m_oMenu.SetVkey(27);
-			this->m_oQuickSave.SetVkey(113);
-			this->m_oConsole.SetVkey(112);
+			this->m_oMoveForward.SetVkey(17);
+			this->m_oMoveBackward.SetVkey(31);
+			this->m_oTurnLeft.SetVkey(203);
+			this->m_oTurnRight.SetVkey(205);
+			this->m_oStrafeLeft.SetVkey(31);
+			this->m_oStrafeRight.SetVkey(32);
+			this->m_oAttack.SetVkey(57);
+			this->m_oUse.SetVkey(18);
+			this->m_oThrow.SetVkey(34);
+			this->m_oSlot1.SetVkey(2);
+			this->m_oSlot2.SetVkey(3);
+			this->m_oSlot3.SetVkey(4);
+			this->m_oSlot4.SetVkey(5);
+			this->m_oSlot5.SetVkey(6);
+			this->m_oMenu.SetVkey(1);
+			this->m_oQuickSave.SetVkey(60);
+			this->m_oConsole.SetVkey(59);
 		}
 	public:
 		CSettingsKeys() {}

@@ -13,7 +13,7 @@
 
 #include "blooddecal.as"
 
-const float C_HEADCRAB_DEFAULT_SPEED = 8;
+const float C_HEADCRAB_DEFAULT_SPEED = 350;
 const int C_HEADCRAB_REACT_RANGE = 250;
 const int C_HEADGRAB_ATTACK_RANGE = 50;
 const uint C_HEADGRAB_DAMAGE_VALUE = 5;

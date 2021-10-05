@@ -25,6 +25,7 @@
 extern DxWindow::CDxWindow* pWindow;
 extern DxRenderer::CDxRenderer* pRenderer;
 extern DxSound::CDxSound* pSound;
+extern Input::CDxInput* pInput;
 extern Scripting::CScriptInt* pScriptingInt;
 extern std::wstring wszBasePath;
 extern ConfigMgr::CConfigInt* pConfigMgr;

@@ -94,6 +94,7 @@ class CPlayerAnimation {
 	}
 }
 
+const int PLAYER_SPEED = 250;
 const int BTN_FORWARD = (1 << 0);
 const int BTN_BACKWARD = (1 << 1);
 const int BTN_MOVELEFT = (1 << 2);
@@ -222,24 +223,40 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		//Handle button flags
 
 		if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
-			Ent_Move(this, 10, MOVE_FORWARD);
+			Ent_Move(this, PLAYER_SPEED, MOVE_FORWARD);
 			this.m_bMoving = true;
 		} 
 		
 		if ((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD) {
-			Ent_Move(this, 10, MOVE_BACKWARD);
+			Ent_Move(this, PLAYER_SPEED, MOVE_BACKWARD);
 			this.m_bMoving = true;
 		} 
 		
 		if ((this.m_uiButtons & BTN_MOVELEFT) == BTN_MOVELEFT) {
-			Ent_Move(this, 10, MOVE_LEFT);
+			float fSpeed;
+			
+			if ((this.m_fRotation > 4.725f) || (this.m_fRotation < 1.575f)) {
+				fSpeed = -PLAYER_SPEED;
+			} else {
+				fSpeed = PLAYER_SPEED;
+			}
+			
+			Ent_Move(this, fSpeed, MOVE_LEFT);
 			this.m_bMoving = true;
 		} 
 		
 		if ((this.m_uiButtons & BTN_MOVERIGHT) == BTN_MOVERIGHT) {
-			Ent_Move(this, 10, MOVE_RIGHT);
+			float fSpeed;
+			
+			if ((this.m_fRotation > 4.725f) || (this.m_fRotation < 1.575f)) {
+				fSpeed = -PLAYER_SPEED;
+			} else {
+				fSpeed = PLAYER_SPEED;
+			}
+			
+			Ent_Move(this, fSpeed, MOVE_RIGHT);
 			this.m_bMoving = true;
-		} 
+		}
 
 		if ((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT) {
 			this.m_fRotation += 0.05f;
@@ -270,15 +287,18 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			if (this.m_tmrAttack.IsElapsed()) {
 				this.m_tmrAttack.Reset();
 				
+				Vector vecBulletPos = this.m_vecPos;
+				vecBulletPos[0] += int(sin(this.GetRotation()) * 50);
+				vecBulletPos[1] -= int(cos(this.GetRotation()) * 50);
+				
 				if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
 					if (HUD_GetAmmoItemCurrent("handgun") > 0) {
 						CGunEntity @gun = CGunEntity();
 						
-						Vector vecGunPos = Vector(this.m_vecPos[0] + 64 / 2, this.m_vecPos[1] + 64 / 2);
 						gun.SetRotation(this.GetRotation());
 						gun.SetOwner(@this);
 						
-						Ent_SpawnEntity("weapon_gun", @gun, vecGunPos);
+						Ent_SpawnEntity("weapon_gun", @gun, vecBulletPos);
 						
 						HUD_UpdateAmmoItem("handgun", HUD_GetAmmoItemCurrent("handgun") - 1, HUD_GetAmmoItemMax("handgun"));
 						
@@ -292,7 +312,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						laser.SetRotation(this.GetRotation());
 						laser.SetOwner(@this);
 						
-						Ent_SpawnEntity("weapon_laser", @laser, this.m_vecPos);
+						Ent_SpawnEntity("weapon_laser", @laser, vecBulletPos);
 						
 						HUD_UpdateAmmoItem("laser", HUD_GetAmmoItemCurrent("laser") - 1, HUD_GetAmmoItemMax("laser"));
 						
@@ -304,7 +324,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						for (int i = 0; i < 3; i++) {
 							CGunEntity @gun = CGunEntity();
 						
-							Vector vecGunPos = Vector(this.m_vecPos[0] + 64 / 2, this.m_vecPos[1] + 64 / 2);
 							float fGunRot = this.GetRotation();
 							
 							if (i == 0) {
@@ -316,7 +335,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 							gun.SetRotation(fGunRot);
 							gun.SetOwner(@this);
 							
-							Ent_SpawnEntity("weapon_gun", @gun, vecGunPos);
+							Ent_SpawnEntity("weapon_gun", @gun, vecBulletPos);
 						}
 						
 						HUD_UpdateAmmoItem("shotgun", HUD_GetAmmoItemCurrent("shotgun") - 1, HUD_GetAmmoItemMax("shotgun"));

@@ -121,7 +121,7 @@ class CTankEntity : IScriptedEntity
 		if (this.m_tmrSpriteChange.IsElapsed()) {
 			this.m_tmrSpriteChange.Reset();
 			
-			Ent_Move(this, 15, MOVE_FORWARD);
+			Ent_Move(this, 250, MOVE_FORWARD);
 		}
 		
 		//Process target search

@@ -60,9 +60,21 @@ namespace Game {
 	{
 		//Process game
 
+		//Query performance frequency
+		QueryPerformanceFrequency((LARGE_INTEGER*)&this->m_lFrequency);
+
+		//Get initial performance counter value
+		QueryPerformanceCounter((LARGE_INTEGER*)&this->m_lLastCount);
+
 		while (this->m_bInit) {
 			//Perform window processing
 			pWindow->Process();
+
+			//Process input
+			if (pInput) {
+				pInput->ProcessKeyboard();
+				pInput->ProcessMouse();
+			}
 
 			//Process Steam callbacks
 			if (pAppSteamID->iValue != 0) {
@@ -110,13 +122,19 @@ namespace Game {
 			}
 
 			if ((this->m_bGameStarted) && (!this->m_bGamePause)) {
-				this->m_oGameSpeed.Update(); //Update gamespeed timer
-				if (this->m_oGameSpeed.Elapsed()) {
-					//Process scripted entities
-					Entity::oScriptedEntMgr.Process();
+				//Query current performance counter
+				QueryPerformanceCounter((LARGE_INTEGER*)&this->m_ilCurCount);
 
-					this->m_oGameSpeed.Reset();
+				if (this->m_ilCurCount - this->m_lLastCount > this->m_lFrequency) { //If a second has elapsed
+					this->m_lLastCount = this->m_ilCurCount; //Update last count value
+					this->m_iFrameRate = this->m_iFrames; //Store rate for this second
+					this->m_iFrames = 0; //Clear to start counting again
+				} else {
+					this->m_iFrames++; //Increment frames
 				}
+
+				//Process scripted entities
+				Entity::oScriptedEntMgr.Process();
 
 				//Process goal entity
 				if (this->m_pGoalEntity) {

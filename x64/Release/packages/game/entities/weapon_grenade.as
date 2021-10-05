@@ -32,7 +32,7 @@ class CGrenadeEntity : IScriptedEntity
 	CGrenadeEntity()
     {
 		this.m_vecSize = Vector(32, 32);
-		this.m_fSpeed = 10.0;
+		this.m_fSpeed = 450.0;
 		this.m_bRemove = false;
 		@this.m_pOwner = null;
 		this.m_fDrawingRotation = 0.00;

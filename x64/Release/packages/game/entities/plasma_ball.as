@@ -68,7 +68,7 @@ class CPlasmaBall : IScriptedEntity
 				this.m_iSpriteIndex = 0;
 			}
 			
-			Ent_Move(this, 15, MOVE_FORWARD);
+			Ent_Move(this, 350, MOVE_FORWARD);
 		}
 	}
 	

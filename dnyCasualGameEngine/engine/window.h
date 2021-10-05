@@ -49,7 +49,7 @@ namespace DxWindow {
 				this->m_pEvents->OnCreated(hWnd);
 				break;
 			//Input handling:
-			case WM_KEYUP: {
+			/*case WM_KEYUP: {
 				bool bCtrlHeld = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
 				bool bShiftHeld = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
 				bool bAltHeld = (GetKeyState(VK_MENU) & 0x8000) != 0;
@@ -104,16 +104,16 @@ namespace DxWindow {
 				bool bAltHeld = (GetKeyState(VK_MENU) & 0x8000) != 0;
 				return this->m_pEvents->OnMouseEvent(-1, -1, VK_MBUTTON, true, bCtrlHeld, bShiftHeld, bAltHeld);
 				break;
-			}
+			}*/
 			case WM_MOUSEWHEEL: {
 				short wDistance = (short)HIWORD(wParam);
 				bool bForward = wDistance >= 0;
 				this->m_pEvents->OnMouseWheel(wDistance, bForward);
 				break;
 			}
-			case WM_MOUSEMOVE:
+			/*case WM_MOUSEMOVE:
 				return this->m_pEvents->OnMouseEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, false, false, false, false);
-				break;
+				break;*/
 			case WM_PAINT: //Window shall paint
 				this->m_pEvents->OnDraw();
 				return 0;
@@ -228,5 +228,6 @@ namespace DxWindow {
 		inline const HWND GetHandle(void) const { return this->m_hWindow; }
 		int GetResolutionX(void) { return this->m_sRect.right - this->m_sRect.left; }
 		int GetResolutionY(void) { return this->m_sRect.bottom - this->m_sRect.top; }
+		const RECT& GetCurrentRect(void) const { return this->m_sRect; }
 	};
 }

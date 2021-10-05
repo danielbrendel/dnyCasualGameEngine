@@ -13,8 +13,6 @@
 
 #pragma warning(disable : 4996)
 
-#define GAMESPEED 1
-
 #include "renderer.h"
 #include "sound.h"
 #include "window.h"
@@ -63,7 +61,7 @@ namespace Game {
 	void OnHandleWorkshopItem(const std::wstring& wszItem);
 	void HandlePackageUpload(const std::wstring& wszArgs);
 
-	class CGame {
+	class CGame : public Input::CDxInput::IInputEvents {
 	private:
 		struct package_s {
 			std::wstring wszPakName;
@@ -117,7 +115,11 @@ namespace Game {
 		Entity::CHudInfoMessages m_oHudInfoMessages;
 		Entity::CHud* m_pHud;
 		bool m_bInAppRestart;
-		Entity::CTimer m_oGameSpeed;
+		LONGLONG m_lFrequency;
+		LONGLONG m_lLastCount;
+		LONGLONG m_ilCurCount;
+		int m_iFrameRate;
+		int m_iFrames;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -183,10 +185,6 @@ namespace Game {
 			}
 
 			pRenderer->SetBackgroundPicture(wszBackgroundFile);
-
-			this->m_oGameSpeed.SetDelay(GAMESPEED);
-			this->m_oGameSpeed.Reset();
-			this->m_oGameSpeed.SetActive(true);
 
 			this->m_bGameStarted = true;
 
@@ -318,8 +316,35 @@ namespace Game {
 
 			return std::string::npos;
 		}
+
+		// Input events for DirectInput
+
+		virtual void OnKeyDown(int vKey)
+		{
+			oDxWindowEvents.OnKeyEvent(vKey, true, false, false, false);
+		}
+
+		virtual void OnKeyUp(int vKey)
+		{
+			oDxWindowEvents.OnKeyEvent(vKey, false, false, false, false);
+		}
+
+		virtual void OnMouseMove(int x, int y)
+		{
+			oDxWindowEvents.OnMouseEvent(x, y, 0, false, false, false, false);
+		}
+
+		virtual void OnMouseKeyDown(int vKey)
+		{
+			oDxWindowEvents.OnMouseEvent(0, 0, vKey, true, false, false, false);
+		}
+
+		virtual void OnMouseKeyUp(int vKey)
+		{
+			oDxWindowEvents.OnMouseEvent(0, 0, vKey, false, false, false, false);
+		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr), m_bInAppRestart(false) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr), m_bInAppRestart(false), m_iFrames(100), m_iFrameRate(100) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(void)
@@ -421,6 +446,13 @@ namespace Game {
 				this->Release();
 				return false;
 			}
+
+			//Instantiate input manager
+			pInput = new Input::CDxInput();
+			if (!pInput) {
+				this->Release();
+				return false;
+			}
 			
 			//Initialize game window
 			if (!pWindow->Initialize(pAppName->szValue, pGfxResolutionWidth->iValue, pGfxResolutionHeight->iValue, &oDxWindowEvents)) {
@@ -436,6 +468,12 @@ namespace Game {
 
 			//Initialize sound
 			if (!pSound->Initialize(pWindow->GetHandle())) {
+				this->Release();
+				return false;
+			}
+
+			//Initialize input
+			if (!pInput->Initialize(pWindow->GetHandle(), this, pWindow->GetCurrentRect().left, pWindow->GetCurrentRect().top)) {
 				this->Release();
 				return false;
 			}
@@ -731,6 +769,7 @@ namespace Game {
 			//Free memory
 			FREE(this->m_pHud);
 			FREE(pConsole);
+			FREE(pInput);
 			FREE(pSound);
 			FREE(pRenderer);
 			FREE(pWindow);
@@ -773,5 +812,7 @@ namespace Game {
 		Entity::CHud* GetHUD(void) { return this->m_pHud; }
 		//Indicate if game is started
 		bool IsGameStarted(void) { return this->m_bGameStarted; }
+		//Get current frame rate
+		int GetCurrentFramerate(void) { return this->m_iFrameRate; }
 	};
 }

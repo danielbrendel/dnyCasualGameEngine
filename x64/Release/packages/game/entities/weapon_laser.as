@@ -37,7 +37,7 @@ class CLaserEntity : IScriptedEntity
 	CLaserEntity()
     {
 		this.m_vecSize = Vector(50, 35);
-		this.m_fSpeed = 35.0;
+		this.m_fSpeed = 650.0;
 		this.m_bRemove = false;
 		@this.m_pOwner = null;
     }

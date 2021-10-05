@@ -14,6 +14,7 @@
 DxWindow::CDxWindow* pWindow = nullptr;
 DxRenderer::CDxRenderer* pRenderer = nullptr;
 DxSound::CDxSound* pSound = nullptr;
+Input::CDxInput* pInput = nullptr;
 Scripting::CScriptInt* pScriptingInt = nullptr;
 std::wstring wszBasePath = L"";
 ConfigMgr::CConfigInt* pConfigMgr = nullptr;

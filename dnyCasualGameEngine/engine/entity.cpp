@@ -272,20 +272,20 @@ namespace Entity {
 				Vector vecPosition = pEntity->GetPosition();
 				float fRotation = pEntity->GetRotation();
 				Vector vecSize = pEntity->GetSize();
-
+				
 				//Calculate forward or backward vector according to dir
 				if (dir == MOVE_FORWARD) {
-					vecPosition[0] += (int)(sin(fRotation + 0.015) * fSpeed);
-					vecPosition[1] -= (int)(cos(fRotation + 0.015) * fSpeed);
+					vecPosition[0] += (int)(sin(fRotation + 0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
+					vecPosition[1] -= (int)(cos(fRotation + 0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
 				} else if (dir == MOVE_BACKWARD) {
-					vecPosition[0] -= (int)(sin(fRotation + 0.015) * fSpeed);
-					vecPosition[1] += (int)(cos(fRotation + 0.015) * fSpeed);
+					vecPosition[0] -= (int)(sin(fRotation + 0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
+					vecPosition[1] += (int)(cos(fRotation + 0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
 				} else if (dir == MOVE_LEFT) {
-					vecPosition[0] += (int)(sin(fRotation + 80.0) * fSpeed);
-					vecPosition[1] -= (int)(cos(fRotation + 80.0) * fSpeed);
+					vecPosition[0] += (int)(sin(fRotation + 80.0) * fSpeed) / Game::pGame->GetCurrentFramerate();
+					vecPosition[1] -= (int)(cos(fRotation + 80.0) * fSpeed) / Game::pGame->GetCurrentFramerate();
 				} else if (dir == MOVE_RIGHT) {
-					vecPosition[0] -= (int)(sin(fRotation + 80.0) * fSpeed);
-					vecPosition[1] += (int)(cos(fRotation + 80.0) * fSpeed);
+					vecPosition[0] -= (int)(sin(fRotation + 80.0) * fSpeed) / Game::pGame->GetCurrentFramerate();
+					vecPosition[1] += (int)(cos(fRotation + 80.0) * fSpeed) / Game::pGame->GetCurrentFramerate();
 				}
 
 				//If not collided then move forward

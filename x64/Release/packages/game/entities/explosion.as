@@ -140,7 +140,9 @@ class CExplosionEntity : IScriptedEntity
 				if (ref.GetName() == "headcrab") {
 					casted.AddPlayerScore(1);
 				} else if (ref.GetName() == "tank") {
-					casted.AddPlayerScore(10);
+					casted.AddPlayerScore(3);
+				} else if (ref.GetName() == "teslatower") {
+					casted.AddPlayerScore(2);
 				} else {
 					casted.AddPlayerScore(1);
 				}

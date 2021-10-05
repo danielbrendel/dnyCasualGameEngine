@@ -126,6 +126,8 @@ class CLaserEntity : IScriptedEntity
 					if (ref.GetName() == "headcrab") {
 						casted.AddPlayerScore(1);
 					} else if (ref.GetName() == "tank") {
+						casted.AddPlayerScore(15);
+					} else if (ref.GetName() == "teslatower") {
 						casted.AddPlayerScore(10);
 					} else {
 						casted.AddPlayerScore(1);

@@ -471,7 +471,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called when entity gets damaged
 	void OnDamage(uint32 damageValue)
 	{
-		return;
 		if (this.m_tmrMayDamage.IsElapsed()) {
 			if (this.m_uiHealth < damageValue) {
 				this.m_uiHealth = 0;

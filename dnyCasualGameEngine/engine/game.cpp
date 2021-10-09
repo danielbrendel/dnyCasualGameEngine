@@ -67,6 +67,17 @@ namespace Game {
 		QueryPerformanceCounter((LARGE_INTEGER*)&this->m_lLastCount);
 
 		while (this->m_bInit) {
+			//Query current performance counter
+			QueryPerformanceCounter((LARGE_INTEGER*)&this->m_ilCurCount);
+
+			if (this->m_ilCurCount - this->m_lLastCount > this->m_lFrequency) { //If a second has elapsed
+				this->m_lLastCount = this->m_ilCurCount; //Update last count value
+				this->m_iFrameRate = this->m_iFrames; //Store rate for this second
+				this->m_iFrames = 0; //Clear to start counting again
+			} else {
+				this->m_iFrames++; //Increment frames
+			}
+
 			//Perform window processing
 			pWindow->Process();
 
@@ -126,17 +137,6 @@ namespace Game {
 			}
 
 			if ((this->m_bGameStarted) && (!this->m_bGamePause)) {
-				//Query current performance counter
-				QueryPerformanceCounter((LARGE_INTEGER*)&this->m_ilCurCount);
-
-				if (this->m_ilCurCount - this->m_lLastCount > this->m_lFrequency) { //If a second has elapsed
-					this->m_lLastCount = this->m_ilCurCount; //Update last count value
-					this->m_iFrameRate = this->m_iFrames; //Store rate for this second
-					this->m_iFrames = 0; //Clear to start counting again
-				} else {
-					this->m_iFrames++; //Increment frames
-				}
-
 				//Process scripted entities
 				Entity::oScriptedEntMgr.Process();
 

@@ -379,10 +379,10 @@ namespace DxRenderer {
 				return GFX_INVALID_SPRITE_ID;
 
 			//Handle case if sprite with that texture already exists
-			HD3DSPRITE hExists = this->FindSprite(wszTexture, iFrameCount, iFrameWidth, iFrameHeight, iFramesPerLine);
+			/*HD3DSPRITE hExists = this->FindSprite(wszTexture, iFrameCount, iFrameWidth, iFrameHeight, iFramesPerLine);
 			if (hExists != GFX_INVALID_SPRITE_ID) {
 				return hExists;
-			}
+			}*/
 
 			d3dsprite_s sSpriteData;	
 

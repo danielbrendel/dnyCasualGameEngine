@@ -37,6 +37,8 @@ namespace Game {
 		virtual void OnRelease(void);
 	};
 
+	const int C_MENU_BANNER_WIDTH = 768;
+
 	extern CWindowEvents oDxWindowEvents;
 
 	void UnknownExpressionHandler(const std::wstring& szCmdName);

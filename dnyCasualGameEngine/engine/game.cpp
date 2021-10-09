@@ -204,7 +204,7 @@ namespace Game {
 
 		//Draw menu if opened
 		if (this->m_oMenu.IsOpen()) {
-			pRenderer->DrawSprite(this->m_hBanner, pGfxResolutionWidth->iValue / 2 - 768 / 2, 10, 0, 0.0f);
+			pRenderer->DrawSprite(this->m_hBanner, pGfxResolutionWidth->iValue / 2 - C_MENU_BANNER_WIDTH / 2, 10, 0, 0.0f);
 
 			this->m_oMenu.Draw();
 		}

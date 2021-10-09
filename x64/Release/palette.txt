@@ -46,6 +46,10 @@ settings.gfx.cbresolutions.fill 150 0 0 255
 settings.gfx.cbresolutions.frame 255 255 255 255
 settings.gfx.cbresolutions.hover 0 150 0 255
 settings.gfx.cbresolutions.text 0 0 0 255
+settings.gfx.cblocales.fill 255 0 0 255
+settings.gfx.cblocales.frame 255 255 255 255
+settings.gfx.cblocales.hover 0 150 0 255
+settings.gfx.cblocales.text 0 0 0 255
 settings.gfx.cbfullscreen.checked 0 0 255 255
 settings.gfx.cbfullscreen.frame 255 255 255 255
 settings.gfx.cbfullscreen.hover 255 0 0 255

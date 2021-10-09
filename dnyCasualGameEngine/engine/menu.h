@@ -654,42 +654,42 @@ namespace Menu {
 			const int iStartPos = 50;
 
 			menuentry_s sResumeGame;
-			sResumeGame.wszText = L"Resume game";
+			sResumeGame.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.resumegame", L"Resume game");
 			sResumeGame.onClick = &MainMenu_OnResumeGame;
 			sResumeGame.x = 10;
 			sResumeGame.y = h - iStartPos - 50 * 6;
 			sResumeGame.bShow = false;
 
 			menuentry_s sStopGame;
-			sStopGame.wszText = L"Stop game";
+			sStopGame.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.stopgame", L"Stop game");
 			sStopGame.onClick = &MainMenu_OnStopGame;
 			sStopGame.x = 10;
 			sStopGame.y = h - iStartPos - 50 * 5;
 			sStopGame.bShow = false;
 
 			menuentry_s sPlay;
-			sPlay.wszText = L"Play";
+			sPlay.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.play", L"Play");
 			sPlay.onClick = &MainMenu_OnOpenPlay;
 			sPlay.x = 10;
 			sPlay.y = h - iStartPos - 50 * 3;
 			sPlay.bShow = true;
 
 			menuentry_s sPackages;
-			sPackages.wszText = L"Mods";
+			sPackages.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.mods", L"Mods");
 			sPackages.onClick = &MainMenu_OnOpenPackages;
 			sPackages.x = 10;
 			sPackages.y = h - iStartPos - 50 * 2;
 			sPackages.bShow = true;
 
 			menuentry_s sSettings;
-			sSettings.wszText = L"Settings";
+			sSettings.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.settings", L"Settings");
 			sSettings.onClick = &MainMenu_OnOpenSettings;
 			sSettings.x = 10;
 			sSettings.y = h - iStartPos - 50;
 			sSettings.bShow = true;
 
 			menuentry_s sQuit;
-			sQuit.wszText = L"Quit";
+			sQuit.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.quit", L"Quit");
 			sQuit.onClick = &MainMenu_OnQuitGame;
 			sQuit.x = 10;
 			sQuit.y = h - iStartPos;
@@ -1008,6 +1008,8 @@ namespace Menu {
 		Entity::Vector m_vecMousePos;
 		Entity::Color m_colSavedGamesTitle;
 		Entity::Color m_colNoSavedGamesYet;
+		std::wstring m_wszLocaleSavedGames;
+		std::wstring m_wszLocaleNoSavedGamesYet;
 
 		std::string RemoveFileExtension(const std::string& szName)
 		{
@@ -1082,7 +1084,7 @@ namespace Menu {
 			this->m_hUp = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\up.png", 1, 50, 50, 1, false);
 			this->m_hDown = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\down.png", 1, 50, 50, 1, false);
 
-			this->m_oPlay.SetText(L"Start new game");
+			this->m_oPlay.SetText(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.btnplay", L"Start new game"));
 			this->m_oPlay.SetPosition(Entity::Vector(250, 200));
 			this->m_oPlay.SetSize(Entity::Vector(230, 35));
 			this->m_oPlay.SetOwner(this);
@@ -1100,7 +1102,7 @@ namespace Menu {
 			this->m_oSaveGames.SetHoverColor(GetPaletteItem(L"playmenu.lstsavegames.hover", Entity::Color(100, 100, 100, 150)));
 			this->m_oSaveGames.SetSelectColor(GetPaletteItem(L"playmenu.lstsavegames.select", Entity::Color(150, 150, 150, 150)));
 
-			this->m_oLoad.SetText(L"Load game");
+			this->m_oLoad.SetText(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.btnload", L"Load game"));
 			this->m_oLoad.SetPosition(Entity::Vector(265, 300 + 300 + 10));
 			this->m_oLoad.SetSize(Entity::Vector(150, 35));
 			this->m_oLoad.SetOwner(this);
@@ -1113,6 +1115,9 @@ namespace Menu {
 			this->m_colNoSavedGamesYet = GetPaletteItem(L"playmenu.nosavedgamesyet", Entity::Color(200, 200, 200, 150));
 
 			this->m_hSelect = pSound->QuerySound(wszBasePath + L"media\\sound\\listbox_select.wav");
+
+			this->m_wszLocaleSavedGames = oEngineLocaleMgr.QueryPhrase(L"app.playmenu.savedgames", L"Saved games");
+			this->m_wszLocaleNoSavedGamesYet = oEngineLocaleMgr.QueryPhrase(L"app.playmenu.nosavedgamesyet", L"No saved games yet.");
 
 			this->AcquireSavedGameStates();
 
@@ -1168,12 +1173,10 @@ namespace Menu {
 			pRenderer->DrawSprite(this->m_hUp, 265 + 604, 300 + 300 / 2 - 50 / 2 - 10, 0, 0.0f);
 			pRenderer->DrawSprite(this->m_hDown, 265 + 604, 300 + 300 / 2 - 50 / 2 + 50 - 10, 0, 0.0f);
 			
-			pRenderer->DrawString(pDefaultFont, L"Saved games", 265, 279, this->m_colSavedGamesTitle.r, this->m_colSavedGamesTitle.g, this->m_colSavedGamesTitle.b, this->m_colSavedGamesTitle.a);
+			pRenderer->DrawString(pDefaultFont, this->m_wszLocaleSavedGames, 265, 279, this->m_colSavedGamesTitle.r, this->m_colSavedGamesTitle.g, this->m_colSavedGamesTitle.b, this->m_colSavedGamesTitle.a);
 
 			if (this->m_oSaveGames.GetCount() == 0) {
-				const std::wstring wszHint = L"No saved games yet.";
-				
-				pRenderer->DrawString(pDefaultFont, wszHint, 265 + 300 - ((int)wszHint.length() * iDefaultFontSize[0] / 2), 300 + 150 - iDefaultFontSize[1] / 2, this->m_colNoSavedGamesYet.r, this->m_colNoSavedGamesYet.g, this->m_colNoSavedGamesYet.b, this->m_colNoSavedGamesYet.a);
+				pRenderer->DrawString(pDefaultFont, this->m_wszLocaleNoSavedGamesYet, 265 + 300 - ((int)this->m_wszLocaleNoSavedGamesYet.length() * iDefaultFontSize[0] / 2), 300 + 150 - iDefaultFontSize[1] / 2, this->m_colNoSavedGamesYet.r, this->m_colNoSavedGamesYet.g, this->m_colNoSavedGamesYet.b, this->m_colNoSavedGamesYet.a);
 			}
 		}
 
@@ -1234,6 +1237,7 @@ namespace Menu {
 		DxRenderer::HD3DSPRITE m_hForward;
 		Entity::Vector m_vecMousePos;
 		Entity::Color m_colLabels;
+		std::wstring m_wszLocaleNoModsFound;
 	public:
 		CPackageMenu() : m_uiSelectedPackage(std::string::npos) {}
 		~CPackageMenu() {}
@@ -1306,7 +1310,7 @@ namespace Menu {
 				iAboutContentHeight = (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1];
 			}
 
-			this->m_oButton.SetText(L"Play!");
+			this->m_oButton.SetText(oEngineLocaleMgr.QueryPhrase(L"app.packagemenu.btnplay", L"Play"));
 			this->m_oButton.SetPosition(Entity::Vector(250, 200 + iAboutContentHeight));
 			this->m_oButton.SetSize(Entity::Vector(130, 35));
 			this->m_oButton.SetOwner(this);
@@ -1324,7 +1328,7 @@ namespace Menu {
 			this->m_oImageListView.SetSelectColor(GetPaletteItem(L"packagemenu.listview.select", Entity::Color(0, 200, 0, 150)));
 			this->m_oImageListView.UpdateDimensions();
 
-			this->m_oBrowse.SetText(L"Browse Workshop");
+			this->m_oBrowse.SetText(oEngineLocaleMgr.QueryPhrase(L"app.packagemenu.btnbrowse", L"Browse Workshop"));
 			this->m_oBrowse.SetPosition(Entity::Vector(450, 200 + iAboutContentHeight));
 			this->m_oBrowse.SetSize(Entity::Vector(150, 35));
 			this->m_oBrowse.SetOwner(this);
@@ -1335,6 +1339,8 @@ namespace Menu {
 
 			this->m_colLabels = GetPaletteItem(L"packagemenu.labels", Entity::Color(200, 200, 200, 255));
 			
+			this->m_wszLocaleNoModsFound = oEngineLocaleMgr.QueryPhrase(L"app.packagemenu.nomodsfound", L"No mods found");
+
 			return true;
 		}
 
@@ -1350,7 +1356,7 @@ namespace Menu {
 
 			//Draw hint if there are no packages found
 			if (this->m_vPackages.size() == 0) {
-				pRenderer->DrawString(pDefaultFont, L"No mods found", iStartPosX, iStartPosY, this->m_colLabels.r, this->m_colLabels.g, this->m_colLabels.b, this->m_colLabels.a);
+				pRenderer->DrawString(pDefaultFont, this->m_wszLocaleNoModsFound, iStartPosX, iStartPosY, this->m_colLabels.r, this->m_colLabels.g, this->m_colLabels.b, this->m_colLabels.a);
 			}
 
 			//Draw selected package preview
@@ -1872,7 +1878,7 @@ namespace Menu {
 			this->m_btnSave.SetTextColor(GetPaletteItem(L"settings.keys.btnsave.text", Entity::Color(250, 250, 250, 150)));
 			this->m_btnSave.SetPosition(Entity::Vector(250, 730));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
-			this->m_btnSave.SetText(L"Save");
+			this->m_btnSave.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.keys.btnsave", L"Save"));
 
 			this->m_btnRestoreDefaults.SetOwner(this);
 			this->m_btnRestoreDefaults.SetFillColor(GetPaletteItem(L"settings.keys.btnrestore.fill", Entity::Color(200, 200, 200, 150)));
@@ -1881,7 +1887,7 @@ namespace Menu {
 			this->m_btnRestoreDefaults.SetTextColor(GetPaletteItem(L"settings.keys.btnrestore.text", Entity::Color(0, 0, 0, 150)));
 			this->m_btnRestoreDefaults.SetPosition(Entity::Vector(500, 730));
 			this->m_btnRestoreDefaults.SetSize(Entity::Vector(200, 35));
-			this->m_btnRestoreDefaults.SetText(L"Reset defaults");
+			this->m_btnRestoreDefaults.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.keys.btnrestoredefaults", L"Reset defaults"));
 
 			return true;
 		}
@@ -1975,10 +1981,13 @@ namespace Menu {
 	private:
 		Entity::Vector m_vecPos;
 		CComboBox m_oResolutions;
+		CComboBox m_oLocales;
 		CCheckbox m_oFullscreen;
 		CButton m_btnSave;
 		std::vector<std::wstring> m_vResolutions;
+		std::vector<std::wstring> m_vLocales;
 		Entity::Color m_colRestartHint;
+		std::wstring m_wszLocaleRestartHint;
 
 		void ReadResolutions(void)
 		{
@@ -1999,6 +2008,26 @@ namespace Menu {
 			}
 		}
 
+		void ReadLocales(void)
+		{
+			//Read locales from disk
+
+			WIN32_FIND_DATA sFindData;
+
+			HANDLE hFileSearch = FindFirstFile((wszBasePath + L"lang\\*.*").c_str(), &sFindData);
+			if (hFileSearch != INVALID_HANDLE_VALUE) {
+				while (FindNextFile(hFileSearch, &sFindData)) {
+					if ((sFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) {
+						if (sFindData.cFileName[0] != '.') {
+							this->m_vLocales.push_back(sFindData.cFileName);
+						}
+					}
+				}
+
+				FindClose(hFileSearch);
+			}
+		}
+
 		void SaveGfxSettings(void)
 		{
 			//Save graphics settings
@@ -2015,10 +2044,24 @@ namespace Menu {
 			std::wofstream hFile;
 			hFile.open(wszBasePath + L"gfx.cfg", std::wofstream::out);
 			if (hFile.is_open()) {
-				hFile << L"# Sound settings configuration file" << std::endl << std::endl;
+				hFile << L"# Gfx settings configuration file" << std::endl << std::endl;
 				hFile << L"gfx_resolution_width " + wszWidth << std::endl;
 				hFile << L"gfx_resolution_height " + wszHeight << std::endl;
 				hFile << L"gfx_fullscreen " << ((this->m_oFullscreen.IsChecked()) ? L"1" : L"0") << std::endl;
+
+				hFile.close();
+			}
+		}
+
+		void SaveUISettings(void)
+		{
+			//Save UI settings
+
+			std::wofstream hFile;
+			hFile.open(wszBasePath + L"ui.cfg", std::wofstream::out);
+			if (hFile.is_open()) {
+				hFile << L"# UI settings configuration file" << std::endl << std::endl;
+				hFile << L"app_language \"" << this->m_oLocales.GetSelectedItem() << L"\"" << std::endl;
 
 				hFile.close();
 			}
@@ -2032,6 +2075,7 @@ namespace Menu {
 			//Initialize component
 
 			this->ReadResolutions();
+			this->ReadLocales();
 
 			this->m_oResolutions.SetFillColor(GetPaletteItem(L"settings.gfx.cbresolutions.fill", Entity::Color(50, 50, 50, 150)));
 			this->m_oResolutions.SetFrameColor(GetPaletteItem(L"settings.gfx.cbresolutions.frame", Entity::Color(255, 255, 255, 150)));
@@ -2041,6 +2085,14 @@ namespace Menu {
 			this->m_oResolutions.SetTextColor(GetPaletteItem(L"settings.gfx.cbresolutions.text", Entity::Color(200, 200, 200, 255)));
 			this->m_oResolutions.SetWidth(200);
 
+			this->m_oLocales.SetFillColor(GetPaletteItem(L"settings.gfx.cblocales.fill", Entity::Color(50, 50, 50, 150)));
+			this->m_oLocales.SetFrameColor(GetPaletteItem(L"settings.gfx.cblocales.frame", Entity::Color(255, 255, 255, 150)));
+			this->m_oLocales.SetHoverColor(GetPaletteItem(L"settings.gfx.cblocales.hover", Entity::Color(0, 50, 125, 150)));
+			this->m_oLocales.SetPosition(Entity::Vector(250, 340));
+			this->m_oLocales.SetSelectedItem(0);
+			this->m_oLocales.SetTextColor(GetPaletteItem(L"settings.gfx.cblocales.text", Entity::Color(200, 200, 200, 255)));
+			this->m_oLocales.SetWidth(200);
+
 			for (size_t i = 0; i < this->m_vResolutions.size(); i++) {
 				this->m_oResolutions.AddItem(this->m_vResolutions[i]);
 
@@ -2049,11 +2101,19 @@ namespace Menu {
 				}
 			}
 
+			for (size_t i = 0; i < this->m_vLocales.size(); i++) {
+				this->m_oLocales.AddItem(this->m_vLocales[i]);
+
+				if (this->m_vLocales[i] == pAppLang->szValue) {
+					this->m_oLocales.SetSelectedItem(i);
+				}
+			}
+
 			this->m_oFullscreen.SetCheckColor(GetPaletteItem(L"settings.gfx.cbfullscreen.checked", Entity::Color(50, 135, 0, 150)));
 			this->m_oFullscreen.SetChecked(pGfxFullscreen->bValue);
 			this->m_oFullscreen.SetFrameColor(GetPaletteItem(L"settings.gfx.cbfullscreen.frame", Entity::Color(200, 200, 200, 150)));
 			this->m_oFullscreen.SetHoverColor(GetPaletteItem(L"settings.gfx.cbfullscreen.hover", Entity::Color(255, 255, 255, 150)));
-			this->m_oFullscreen.SetLabel(L"Run in fullscreen");
+			this->m_oFullscreen.SetLabel(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.gfx.lblfullscreen", L"Run in fullscreen"));
 			this->m_oFullscreen.SetLabelColor(GetPaletteItem(L"settings.gfx.cbfullscreen.label", Entity::Color(200, 200, 200, 150)));
 			this->m_oFullscreen.SetPosition(Entity::Vector(250, 300));
 
@@ -2064,9 +2124,11 @@ namespace Menu {
 			this->m_btnSave.SetTextColor(GetPaletteItem(L"settings.gfx.btnsave.text", Entity::Color(250, 250, 250, 255)));
 			this->m_btnSave.SetPosition(Entity::Vector(250, 600));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
-			this->m_btnSave.SetText(L"Save");
+			this->m_btnSave.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.gfx.btnsave", L"Save"));
 
 			this->m_colRestartHint = GetPaletteItem(L"settings.gfx.restarthint", Entity::Color(150, 150, 0, 255));
+
+			this->m_wszLocaleRestartHint = oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.gfx.restarthint", L"Note: Saving graphic settings will trigger an application restart");
 
 			return true;
 		}
@@ -2077,10 +2139,11 @@ namespace Menu {
 
 			this->m_oFullscreen.Draw();
 			this->m_oResolutions.Draw();
+			this->m_oLocales.Draw();
 			this->m_btnSave.Draw();
 
 			if (!this->m_oResolutions.IsOpen()) {
-				pRenderer->DrawString(pDefaultFont, L"Note: Saving graphic settings will trigger an application restart", 250, 340, this->m_colRestartHint.r, this->m_colRestartHint.g, this->m_colRestartHint.b, this->m_colRestartHint.a);
+				pRenderer->DrawString(pDefaultFont, this->m_wszLocaleRestartHint, 250, 400, this->m_colRestartHint.r, this->m_colRestartHint.g, this->m_colRestartHint.b, this->m_colRestartHint.a);
 			}
 		}
 
@@ -2089,6 +2152,7 @@ namespace Menu {
 			//Handle mouse events
 
 			this->m_oResolutions.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oLocales.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 
 			if (!this->m_oResolutions.IsOpen()) {
 				this->m_oFullscreen.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
@@ -2113,6 +2177,7 @@ namespace Menu {
 		CSlider m_oVolume;
 		CButton m_btnSave;
 		Entity::Color m_colLabel;
+		std::wstring m_wszLocaleVolumeLabel;
 
 		void SaveSoundSettings(void)
 		{
@@ -2153,9 +2218,11 @@ namespace Menu {
 			this->m_btnSave.SetTextColor(GetPaletteItem(L"settings.snd.btnsave.text", Entity::Color(250, 250, 250, 255)));
 			this->m_btnSave.SetPosition(Entity::Vector(250, 600));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
-			this->m_btnSave.SetText(L"Save");
+			this->m_btnSave.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.snd.btnsave", L"Save"));
 
 			this->m_colLabel = GetPaletteItem(L"settings.snd.label", Entity::Color(200, 200, 200, 255));
+
+			this->m_wszLocaleVolumeLabel = oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.snd.volume", L"Volume: ");
 
 			return true;
 		}
@@ -2164,7 +2231,7 @@ namespace Menu {
 		{
 			//Draw controls
 
-			pRenderer->DrawString(pDefaultFont, L"Volume: ", this->m_vecPos[0], this->m_vecPos[1], this->m_colLabel.r, this->m_colLabel.g, this->m_colLabel.b, this->m_colLabel.a);
+			pRenderer->DrawString(pDefaultFont, this->m_wszLocaleVolumeLabel, this->m_vecPos[0], this->m_vecPos[1], this->m_colLabel.r, this->m_colLabel.g, this->m_colLabel.b, this->m_colLabel.a);
 
 			this->m_oVolume.Draw();
 
@@ -2211,9 +2278,9 @@ namespace Menu {
 			this->m_oMenuSnd.SetPosition(Entity::Vector(250, 250));
 
 			this->m_oTabMenu.Initialize(w, h, pGameStarted);
-			this->m_oTabMenu.AddItem(L"Bindings", &this->m_oMenuKeys);
-			this->m_oTabMenu.AddItem(L"Graphics", &this->m_oMenuGfx);
-			this->m_oTabMenu.AddItem(L"Sound   ", &this->m_oMenuSnd);
+			this->m_oTabMenu.AddItem(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.tabs.bindings", L"Bindings   "), &this->m_oMenuKeys);
+			this->m_oTabMenu.AddItem(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.tabs.gfxui", L"Graphics/UI"), &this->m_oMenuGfx);
+			this->m_oTabMenu.AddItem(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.tabs.snd", L"Sound      "), &this->m_oMenuSnd);
 
 			this->m_oTabMenu.SetPosition(Entity::Vector(250, 200));
 			this->m_oTabMenu.SetTabSpacing(20);
@@ -2504,6 +2571,11 @@ namespace Menu {
 		Entity::Vector m_vecPos;
 		Entity::Vector m_vecSize;
 		Entity::Color m_colStats;
+		std::wstring m_wszLocaleReturnToMainMenu;
+		std::wstring m_wszLocaleGameCompleted;
+		std::wstring m_wszLocaleProceedWithNextMap;
+		std::wstring m_wszLocaleMapCompleted;
+		std::wstring m_wszLocaleAchievedScore;
 	public:
 		CIntermissionMenu() : m_bGameFinished(false) {}
 		~CIntermissionMenu() {}
@@ -2533,6 +2605,12 @@ namespace Menu {
 
 			this->m_colStats = GetPaletteItem(L"intermission.stats", Entity::Color(200, 200, 200, 255));
 
+			this->m_wszLocaleReturnToMainMenu = oEngineLocaleMgr.QueryPhrase(L"app.intermissionmenu.returntomainmenu", L"Return to main menu");
+			this->m_wszLocaleGameCompleted = oEngineLocaleMgr.QueryPhrase(L"app.intermissionmenu.gamecompleted", L"Game completed!");
+			this->m_wszLocaleProceedWithNextMap = oEngineLocaleMgr.QueryPhrase(L"app.intermissionmenu.proceedwithnextmap", L"Proceed with next map");
+			this->m_wszLocaleMapCompleted = oEngineLocaleMgr.QueryPhrase(L"app.intermissionmenu.mapcompleted", L"Map completed!");
+			this->m_wszLocaleAchievedScore = oEngineLocaleMgr.QueryPhrase(L"app.intermissionmenu.achievedscore", L"Your achieved score: ${ACHIEVED_SCORE}");
+
 			return true;
 		}
 
@@ -2543,11 +2621,11 @@ namespace Menu {
 			this->m_bGameFinished = value; 
 
 			if (value) {
-				this->m_oButton.SetText(L"Return to main menu");
-				this->m_oForm.SetTitle(L"Game completed!");
+				this->m_oButton.SetText(this->m_wszLocaleReturnToMainMenu);
+				this->m_oForm.SetTitle(this->m_wszLocaleGameCompleted);
 			} else {
-				this->m_oButton.SetText(L"Proceed with next map");
-				this->m_oForm.SetTitle(L"Map completed!");
+				this->m_oButton.SetText(this->m_wszLocaleProceedWithNextMap);
+				this->m_oForm.SetTitle(this->m_wszLocaleMapCompleted);
 			}
 		}
 
@@ -2575,7 +2653,7 @@ namespace Menu {
 			this->m_oForm.Draw();
 			this->m_oButton.Draw();
 
-			pRenderer->DrawString(pDefaultFont, L"Your achieved score: " + std::to_wstring(this->m_iScore), this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, this->m_colStats.r, this->m_colStats.g, this->m_colStats.b, this->m_colStats.a);
+			pRenderer->DrawString(pDefaultFont, Utils::ReplaceStringW(this->m_wszLocaleAchievedScore, L"${ACHIEVED_SCORE}", std::to_wstring(this->m_iScore)), this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, this->m_colStats.r, this->m_colStats.g, this->m_colStats.b, this->m_colStats.a);
 		}
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)
@@ -2599,6 +2677,8 @@ namespace Menu {
 		Entity::Vector m_vecPos;
 		Entity::Vector m_vecSize;
 		Entity::Color m_colLabels;
+		std::wstring m_wszLocaleHint1;
+		std::wstring m_wszLocaleHint2;
 	public:
 		CGameOverMenu() {}
 		~CGameOverMenu() {}
@@ -2618,7 +2698,7 @@ namespace Menu {
 			this->m_oForm.SetBorderColor(GetPaletteItem(L"gameover.form.border", Entity::Color(200, 200, 200, 150)));
 			this->m_oForm.SetTitleBarColor(GetPaletteItem(L"gameover.form.title.bar", Entity::Color(50, 125, 0, 150)));
 			this->m_oForm.SetTitleTextColor(GetPaletteItem(L"gameover.form.title.text", Entity::Color(250, 250, 250, 255)));
-			this->m_oForm.SetTitle(L"Game over!");
+			this->m_oForm.SetTitle(oEngineLocaleMgr.QueryPhrase(L"app.gameovermenu.frmtitle", L"Game over!"));
 
 			this->m_oBtnRestart.SetFrameColor(GetPaletteItem(L"gameover.btnrestart.frame", Entity::Color(200, 200, 200, 150)));
 			this->m_oBtnRestart.SetFillColor(GetPaletteItem(L"gameover.btnrestart.fill", Entity::Color(50, 150, 50, 150)));
@@ -2626,7 +2706,7 @@ namespace Menu {
 			this->m_oBtnRestart.SetTextColor(GetPaletteItem(L"gameover.btnrestart.text", Entity::Color(250, 250, 250, 255)));
 			this->m_oBtnRestart.SetSize(Entity::Vector(200, 35));
 			this->m_oBtnRestart.SetOwner(this);
-			this->m_oBtnRestart.SetText(L"Try again");
+			this->m_oBtnRestart.SetText(oEngineLocaleMgr.QueryPhrase(L"app.gameovermenu.btnrestart", L"Try again"));
 
 			this->m_oBtnLoadLastSavedGame.SetFrameColor(GetPaletteItem(L"gameover.btnlastsavedgame.frame", Entity::Color(200, 200, 200, 150)));
 			this->m_oBtnLoadLastSavedGame.SetFillColor(GetPaletteItem(L"gameover.btnlastsavedgame.fill", Entity::Color(50, 150, 50, 150)));
@@ -2634,7 +2714,7 @@ namespace Menu {
 			this->m_oBtnLoadLastSavedGame.SetTextColor(GetPaletteItem(L"gameover.btnlastsavedgame.text", Entity::Color(250, 250, 250, 255)));
 			this->m_oBtnLoadLastSavedGame.SetSize(Entity::Vector(200, 35));
 			this->m_oBtnLoadLastSavedGame.SetOwner(this);
-			this->m_oBtnLoadLastSavedGame.SetText(L"Quick load");
+			this->m_oBtnLoadLastSavedGame.SetText(oEngineLocaleMgr.QueryPhrase(L"app.gameovermenu.btnlastsavedgame", L"Quick load"));
 
 			this->m_oBtnReturnToMainMenu.SetFrameColor(GetPaletteItem(L"gameover.btnreturntomain.frame", Entity::Color(200, 200, 200, 150)));
 			this->m_oBtnReturnToMainMenu.SetFillColor(GetPaletteItem(L"gameover.btnreturntomain.fill", Entity::Color(50, 150, 50, 150)));
@@ -2642,9 +2722,12 @@ namespace Menu {
 			this->m_oBtnReturnToMainMenu.SetTextColor(GetPaletteItem(L"gameover.btnreturntomain.text", Entity::Color(250, 250, 250, 255)));
 			this->m_oBtnReturnToMainMenu.SetSize(Entity::Vector(300, 35));
 			this->m_oBtnReturnToMainMenu.SetOwner(this);
-			this->m_oBtnReturnToMainMenu.SetText(L"Return to main menu");
+			this->m_oBtnReturnToMainMenu.SetText(oEngineLocaleMgr.QueryPhrase(L"app.gameovermenu.btnreturntomainmenu", L"Return to main menu"));
 
 			this->m_colLabels = GetPaletteItem(L"gameover.labels", Entity::Color(250, 250, 250, 255));
+
+			this->m_wszLocaleHint1 = oEngineLocaleMgr.QueryPhrase(L"app.gameovermenu.hint1", L"Your game is over.");
+			this->m_wszLocaleHint2 = oEngineLocaleMgr.QueryPhrase(L"app.gameovermenu.hint2", L"You can try again or return to main menu.");
 
 			return true;
 		}
@@ -2670,8 +2753,8 @@ namespace Menu {
 			this->m_oBtnLoadLastSavedGame.Draw();
 			this->m_oBtnReturnToMainMenu.Draw();
 
-			pRenderer->DrawString(pDefaultFont, L"Your game is over.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 79, this->m_colLabels.r, this->m_colLabels.g, this->m_colLabels.b, this->m_colLabels.a);
-			pRenderer->DrawString(pDefaultFont, L"You can try again or return to main menu.", this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, this->m_colLabels.r, this->m_colLabels.g, this->m_colLabels.b, this->m_colLabels.a);
+			pRenderer->DrawString(pDefaultFont, this->m_wszLocaleHint1, this->m_vecPos[0] + 20, this->m_vecPos[1] + 79, this->m_colLabels.r, this->m_colLabels.g, this->m_colLabels.b, this->m_colLabels.a);
+			pRenderer->DrawString(pDefaultFont, this->m_wszLocaleHint2, this->m_vecPos[0] + 20, this->m_vecPos[1] + 100, this->m_colLabels.r, this->m_colLabels.g, this->m_colLabels.b, this->m_colLabels.a);
 		}
 
 		void OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

@@ -39,4 +39,5 @@ Achievements::CSteamAchievements* pAchievements = nullptr;
 DxRenderer::d3dfont_s* pDefaultFont = nullptr;
 int iDefaultFontSize[2];
 
+Localization::CLocalizationMgr oEngineLocaleMgr;
 Localization::CLocalizationMgr oPackageLocaleMgr;

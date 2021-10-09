@@ -50,4 +50,5 @@ extern Achievements::CSteamAchievements* pAchievements;
 extern DxRenderer::d3dfont_s* pDefaultFont;
 extern int iDefaultFontSize[2];
 
+extern Localization::CLocalizationMgr oEngineLocaleMgr;
 extern Localization::CLocalizationMgr oPackageLocaleMgr;

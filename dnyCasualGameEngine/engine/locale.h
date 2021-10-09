@@ -152,6 +152,10 @@ namespace Localization {
 					wchar_t wszLineBuffer[4096] = { 0 };
 					hFile.getline(wszLineBuffer, sizeof(wszLineBuffer), '\n');
 
+					if ((wszLineBuffer[0] == '#') || (wcslen(wszLineBuffer) == 0)) {
+						continue;
+					}
+
 					phrase_s sPhrase;
 					this->ExtractIdentAndPhrase(wszLineBuffer, sPhrase);
 					sLangData.vPhrases.push_back(sPhrase);

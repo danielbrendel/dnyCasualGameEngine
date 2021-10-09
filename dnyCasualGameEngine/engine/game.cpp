@@ -358,9 +358,9 @@ namespace Game {
 			pScriptingInt->CallScriptFunction(this->m_vEntityScripts[uiPlayerScript].hScript, true, "SaveGame", nullptr, &bResult, Scripting::FA_BYTE);
 
 			if (bResult) {
-				this->m_oHudInfoMessages.AddMessage(L"Game saved!", Entity::HudMessageColor::HM_GREEN);
+				this->m_oHudInfoMessages.AddMessage(oEngineLocaleMgr.QueryPhrase(L"app.savegame.success", L"Game saved!"), Entity::HudMessageColor::HM_GREEN);
 			} else {
-				this->m_oHudInfoMessages.AddMessage(L"Failed to save game", Entity::HudMessageColor::HM_RED);
+				this->m_oHudInfoMessages.AddMessage(oEngineLocaleMgr.QueryPhrase(L"app.savegame.failure", L"Failed to save game"), Entity::HudMessageColor::HM_RED);
 			}
 		}
 

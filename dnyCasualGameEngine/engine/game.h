@@ -505,6 +505,10 @@ namespace Game {
 				return false;
 			}
 
+			//Initialize engine localization
+			oEngineLocaleMgr.SetLanguagePath(wszBasePath + L"lang");
+			oEngineLocaleMgr.SetLocale(pAppLang->szValue);
+
 			//Load color palette
 			Menu::LoadPalette();
 			

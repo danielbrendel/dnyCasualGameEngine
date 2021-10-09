@@ -290,6 +290,25 @@ namespace Utils {
 		return szResult;
 	}
 
+	std::wstring ReplaceStringW(const std::wstring& wszString, const std::wstring& wszFind, const std::wstring& wszNew)
+	{
+		//Replace all occurences of a string
+
+		std::wstring wszResult = wszString;
+
+		//Find position of occurence in string
+		size_t uiSubstrPos = wszResult.find(wszFind);
+		while (uiSubstrPos != std::wstring::npos) {
+			//Replace var identifier with value
+			wszResult = wszResult.replace(wszResult.begin() + uiSubstrPos, wszResult.begin() + uiSubstrPos + wszFind.length(), wszNew);
+
+			//Update position value
+			uiSubstrPos = wszResult.find(wszFind);
+		}
+
+		return wszResult;
+	}
+
 	std::vector<std::wstring> ListFilesByExt(const std::wstring& wszBaseDir, const wchar_t** pFileList, const size_t uiListLen)
 	{
 		WIN32_FIND_DATA sFindData = { 0 };

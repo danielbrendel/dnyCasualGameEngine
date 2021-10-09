@@ -65,7 +65,7 @@ namespace Menu {
 			if (this->m_oSaveGames.GetSelectedItem() != std::string::npos) {
 				Game::pGame->LoadSavedGameState(this->m_oSaveGames.GetItem(this->m_oSaveGames.GetSelectedItem()));
 			} else {
-				Game::pGame->AddHudInfoMessage(L"Please select a saved game state", Entity::HudMessageColor::HM_RED, 5000);
+				Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.info.selectgamestate", L"Please select a saved game state"), Entity::HudMessageColor::HM_RED, 5000);
 			}
 		}
 	}
@@ -129,11 +129,11 @@ namespace Menu {
 	{
 		if (pButton == &this->m_btnSave) {
 			this->SaveBindings();
-			Game::pGame->AddHudInfoMessage(L"Settings saved!", Entity::HudMessageColor::HM_GREEN);
+			Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.keys.info.saved", L"Settings saved!"), Entity::HudMessageColor::HM_GREEN);
 		} else if (pButton == &this->m_btnRestoreDefaults) {
 			this->RestoreDefaults();
 			this->SaveBindings();
-			Game::pGame->AddHudInfoMessage(L"Default key settings restored!", Entity::HudMessageColor::HM_GREEN);
+			Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.keys.info.defaultrestored", L"Default key settings restored!"), Entity::HudMessageColor::HM_GREEN);
 		}
 	}
 
@@ -141,7 +141,8 @@ namespace Menu {
 	{
 		if (pButton == &this->m_btnSave) {
 			this->SaveGfxSettings();
-			Game::pGame->AddHudInfoMessage(L"Settings saved!", Entity::HudMessageColor::HM_GREEN);
+			this->SaveUISettings();
+			Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.gfx.info.saved", L"Settings saved!"), Entity::HudMessageColor::HM_GREEN);
 			pConfigMgr->Parse(L"restart");
 		}
 	}
@@ -150,7 +151,7 @@ namespace Menu {
 	{
 		if (pButton == &this->m_btnSave) {
 			this->SaveSoundSettings();
-			Game::pGame->AddHudInfoMessage(L"Settings saved!", Entity::HudMessageColor::HM_GREEN);
+			Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.snd.info.saved", L"Settings saved!"), Entity::HudMessageColor::HM_GREEN);
 		}
 	}
 

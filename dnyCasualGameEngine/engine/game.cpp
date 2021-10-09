@@ -352,6 +352,10 @@ namespace Game {
 		}
 		
 		if ((vKey == g_oInputMgr.GetKeyBindingCode(L"SAVEGAME")) && (!bDown)) {
+			if (GetFileAttributes((wszBasePath + L"saves").c_str()) == INVALID_FILE_ATTRIBUTES) {
+				CreateDirectory((wszBasePath + L"saves").c_str(), nullptr);
+			}
+
 			size_t uiPlayerScript = this->FindScript(L"player");
 			bool bResult = false;
 

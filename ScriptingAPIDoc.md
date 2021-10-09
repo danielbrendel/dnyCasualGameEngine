@@ -1,4 +1,4 @@
-# API documentation for Casual Game Engine (dnyCasualGameEngine)
+# Scripting API documentation for Casual Game Engine (dnyCasualGameEngine)
 
 (C) 2021 by Daniel Brendel (dbrendel1988[at]gmail[dot]com)
 

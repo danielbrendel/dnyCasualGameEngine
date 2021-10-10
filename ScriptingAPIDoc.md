@@ -419,3 +419,6 @@ You can use all things from
 * AngelScript std string
 * AngelScript script array
 * AngelScript script math
+
+View the official AngelScript documentation in order to learn about
+general AngelScript programming and how the scripting language works.

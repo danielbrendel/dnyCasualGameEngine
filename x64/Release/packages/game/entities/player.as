@@ -525,8 +525,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		}
 	}
 	
-	//Called for recieving the model data for this entity. This is only used for
-	//damageable entities. 
+	//Called for accessing the model data for this entity.
 	Model& GetModel()
 	{
 		return this.m_oModel;

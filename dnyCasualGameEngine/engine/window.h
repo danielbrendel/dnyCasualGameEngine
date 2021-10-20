@@ -171,6 +171,11 @@ namespace DxWindow {
 			if (!this->m_hWindow)
 				return false;
 			
+			//Center window to screen
+			RECT sDesktopRect;
+			GetWindowRect(GetDesktopWindow(), &sDesktopRect);
+			SetWindowPos(this->m_hWindow, 0, sDesktopRect.right / 2 - w / 2, sDesktopRect.bottom / 2 - h / 2, w, h, SWP_NOSIZE | SWP_NOZORDER);
+
 			//Save window rect data
 			if (!GetWindowRect(this->m_hWindow, &this->m_sRect)) {
 				this->Release();

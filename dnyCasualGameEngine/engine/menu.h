@@ -1085,7 +1085,7 @@ namespace Menu {
 			this->m_hDown = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\down.png", 1, 50, 50, 1, false);
 
 			this->m_oPlay.SetText(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.btnplay", L"Start new game"));
-			this->m_oPlay.SetPosition(Entity::Vector(250, 200));
+			this->m_oPlay.SetPosition(Entity::Vector(350, 200));
 			this->m_oPlay.SetSize(Entity::Vector(230, 35));
 			this->m_oPlay.SetOwner(this);
 			this->m_oPlay.SetTextColor(GetPaletteItem(L"playmenu.btnplay.text", Entity::Color(250, 250, 250, 255)));
@@ -1094,7 +1094,7 @@ namespace Menu {
 			this->m_oPlay.SetHoverColor(GetPaletteItem(L"playmenu.btnplay.hover", Entity::Color(143, 235, 155, 150)));
 
 			this->m_oSaveGames.SetOwner(this);
-			this->m_oSaveGames.SetPosition(Entity::Vector(265, 300));
+			this->m_oSaveGames.SetPosition(Entity::Vector(365, 300));
 			this->m_oSaveGames.SetSize(Entity::Vector(600, 300));
 			this->m_oSaveGames.SetFrameColor(GetPaletteItem(L"playmenu.lstsavegames.frame", Entity::Color(150, 150, 150, 150)));
 			this->m_oSaveGames.SetFillColor(GetPaletteItem(L"playmenu.lstsavegames.fill", Entity::Color(50, 50, 50, 150)));
@@ -1103,7 +1103,7 @@ namespace Menu {
 			this->m_oSaveGames.SetSelectColor(GetPaletteItem(L"playmenu.lstsavegames.select", Entity::Color(150, 150, 150, 150)));
 
 			this->m_oLoad.SetText(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.btnload", L"Load game"));
-			this->m_oLoad.SetPosition(Entity::Vector(265, 300 + 300 + 10));
+			this->m_oLoad.SetPosition(Entity::Vector(365, 300 + 300 + 10));
 			this->m_oLoad.SetSize(Entity::Vector(150, 35));
 			this->m_oLoad.SetOwner(this);
 			this->m_oLoad.SetTextColor(GetPaletteItem(L"playmenu.btnload.text", Entity::Color(250, 250, 250, 255)));
@@ -1170,13 +1170,13 @@ namespace Menu {
 			this->m_oSaveGames.Draw();
 			this->m_oLoad.Draw();
 
-			pRenderer->DrawSprite(this->m_hUp, 265 + 604, 300 + 300 / 2 - 50 / 2 - 10, 0, 0.0f);
-			pRenderer->DrawSprite(this->m_hDown, 265 + 604, 300 + 300 / 2 - 50 / 2 + 50 - 10, 0, 0.0f);
+			pRenderer->DrawSprite(this->m_hUp, 365 + 604, 300 + 300 / 2 - 50 / 2 - 10, 0, 0.0f);
+			pRenderer->DrawSprite(this->m_hDown, 365 + 604, 300 + 300 / 2 - 50 / 2 + 50 - 10, 0, 0.0f);
 			
-			pRenderer->DrawString(pDefaultFont, this->m_wszLocaleSavedGames, 265, 279, this->m_colSavedGamesTitle.r, this->m_colSavedGamesTitle.g, this->m_colSavedGamesTitle.b, this->m_colSavedGamesTitle.a);
+			pRenderer->DrawString(pDefaultFont, this->m_wszLocaleSavedGames, 365, 279, this->m_colSavedGamesTitle.r, this->m_colSavedGamesTitle.g, this->m_colSavedGamesTitle.b, this->m_colSavedGamesTitle.a);
 
 			if (this->m_oSaveGames.GetCount() == 0) {
-				pRenderer->DrawString(pDefaultFont, this->m_wszLocaleNoSavedGamesYet, 265 + 300 - ((int)this->m_wszLocaleNoSavedGamesYet.length() * iDefaultFontSize[0] / 2), 300 + 150 - iDefaultFontSize[1] / 2, this->m_colNoSavedGamesYet.r, this->m_colNoSavedGamesYet.g, this->m_colNoSavedGamesYet.b, this->m_colNoSavedGamesYet.a);
+				pRenderer->DrawString(pDefaultFont, this->m_wszLocaleNoSavedGamesYet, 365 + 300 - ((int)this->m_wszLocaleNoSavedGamesYet.length() * iDefaultFontSize[0] / 2), 300 + 150 - iDefaultFontSize[1] / 2, this->m_colNoSavedGamesYet.r, this->m_colNoSavedGamesYet.g, this->m_colNoSavedGamesYet.b, this->m_colNoSavedGamesYet.a);
 			}
 		}
 
@@ -1193,11 +1193,11 @@ namespace Menu {
 			this->m_oLoad.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 
 			if ((iMouseKey == 1) && (!bDown)) {
-				if ((this->m_vecMousePos[0] > 265 + 604) && (this->m_vecMousePos[0] < 265 + 604 + 50) && (this->m_vecMousePos[1] > 300 + 300 / 2 - 50 / 2 - 10) && (this->m_vecMousePos[1] < 300 + 300 / 2 - 50 / 2 - 10 + 50)) {
+				if ((this->m_vecMousePos[0] > 365 + 604) && (this->m_vecMousePos[0] < 365 + 604 + 50) && (this->m_vecMousePos[1] > 300 + 300 / 2 - 50 / 2 - 10) && (this->m_vecMousePos[1] < 300 + 300 / 2 - 50 / 2 - 10 + 50)) {
 					this->m_oSaveGames.ScrollDown();
 				}
 
-				if ((this->m_vecMousePos[0] > 265 + 604) && (this->m_vecMousePos[0] < 265 + 604 + 50) && (this->m_vecMousePos[1] > 300 + 300 / 2 - 50 / 2 + 50 - 10) && (this->m_vecMousePos[1] < 300 + 300 / 2 - 50 / 2 + 50 - 10 + 50)) {
+				if ((this->m_vecMousePos[0] > 365 + 604) && (this->m_vecMousePos[0] < 365 + 604 + 50) && (this->m_vecMousePos[1] > 300 + 300 / 2 - 50 / 2 + 50 - 10) && (this->m_vecMousePos[1] < 300 + 300 / 2 - 50 / 2 + 50 - 10 + 50)) {
 					this->m_oSaveGames.ScrollUp();
 				}
 			}
@@ -1311,7 +1311,7 @@ namespace Menu {
 			}
 
 			this->m_oButton.SetText(oEngineLocaleMgr.QueryPhrase(L"app.packagemenu.btnplay", L"Play"));
-			this->m_oButton.SetPosition(Entity::Vector(250, 200 + iAboutContentHeight));
+			this->m_oButton.SetPosition(Entity::Vector(350, 200 + iAboutContentHeight));
 			this->m_oButton.SetSize(Entity::Vector(130, 35));
 			this->m_oButton.SetOwner(this);
 			this->m_oButton.SetTextColor(GetPaletteItem(L"packagemenu.btnplay.text", Entity::Color(250, 250, 250, 255)));
@@ -1320,7 +1320,7 @@ namespace Menu {
 			this->m_oButton.SetHoverColor(GetPaletteItem(L"packagemenu.btnplay.hover", Entity::Color(143, 235, 155, 150)));
 
 			this->m_oImageListView.SetOwner(this);
-			this->m_oImageListView.SetPosition(Entity::Vector(250, 200 + 45 + iAboutContentHeight));
+			this->m_oImageListView.SetPosition(Entity::Vector(350, 200 + 45 + iAboutContentHeight));
 			this->m_oImageListView.SetSize(Entity::Vector(700, 400));
 			this->m_oImageListView.SetImageGap(10);
 			this->m_oImageListView.SetImageSize(Entity::Vector(195, 90));
@@ -1329,7 +1329,7 @@ namespace Menu {
 			this->m_oImageListView.UpdateDimensions();
 
 			this->m_oBrowse.SetText(oEngineLocaleMgr.QueryPhrase(L"app.packagemenu.btnbrowse", L"Browse Workshop"));
-			this->m_oBrowse.SetPosition(Entity::Vector(450, 200 + iAboutContentHeight));
+			this->m_oBrowse.SetPosition(Entity::Vector(550, 200 + iAboutContentHeight));
 			this->m_oBrowse.SetSize(Entity::Vector(150, 35));
 			this->m_oBrowse.SetOwner(this);
 			this->m_oBrowse.SetTextColor(GetPaletteItem(L"packagemenu.btnbrowse.text", Entity::Color(250, 250, 250, 255)));
@@ -1351,7 +1351,7 @@ namespace Menu {
 			if (!this->m_bActive)
 				return;
 
-			const int iStartPosX = 250;
+			const int iStartPosX = 350;
 			const int iStartPosY = 200;
 
 			//Draw hint if there are no packages found
@@ -1385,8 +1385,8 @@ namespace Menu {
 					iAboutContentHeight = (int)this->m_vPackages[this->m_uiSelectedPackage].vAboutContent.size() * iDefaultFontSize[1];
 				}
 
-				pRenderer->DrawSprite(this->m_hBackward, 250, 200 + 45 + iAboutContentHeight + 350, 0, 0.0f);
-				pRenderer->DrawSprite(this->m_hForward, 300, 200 + 45 + iAboutContentHeight + 350, 0, 0.0f);
+				pRenderer->DrawSprite(this->m_hBackward, 350, 200 + 45 + iAboutContentHeight + 350, 0, 0.0f);
+				pRenderer->DrawSprite(this->m_hForward, 400, 200 + 45 + iAboutContentHeight + 350, 0, 0.0f);
 			}
 		}
 
@@ -1789,94 +1789,94 @@ namespace Menu {
 			this->m_oMoveForward.Initialize(0, 0, nullptr);
 			this->m_oMoveForward.SetCommand(L"MOVE_FORWARD");
 			this->m_oMoveForward.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MOVE_FORWARD"));
-			this->m_oMoveForward.SetPosition(Entity::Vector(250, 250));
+			this->m_oMoveForward.SetPosition(Entity::Vector(350, 250));
 
 			this->m_oMoveBackward.Initialize(0, 0, nullptr);
 			this->m_oMoveBackward.SetCommand(L"MOVE_BACKWARD");
 			this->m_oMoveBackward.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MOVE_BACKWARD"));
-			this->m_oMoveBackward.SetPosition(Entity::Vector(250, 300));
+			this->m_oMoveBackward.SetPosition(Entity::Vector(350, 300));
 
 			this->m_oTurnLeft.Initialize(0, 0, nullptr);
 			this->m_oTurnLeft.SetCommand(L"TURN_LEFT");
 			this->m_oTurnLeft.SetVkey(g_oInputMgr.GetKeyBindingCode(L"TURN_LEFT"));
-			this->m_oTurnLeft.SetPosition(Entity::Vector(250, 350));
+			this->m_oTurnLeft.SetPosition(Entity::Vector(350, 350));
 
 			this->m_oTurnRight.Initialize(0, 0, nullptr);
 			this->m_oTurnRight.SetCommand(L"TURN_RIGHT");
 			this->m_oTurnRight.SetVkey(g_oInputMgr.GetKeyBindingCode(L"TURN_RIGHT"));
-			this->m_oTurnRight.SetPosition(Entity::Vector(250, 400));
+			this->m_oTurnRight.SetPosition(Entity::Vector(350, 400));
 
 			this->m_oStrafeLeft.Initialize(0, 0, nullptr);
 			this->m_oStrafeLeft.SetCommand(L"MOVE_LEFT");
 			this->m_oStrafeLeft.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MOVE_LEFT"));
-			this->m_oStrafeLeft.SetPosition(Entity::Vector(250, 450));
+			this->m_oStrafeLeft.SetPosition(Entity::Vector(350, 450));
 
 			this->m_oStrafeRight.Initialize(0, 0, nullptr);
 			this->m_oStrafeRight.SetCommand(L"MOVE_RIGHT");
 			this->m_oStrafeRight.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MOVE_RIGHT"));
-			this->m_oStrafeRight.SetPosition(Entity::Vector(250, 500));
+			this->m_oStrafeRight.SetPosition(Entity::Vector(350, 500));
 
 			this->m_oAttack.Initialize(0, 0, nullptr);
 			this->m_oAttack.SetCommand(L"ATTACK");
 			this->m_oAttack.SetVkey(g_oInputMgr.GetKeyBindingCode(L"ATTACK"));
-			this->m_oAttack.SetPosition(Entity::Vector(550, 250));
+			this->m_oAttack.SetPosition(Entity::Vector(650, 250));
 
 			this->m_oUse.Initialize(0, 0, nullptr);
 			this->m_oUse.SetCommand(L"USE");
 			this->m_oUse.SetVkey(g_oInputMgr.GetKeyBindingCode(L"USE"));
-			this->m_oUse.SetPosition(Entity::Vector(550, 300));
+			this->m_oUse.SetPosition(Entity::Vector(650, 300));
 
 			this->m_oThrow.Initialize(0, 0, nullptr);
 			this->m_oThrow.SetCommand(L"THROW");
 			this->m_oThrow.SetVkey(g_oInputMgr.GetKeyBindingCode(L"THROW"));
-			this->m_oThrow.SetPosition(Entity::Vector(550, 350));
+			this->m_oThrow.SetPosition(Entity::Vector(650, 350));
 
 			this->m_oSlot1.Initialize(0, 0, nullptr);
 			this->m_oSlot1.SetCommand(L"SLOT1");
 			this->m_oSlot1.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT1"));
-			this->m_oSlot1.SetPosition(Entity::Vector(250, 550));
+			this->m_oSlot1.SetPosition(Entity::Vector(350, 550));
 
 			this->m_oSlot2.Initialize(0, 0, nullptr);
 			this->m_oSlot2.SetCommand(L"SLOT2");
 			this->m_oSlot2.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT2"));
-			this->m_oSlot2.SetPosition(Entity::Vector(550, 550));
+			this->m_oSlot2.SetPosition(Entity::Vector(650, 550));
 
 			this->m_oSlot3.Initialize(0, 0, nullptr);
 			this->m_oSlot3.SetCommand(L"SLOT3");
 			this->m_oSlot3.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT3"));
-			this->m_oSlot3.SetPosition(Entity::Vector(250, 600));
+			this->m_oSlot3.SetPosition(Entity::Vector(350, 600));
 
 			this->m_oSlot4.Initialize(0, 0, nullptr);
 			this->m_oSlot4.SetCommand(L"SLOT4");
 			this->m_oSlot4.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT4"));
-			this->m_oSlot4.SetPosition(Entity::Vector(550, 600));
+			this->m_oSlot4.SetPosition(Entity::Vector(650, 600));
 
 			this->m_oSlot5.Initialize(0, 0, nullptr);
 			this->m_oSlot5.SetCommand(L"SLOT5");
 			this->m_oSlot5.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT5"));
-			this->m_oSlot5.SetPosition(Entity::Vector(250, 650));
+			this->m_oSlot5.SetPosition(Entity::Vector(350, 650));
 
 			this->m_oMenu.Initialize(0, 0, nullptr);
 			this->m_oMenu.SetCommand(L"MENU");
 			this->m_oMenu.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MENU"));
-			this->m_oMenu.SetPosition(Entity::Vector(550, 400));
+			this->m_oMenu.SetPosition(Entity::Vector(650, 400));
 
 			this->m_oQuickSave.Initialize(0, 0, nullptr);
 			this->m_oQuickSave.SetCommand(L"SAVEGAME");
 			this->m_oQuickSave.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SAVEGAME"));
-			this->m_oQuickSave.SetPosition(Entity::Vector(550, 450));
+			this->m_oQuickSave.SetPosition(Entity::Vector(650, 450));
 
 			this->m_oConsole.Initialize(0, 0, nullptr);
 			this->m_oConsole.SetCommand(L"CONSOLE");
 			this->m_oConsole.SetVkey(g_oInputMgr.GetKeyBindingCode(L"CONSOLE"));
-			this->m_oConsole.SetPosition(Entity::Vector(550, 500));
+			this->m_oConsole.SetPosition(Entity::Vector(650, 500));
 
 			this->m_btnSave.SetOwner(this);
 			this->m_btnSave.SetFillColor(GetPaletteItem(L"settings.keys.btnsave.fill", Entity::Color(50, 135, 0, 150)));
 			this->m_btnSave.SetFrameColor(GetPaletteItem(L"settings.keys.btnsave.frame", Entity::Color(250, 250, 250, 150)));
 			this->m_btnSave.SetHoverColor(GetPaletteItem(L"settings.keys.btnsave.hover", Entity::Color(76, 155, 0, 150)));
 			this->m_btnSave.SetTextColor(GetPaletteItem(L"settings.keys.btnsave.text", Entity::Color(250, 250, 250, 150)));
-			this->m_btnSave.SetPosition(Entity::Vector(250, 730));
+			this->m_btnSave.SetPosition(Entity::Vector(350, 730));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
 			this->m_btnSave.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.keys.btnsave", L"Save"));
 
@@ -1885,7 +1885,7 @@ namespace Menu {
 			this->m_btnRestoreDefaults.SetFrameColor(GetPaletteItem(L"settings.keys.btnrestore.frame", Entity::Color(0, 0, 0, 150)));
 			this->m_btnRestoreDefaults.SetHoverColor(GetPaletteItem(L"settings.keys.btnrestore.hover", Entity::Color(250, 250, 250, 150)));
 			this->m_btnRestoreDefaults.SetTextColor(GetPaletteItem(L"settings.keys.btnrestore.text", Entity::Color(0, 0, 0, 150)));
-			this->m_btnRestoreDefaults.SetPosition(Entity::Vector(500, 730));
+			this->m_btnRestoreDefaults.SetPosition(Entity::Vector(600, 730));
 			this->m_btnRestoreDefaults.SetSize(Entity::Vector(200, 35));
 			this->m_btnRestoreDefaults.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.keys.btnrestoredefaults", L"Reset defaults"));
 
@@ -2080,7 +2080,7 @@ namespace Menu {
 			this->m_oResolutions.SetFillColor(GetPaletteItem(L"settings.gfx.cbresolutions.fill", Entity::Color(50, 50, 50, 150)));
 			this->m_oResolutions.SetFrameColor(GetPaletteItem(L"settings.gfx.cbresolutions.frame", Entity::Color(255, 255, 255, 150)));
 			this->m_oResolutions.SetHoverColor(GetPaletteItem(L"settings.gfx.cbresolutions.hover", Entity::Color(0, 50, 125, 150)));
-			this->m_oResolutions.SetPosition(Entity::Vector(250, 250));
+			this->m_oResolutions.SetPosition(Entity::Vector(350, 250));
 			this->m_oResolutions.SetSelectedItem(0);
 			this->m_oResolutions.SetTextColor(GetPaletteItem(L"settings.gfx.cbresolutions.text", Entity::Color(200, 200, 200, 255)));
 			this->m_oResolutions.SetWidth(200);
@@ -2088,7 +2088,7 @@ namespace Menu {
 			this->m_oLocales.SetFillColor(GetPaletteItem(L"settings.gfx.cblocales.fill", Entity::Color(50, 50, 50, 150)));
 			this->m_oLocales.SetFrameColor(GetPaletteItem(L"settings.gfx.cblocales.frame", Entity::Color(255, 255, 255, 150)));
 			this->m_oLocales.SetHoverColor(GetPaletteItem(L"settings.gfx.cblocales.hover", Entity::Color(0, 50, 125, 150)));
-			this->m_oLocales.SetPosition(Entity::Vector(250, 340));
+			this->m_oLocales.SetPosition(Entity::Vector(350, 340));
 			this->m_oLocales.SetSelectedItem(0);
 			this->m_oLocales.SetTextColor(GetPaletteItem(L"settings.gfx.cblocales.text", Entity::Color(200, 200, 200, 255)));
 			this->m_oLocales.SetWidth(200);
@@ -2115,14 +2115,14 @@ namespace Menu {
 			this->m_oFullscreen.SetHoverColor(GetPaletteItem(L"settings.gfx.cbfullscreen.hover", Entity::Color(255, 255, 255, 150)));
 			this->m_oFullscreen.SetLabel(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.gfx.lblfullscreen", L"Run in fullscreen"));
 			this->m_oFullscreen.SetLabelColor(GetPaletteItem(L"settings.gfx.cbfullscreen.label", Entity::Color(200, 200, 200, 150)));
-			this->m_oFullscreen.SetPosition(Entity::Vector(250, 300));
+			this->m_oFullscreen.SetPosition(Entity::Vector(350, 300));
 
 			this->m_btnSave.SetOwner(this);
 			this->m_btnSave.SetFillColor(GetPaletteItem(L"settings.gfx.btnsave.fill", Entity::Color(50, 135, 0, 150)));
 			this->m_btnSave.SetFrameColor(GetPaletteItem(L"settings.gfx.btnsave.frame", Entity::Color(250, 250, 250, 150)));
 			this->m_btnSave.SetHoverColor(GetPaletteItem(L"settings.gfx.btnsave.hover", Entity::Color(76, 155, 0, 150)));
 			this->m_btnSave.SetTextColor(GetPaletteItem(L"settings.gfx.btnsave.text", Entity::Color(250, 250, 250, 255)));
-			this->m_btnSave.SetPosition(Entity::Vector(250, 600));
+			this->m_btnSave.SetPosition(Entity::Vector(350, 600));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
 			this->m_btnSave.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.gfx.btnsave", L"Save"));
 
@@ -2139,11 +2139,15 @@ namespace Menu {
 
 			this->m_oFullscreen.Draw();
 			this->m_oResolutions.Draw();
-			this->m_oLocales.Draw();
+
+			if (!this->m_oResolutions.IsOpen()) {
+				this->m_oLocales.Draw();
+			}
+
 			this->m_btnSave.Draw();
 
 			if (!this->m_oResolutions.IsOpen()) {
-				pRenderer->DrawString(pDefaultFont, this->m_wszLocaleRestartHint, 250, 400, this->m_colRestartHint.r, this->m_colRestartHint.g, this->m_colRestartHint.b, this->m_colRestartHint.a);
+				pRenderer->DrawString(pDefaultFont, this->m_wszLocaleRestartHint, 350, 400, this->m_colRestartHint.r, this->m_colRestartHint.g, this->m_colRestartHint.b, this->m_colRestartHint.a);
 			}
 		}
 
@@ -2206,7 +2210,7 @@ namespace Menu {
 			this->m_oVolume.SetHoverColor(GetPaletteItem(L"settings.snd.sldvolume.hover", Entity::Color(200, 200, 200, 150)));
 			this->m_oVolume.SetLineColor(GetPaletteItem(L"settings.snd.sldvolume.line", Entity::Color(150, 150, 150, 150)));
 			this->m_oVolume.SetMaxValue(10 + 1);
-			this->m_oVolume.SetPosition(Entity::Vector(250, 300));
+			this->m_oVolume.SetPosition(Entity::Vector(350, 300));
 			this->m_oVolume.SetSliderColor(GetPaletteItem(L"settings.snd.sldvolume.slider", Entity::Color(150, 150, 0, 150)));
 			this->m_oVolume.SetValue(pSndVolume->iValue);
 			this->m_oVolume.SetWidth(200);
@@ -2216,7 +2220,7 @@ namespace Menu {
 			this->m_btnSave.SetFrameColor(GetPaletteItem(L"settings.snd.btnsave.frame", Entity::Color(250, 250, 250, 150)));
 			this->m_btnSave.SetHoverColor(GetPaletteItem(L"settings.snd.btnsave.hover", Entity::Color(76, 155, 0, 150)));
 			this->m_btnSave.SetTextColor(GetPaletteItem(L"settings.snd.btnsave.text", Entity::Color(250, 250, 250, 255)));
-			this->m_btnSave.SetPosition(Entity::Vector(250, 600));
+			this->m_btnSave.SetPosition(Entity::Vector(350, 600));
 			this->m_btnSave.SetSize(Entity::Vector(200, 35));
 			this->m_btnSave.SetText(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.snd.btnsave", L"Save"));
 
@@ -2273,16 +2277,16 @@ namespace Menu {
 			this->m_oMenuKeys.Initialize(0, 0, nullptr);
 			this->m_oMenuGfx.Initialize(0, 0, nullptr);
 			this->m_oMenuSnd.Initialize(0, 0, nullptr);
-			this->m_oMenuKeys.SetPosition(Entity::Vector(250, 250));
-			this->m_oMenuGfx.SetPosition(Entity::Vector(250, 250));
-			this->m_oMenuSnd.SetPosition(Entity::Vector(250, 250));
+			this->m_oMenuKeys.SetPosition(Entity::Vector(350, 250));
+			this->m_oMenuGfx.SetPosition(Entity::Vector(350, 250));
+			this->m_oMenuSnd.SetPosition(Entity::Vector(350, 250));
 
 			this->m_oTabMenu.Initialize(w, h, pGameStarted);
 			this->m_oTabMenu.AddItem(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.tabs.bindings", L"Bindings   "), &this->m_oMenuKeys);
 			this->m_oTabMenu.AddItem(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.tabs.gfxui", L"Graphics/UI"), &this->m_oMenuGfx);
 			this->m_oTabMenu.AddItem(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.tabs.snd", L"Sound      "), &this->m_oMenuSnd);
 
-			this->m_oTabMenu.SetPosition(Entity::Vector(250, 200));
+			this->m_oTabMenu.SetPosition(Entity::Vector(350, 200));
 			this->m_oTabMenu.SetTabSpacing(20);
 			this->m_oTabMenu.SetTextColor(GetPaletteItem(L"settingsmenu.tabs.text", Entity::Color(200, 200, 200, 255)));
 			this->m_oTabMenu.SetHoverColor(GetPaletteItem(L"settingsmenu.tabs.hover", Entity::Color(50, 200, 0, 150)));

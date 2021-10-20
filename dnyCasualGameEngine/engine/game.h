@@ -350,7 +350,7 @@ namespace Game {
 		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr), m_bInAppRestart(false), m_iFrames(100), m_iFrameRate(100) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
-		bool Initialize(void)
+		bool Initialize(const std::wstring& wszPackage = L"", const std::wstring& wszMap = L"")
 		{
 			//Initialize game
 
@@ -590,6 +590,12 @@ namespace Game {
 			this->m_bGameStarted = false;
 			this->m_bInGameLoadingProgress = false;
 			
+			//Load map of package if provided
+			if ((wszPackage.length() > 0) && (wszMap.length() > 0)) {
+				this->StartGame(wszPackage);
+				this->LoadMap(wszMap);
+			}
+
 			return this->m_bInit;
 		}
 

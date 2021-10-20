@@ -22,6 +22,7 @@ namespace Utils {
 	std::wstring ExtractFileName(const std::wstring& wszFile);
 	std::string ExtractFileNameA(const std::string& szFile);
 	std::wstring ExtractFilePath(const std::wstring& wszFile);
+	std::wstring GetExeName(void);
 	bool FileExists(const std::wstring& wszFileName);
 	bool DirExists(const std::wstring& wszDirName);
 	inline void CharReplace(std::string& szStr, const char old, const char _new);

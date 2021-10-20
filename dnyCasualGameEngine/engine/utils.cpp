@@ -119,6 +119,17 @@ namespace Utils {
 		return wszFullFileName;
 	}
 
+	std::wstring GetExeName(void)
+	{
+		//Get exe name
+
+		wchar_t wszFullFileName[2048] = { 0 };
+
+		GetModuleFileName(0, wszFullFileName, sizeof(wszFullFileName));
+
+		return ExtractFileName(wszFullFileName);
+	}
+
 	bool FileExists(const std::wstring& wszFileName)
 	{
 		//Indicate whether a file exists or not
@@ -390,7 +401,7 @@ namespace Utils {
 	{
 		//Create a restarter script
 
-		std::wstring wszBatchScript = L"@echo off\ncls\ntaskkill /PID " + std::to_wstring(GetCurrentProcessId()) + "\nstart " APP_EXEFILENAME "\n";
+		std::wstring wszBatchScript = L"@echo off\ncls\ntaskkill /PID " + std::to_wstring(GetCurrentProcessId()) + L"\nstart \"\" \"" + GetExeName() + L"\"\n";
 		std::wstring wszBatchFile = wszBasePath + L"restarter.bat";
 
 		if (FileExists(wszBatchFile)) {

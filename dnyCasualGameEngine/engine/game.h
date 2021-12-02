@@ -124,6 +124,7 @@ namespace Game {
 		int m_iFrameRate;
 		int m_iFrames;
 		size_t m_uiSkipFrame;
+		DxSound::HDXSOUND m_hMenuTheme;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -581,6 +582,10 @@ namespace Game {
 				return false;
 			}
 
+			//Handle menu theme if exists
+			this->m_hMenuTheme = pSound->QuerySound(wszBasePath + L"media\\sound\\menu.wav");
+			pSound->Play(this->m_hMenuTheme, pSndVolume->iValue, DSBPLAY_LOOPING);
+
 			//Create restart script
 			Utils::CreateRestartScript();
 
@@ -611,6 +616,9 @@ namespace Game {
 			if (wszFromPath.length() > 0) {
 				pConsole->AddLine(L"Loading game from path: " + wszFromPath);
 			}
+
+			//Stop menu theme
+			pSound->StopSound(this->m_hMenuTheme);
 
 			//Stop current game if running any
 			if (this->m_bGameStarted) {

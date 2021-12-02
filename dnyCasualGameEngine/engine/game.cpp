@@ -276,6 +276,9 @@ namespace Game {
 
 		//Restore background image
 		pRenderer->SetBackgroundPicture(wszBasePath + L"media\\gfx\\background.jpg");
+
+		//Play main menu theme if loaded
+		pSound->Play(this->m_hMenuTheme, pSndVolume->iValue, DSBPLAY_LOOPING);
 	}
 
 	void CGame::OnMouseEvent(int x, int y, int iMouseKey, bool bDown, bool bCtrlHeld, bool bShiftHeld, bool bAltHeld)

@@ -79,6 +79,7 @@ namespace Game {
 			std::wstring wszName;
 			std::wstring wszFileName;
 			std::wstring wszBackground;
+			std::wstring wszBackgroundFullPath;
 		};
 
 		struct player_s {
@@ -186,6 +187,8 @@ namespace Game {
 			if (!Utils::FileExists(wszBackgroundFile)) {
 				wszBackgroundFile = wszBasePath + L"packages\\.common\\gfx\\" + this->m_sMap.wszBackground;
 			}
+
+			this->m_sMap.wszBackgroundFullPath = wszBackgroundFile;
 
 			pRenderer->SetBackgroundPicture(wszBackgroundFile);
 
@@ -831,5 +834,7 @@ namespace Game {
 		bool IsGameStarted(void) { return this->m_bGameStarted; }
 		//Get current frame rate
 		int GetCurrentFramerate(void) { return this->m_iFrameRate; }
+		//Get current full background file name
+		std::wstring GetFullBackgroundFileName(void) { return this->m_sMap.wszBackgroundFullPath; }
 	};
 }

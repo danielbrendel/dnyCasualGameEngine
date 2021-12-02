@@ -1697,6 +1697,7 @@ namespace Menu {
 		CKeyBinding m_oAttack;
 		CKeyBinding m_oUse;
 		CKeyBinding m_oThrow;
+		CKeyBinding m_oDodge;
 		CKeyBinding m_oSlot1;
 		CKeyBinding m_oSlot2;
 		CKeyBinding m_oSlot3;
@@ -1721,6 +1722,7 @@ namespace Menu {
 			g_oInputMgr.SetKeyBindingCode(L"ATTACK", this->m_oAttack.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"USE", this->m_oUse.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"THROW", this->m_oThrow.GetVkey());
+			g_oInputMgr.SetKeyBindingCode(L"DODGE", this->m_oDodge.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"SLOT1", this->m_oSlot1.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"SLOT2", this->m_oSlot2.GetVkey());
 			g_oInputMgr.SetKeyBindingCode(L"SLOT3", this->m_oSlot3.GetVkey());
@@ -1743,6 +1745,7 @@ namespace Menu {
 				hFile << L"bind " + std::to_wstring(this->m_oAttack.GetVkey()) + L" \"" + this->m_oAttack.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oUse.GetVkey()) + L" \"" + this->m_oUse.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oThrow.GetVkey()) + L" \"" + this->m_oThrow.GetCommand() + L"\"" << std::endl;
+				hFile << L"bind " + std::to_wstring(this->m_oDodge.GetVkey()) + L" \"" + this->m_oDodge.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oSlot1.GetVkey()) + L" \"" + this->m_oSlot1.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oSlot2.GetVkey()) + L" \"" + this->m_oSlot2.GetCommand() + L"\"" << std::endl;
 				hFile << L"bind " + std::to_wstring(this->m_oSlot3.GetVkey()) + L" \"" + this->m_oSlot3.GetCommand() + L"\"" << std::endl;
@@ -1769,6 +1772,7 @@ namespace Menu {
 			this->m_oAttack.SetVkey(57);
 			this->m_oUse.SetVkey(18);
 			this->m_oThrow.SetVkey(34);
+			this->m_oDodge.SetVkey(46);
 			this->m_oSlot1.SetVkey(2);
 			this->m_oSlot2.SetVkey(3);
 			this->m_oSlot3.SetVkey(4);
@@ -1831,6 +1835,11 @@ namespace Menu {
 			this->m_oThrow.SetVkey(g_oInputMgr.GetKeyBindingCode(L"THROW"));
 			this->m_oThrow.SetPosition(Entity::Vector(650, 350));
 
+			this->m_oDodge.Initialize(0, 0, nullptr);
+			this->m_oDodge.SetCommand(L"DODGE");
+			this->m_oDodge.SetVkey(g_oInputMgr.GetKeyBindingCode(L"DODGE"));
+			this->m_oDodge.SetPosition(Entity::Vector(650, 400));
+
 			this->m_oSlot1.Initialize(0, 0, nullptr);
 			this->m_oSlot1.SetCommand(L"SLOT1");
 			this->m_oSlot1.SetVkey(g_oInputMgr.GetKeyBindingCode(L"SLOT1"));
@@ -1859,7 +1868,7 @@ namespace Menu {
 			this->m_oMenu.Initialize(0, 0, nullptr);
 			this->m_oMenu.SetCommand(L"MENU");
 			this->m_oMenu.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MENU"));
-			this->m_oMenu.SetPosition(Entity::Vector(650, 400));
+			this->m_oMenu.SetPosition(Entity::Vector(650, 650));
 
 			this->m_oQuickSave.Initialize(0, 0, nullptr);
 			this->m_oQuickSave.SetCommand(L"SAVEGAME");
@@ -1905,6 +1914,7 @@ namespace Menu {
 			this->m_oAttack.Draw();
 			this->m_oUse.Draw();
 			this->m_oThrow.Draw();
+			this->m_oDodge.Draw();
 			this->m_oSlot1.Draw();
 			this->m_oSlot2.Draw();
 			this->m_oSlot3.Draw();
@@ -1931,6 +1941,7 @@ namespace Menu {
 			this->m_oAttack.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oUse.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oThrow.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oDodge.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSlot1.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSlot2.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSlot3.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
@@ -1957,6 +1968,7 @@ namespace Menu {
 			this->m_oAttack.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oUse.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oThrow.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oDodge.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSlot1.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSlot2.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSlot3.OnKeyEvent(vKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
@@ -2505,14 +2517,7 @@ namespace Menu {
 			this->m_oPackageMenu.AddPackage(wszName, wszPath);
 		}
 
-		void SetOpenStatus(bool status)
-		{
-			this->m_bOpen = status;
-
-			if (status) {
-				this->m_oMainMenu.OnToggleGameActiveMenuItems();
-			}
-		}
+		void SetOpenStatus(bool status);
 
 		void OpenPlayMenu(void)
 		{

@@ -155,6 +155,19 @@ namespace Menu {
 		}
 	}
 
+	void CMenu::SetOpenStatus(bool status)
+	{
+		this->m_bOpen = status;
+
+		if (status) {
+			this->m_oMainMenu.OnToggleGameActiveMenuItems();
+
+			pRenderer->SetBackgroundPicture(wszBasePath + L"media\\gfx\\background.jpg");
+		} else {
+			pRenderer->SetBackgroundPicture(Game::pGame->GetFullBackgroundFileName());
+		}
+	}
+
 	void MainMenu_OnResumeGame(class CMenu* pMenu)
 	{
 		Game::pGame->ResumeGame();

@@ -1590,8 +1590,8 @@ namespace Entity {
 		const std::vector<save_game_entry_s>& GetDataVector(void) const { return this->m_vData; }
 
 		//AngelScript interface methods
-		void Construct(void* pMemory) { new (pMemory) CSaveGameWriter(); }
-		void Destruct(void* pMemory) { ((CSaveGameWriter*)pMemory)->~CSaveGameWriter(); }
+		void Construct(void* pMemory) { new (pMemory) CSaveGameReader(); }
+		void Destruct(void* pMemory) { ((CSaveGameReader*)pMemory)->~CSaveGameReader(); }
 	};
 
 	/* HUD info messages */

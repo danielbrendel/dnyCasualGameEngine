@@ -233,13 +233,18 @@ namespace Entity {
 			return pSound->QuerySound(Utils::ConvertToWideString(szSoundFile));
 		}
 
-		bool PlaySound_(DxSound::HDXSOUND hSound, long lVolume)
+		bool PlaySound_(DxSound::HDXSOUND hSound, long lVolume, bool bLoop = false)
 		{
 			if (!Game::pGame->IsGameStarted()) {
 				return false;
 			}
 
-			return pSound->Play(hSound, lVolume, 0);
+			return pSound->Play(hSound, lVolume, ((bLoop) ? DSBPLAY_LOOPING : 0));
+		}
+
+		bool StopSound_(DxSound::HDXSOUND hSound)
+		{
+			return pSound->StopSound(hSound);
 		}
 
 		int GetCurrentVolume(void)
@@ -961,7 +966,8 @@ namespace Entity {
 			{ "void R_GetDrawingPosition(const Vector &in vMyPos, const Vector &in vMySize, Vector &out)", &APIFuncs::GetDrawingPosition },
 			{ "FontHandle R_GetDefaultFont()", &APIFuncs::GetDefaultFont },
 			{ "SoundHandle S_QuerySound(const string&in szSoundFile)", &APIFuncs::QuerySound },
-			{ "bool S_PlaySound(SoundHandle hSound, int32 lVolume)", &APIFuncs::PlaySound_ },
+			{ "bool S_PlaySound(SoundHandle hSound, int32 lVolume, bool bLoop = false)", &APIFuncs::PlaySound_ },
+			{ "bool S_StopSound(SoundHandle hSound)", &APIFuncs::StopSound_ },
 			{ "int S_GetCurrentVolume()", &APIFuncs::GetCurrentVolume },
 			{ "int Wnd_GetWindowCenterX()", &APIFuncs::GetWindowCenterX },
 			{ "int Wnd_GetWindowCenterY()", &APIFuncs::GetWindowCenterY },

@@ -313,8 +313,10 @@ void R_GetDrawingPosition(const Vector &in vMyPos, const Vector &in vMySize, Vec
 FontHandle R_GetDefaultFont()
 //Query a sound file located on the disk. Path is relative to the directory of the package
 SoundHandle S_QuerySound(const string&in szSoundFile)
-//Play a sound with the given volume (1-10)
-bool S_PlaySound(SoundHandle hSound, int32 lVolume)
+//Play a sound with the given volume (1-10). If bLoop is set to true, the sound will be looped
+bool S_PlaySound(SoundHandle hSound, int32 lVolume, bool bLoop = false)
+//Stop a currently played sound
+bool S_StopSound(SoundHandle hSound)
 //Get current game volume
 int S_GetCurrentVolume()
 //Get the center of the width of the screen

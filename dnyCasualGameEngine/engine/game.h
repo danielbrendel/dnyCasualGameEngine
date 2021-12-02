@@ -774,6 +774,24 @@ namespace Game {
 			this->m_bGamePause = false;
 		}
 
+		void SaveGame(void)
+		{
+			if (GetFileAttributes((wszBasePath + L"saves").c_str()) == INVALID_FILE_ATTRIBUTES) {
+				CreateDirectory((wszBasePath + L"saves").c_str(), nullptr);
+			}
+
+			size_t uiPlayerScript = this->FindScript(L"player");
+			bool bResult = false;
+
+			pScriptingInt->CallScriptFunction(this->m_vEntityScripts[uiPlayerScript].hScript, true, "SaveGame", nullptr, &bResult, Scripting::FA_BYTE);
+
+			if (bResult) {
+				this->m_oHudInfoMessages.AddMessage(oEngineLocaleMgr.QueryPhrase(L"app.savegame.success", L"Game saved!"), Entity::HudMessageColor::HM_GREEN);
+			} else {
+				this->m_oHudInfoMessages.AddMessage(oEngineLocaleMgr.QueryPhrase(L"app.savegame.failure", L"Failed to save game"), Entity::HudMessageColor::HM_RED);
+			}
+		}
+
 		void Release(void)
 		{
 			//Release game component

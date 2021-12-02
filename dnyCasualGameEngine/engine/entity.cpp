@@ -190,6 +190,11 @@ namespace Entity {
 			return Utils::ConvertToAnsiString(oPackageLocaleMgr.QueryPhrase(Utils::ConvertToWideString(szIdent), Utils::ConvertToWideString(szDefault)));
 		}
 
+		void TriggerGameSave(void)
+		{
+			Game::pGame->SaveGame();
+		}
+
 		bool ShouldDraw(const Vector& vMyPos, const Vector& vMySize)
 		{
 			//Determine whether this entity is in viewport so it should be drawn
@@ -1016,7 +1021,8 @@ namespace Entity {
 			{ "bool HUD_IsEnabled()", APIFuncs::IsHUDEnabled },
 			{ "void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },
 			{ "string Lang_QueryPhrase(const string &in szIdent, const string &in szDefault = \"\")", &APIFuncs::QueryLangPhrase },
-			{ "string _(const string &in szIdent, const string &in szDefault = \"\")", &APIFuncs::QueryLangPhrase }
+			{ "string _(const string &in szIdent, const string &in szDefault = \"\")", &APIFuncs::QueryLangPhrase },
+			{ "void TriggerGameSave()", &APIFuncs::TriggerGameSave }
 		};
 
 		for (size_t i = 0; i < _countof(sGameAPIFunctions); i++) {

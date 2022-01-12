@@ -147,6 +147,26 @@ namespace Menu {
 		}
 	}
 
+	void CSettingsSnd::SaveSoundSettings(void)
+	{
+		//Save sound settings
+
+		pSndVolume->iValue = this->m_oVolume.GetValue();
+		pSndPlayMusic->bValue = this->m_oPlayMusic.IsChecked();
+
+		std::wofstream hFile;
+		hFile.open(wszBasePath + L"sound.cfg", std::wofstream::out);
+		if (hFile.is_open()) {
+			hFile << L"# Sound settings configuration file" << std::endl << std::endl;
+			hFile << L"snd_volume " + std::to_wstring(this->m_oVolume.GetValue()) << std::endl;
+			hFile << L"snd_playmusic " + std::to_wstring((int)this->m_oPlayMusic.IsChecked()) << std::endl;
+
+			hFile.close();
+		}
+
+		Game::pGame->ToggleMenuTheme(pSndPlayMusic->bValue);
+	}
+
 	void CSettingsSnd::OnButtonClick(class CButton* pButton)
 	{
 		if (pButton == &this->m_btnSave) {

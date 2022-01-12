@@ -403,6 +403,7 @@ namespace Game {
 			pGfxResolutionHeight = pConfigMgr->CCVar::Add(L"gfx_resolution_height", ConfigMgr::CCVar::CVAR_TYPE_INT, L"768");
 			pGfxFullscreen = pConfigMgr->CCVar::Add(L"gfx_fullscreen", ConfigMgr::CCVar::CVAR_TYPE_BOOL, L"1");
 			pSndVolume = pConfigMgr->CCVar::Add(L"snd_volume", ConfigMgr::CCVar::CVAR_TYPE_INT, L"10");
+			pSndPlayMusic = pConfigMgr->CCVar::Add(L"snd_playmusic", ConfigMgr::CCVar::CVAR_TYPE_BOOL, L"1");
 			
 			//Add commands
 			pConfigMgr->CCommand::Add(L"exec", L"Execute a script file", &Cmd_Exec);
@@ -588,9 +589,13 @@ namespace Game {
 				return false;
 			}
 
-			//Handle menu theme if exists
+			//Handle menu theme
+			
 			this->m_hMenuTheme = pSound->QuerySound(wszBasePath + L"media\\sound\\menu.wav");
-			pSound->Play(this->m_hMenuTheme, pSndVolume->iValue, DSBPLAY_LOOPING);
+
+			if (pSndPlayMusic->bValue) {
+				pSound->Play(this->m_hMenuTheme, pSndVolume->iValue, DSBPLAY_LOOPING);
+			}
 
 			//Create restart script
 			Utils::CreateRestartScript();
@@ -847,6 +852,15 @@ namespace Game {
 		void AddHudInfoMessage(const std::wstring& wszMessage, const Entity::HudMessageColor eColor, int iDuration = Entity::HUDMSG_DEFAULDURATION)
 		{
 			this->m_oHudInfoMessages.AddMessage(wszMessage, eColor, iDuration);
+		}
+
+		void ToggleMenuTheme(bool value)
+		{
+			if (value) {
+				pSound->Play(this->m_hMenuTheme, pSndVolume->iValue, DSBPLAY_LOOPING);
+			} else {
+				pSound->StopSound(this->m_hMenuTheme);
+			}
 		}
 
 		//Return package name

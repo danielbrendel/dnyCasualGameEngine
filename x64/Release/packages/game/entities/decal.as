@@ -17,7 +17,7 @@ class CDecalEntity : IScriptedEntity
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
-	Timer m_oLifeTime;
+	Timer m_tmrLifeTime;
 	SpriteHandle m_hSprite;
 	
 	CDecalEntity()
@@ -30,9 +30,9 @@ class CDecalEntity : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\decal.png", 1, this.m_vecSize[0], this.m_vecSize[1], 1, false);
-		this.m_oLifeTime.SetDelay(120000);
-		this.m_oLifeTime.Reset();
-		this.m_oLifeTime.SetActive(true);
+		this.m_tmrLifeTime.SetDelay(120000);
+		this.m_tmrLifeTime.Reset();
+		this.m_tmrLifeTime.SetActive(true);
 		this.m_oModel.Alloc();
 	}
 	
@@ -44,7 +44,7 @@ class CDecalEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
-		this.m_oLifeTime.Update();
+		this.m_tmrLifeTime.Update();
 	}
 	
 	//Entity can draw everything in default order here
@@ -67,7 +67,7 @@ class CDecalEntity : IScriptedEntity
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{
-		return this.m_oLifeTime.IsElapsed();
+		return this.m_tmrLifeTime.IsElapsed();
 	}
 	
 	//Indicate if entity can be collided

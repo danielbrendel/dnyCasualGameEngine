@@ -25,8 +25,8 @@ class CTeslaTower : IScriptedEntity
 	SoundHandle m_hCharge;
 	IScriptedEntity@ m_pTarget;
 	uint8 m_ucAlpha;
-	Timer m_oAttacking;
-	Timer m_oAlpha;
+	Timer m_tmrAttacking;
+	Timer m_tmrAlpha;
 	uint m_uiHealth;
 	uint m_uiFlickerCount;
 	Timer m_tmrFlicker;
@@ -65,22 +65,22 @@ class CTeslaTower : IScriptedEntity
 		}
 		
 		if (@this.m_pTarget != null) {
-			if (!this.m_oAttacking.IsActive()) {
-				this.m_oAttacking.SetDelay(2500);
-				this.m_oAttacking.Reset();
-				this.m_oAttacking.SetActive(true);
-				this.m_oAlpha.SetDelay(10);
-				this.m_oAlpha.Reset();
-				this.m_oAlpha.SetActive(true);
+			if (!this.m_tmrAttacking.IsActive()) {
+				this.m_tmrAttacking.SetDelay(2500);
+				this.m_tmrAttacking.Reset();
+				this.m_tmrAttacking.SetActive(true);
+				this.m_tmrAlpha.SetDelay(10);
+				this.m_tmrAlpha.Reset();
+				this.m_tmrAlpha.SetActive(true);
 				this.m_ucAlpha = 255;
 				S_PlaySound(this.m_hCharge, 9);
 			}
 		} else {
-			if (this.m_oAttacking.IsActive())
-				this.m_oAttacking.SetActive(false);
+			if (this.m_tmrAttacking.IsActive())
+				this.m_tmrAttacking.SetActive(false);
 			
-			if (this.m_oAlpha.IsActive())
-				this.m_oAlpha.SetActive(false);
+			if (this.m_tmrAlpha.IsActive())
+				this.m_tmrAlpha.SetActive(false);
 				
 			this.m_ucAlpha = 255;
 		}
@@ -114,7 +114,7 @@ class CTeslaTower : IScriptedEntity
 		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\teslatower.png", 1, 32, 55, 1, false);
 		this.m_hAttack = S_QuerySound(GetPackagePath() + "sound\\tesla_attack.wav");
 		this.m_hCharge = S_QuerySound(GetPackagePath() + "sound\\tesla_charge.wav");
-		this.m_oAttacking.SetActive(false);
+		this.m_tmrAttacking.SetActive(false);
 		this.m_tmrFlicker.SetDelay(250);
 		this.m_tmrFlicker.Reset();
 		this.m_tmrFlicker.SetActive(false);
@@ -138,19 +138,19 @@ class CTeslaTower : IScriptedEntity
 	{
 		this.CheckForEnemiesInRange();
 		
-		if (this.m_oAttacking.IsActive()) {
-			this.m_oAttacking.Update();
-			if (this.m_oAttacking.IsElapsed()) {
-				this.m_oAttacking.Reset();
+		if (this.m_tmrAttacking.IsActive()) {
+			this.m_tmrAttacking.Update();
+			if (this.m_tmrAttacking.IsElapsed()) {
+				this.m_tmrAttacking.Reset();
 				this.Fire();
 				this.m_ucAlpha = 255;
 			}
 		}
 		
-		if (this.m_oAlpha.IsActive()) {
-			this.m_oAlpha.Update();
-			if (this.m_oAlpha.IsElapsed()) {
-				this.m_oAlpha.Reset();
+		if (this.m_tmrAlpha.IsActive()) {
+			this.m_tmrAlpha.Update();
+			if (this.m_tmrAlpha.IsElapsed()) {
+				this.m_tmrAlpha.Reset();
 				
 				this.m_ucAlpha -= 2;
 			}

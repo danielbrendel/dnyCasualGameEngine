@@ -42,6 +42,7 @@ extern ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth;
 extern ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight;
 extern ConfigMgr::CCVar::cvar_s* pGfxFullscreen;
 extern ConfigMgr::CCVar::cvar_s* pSndVolume;
+extern ConfigMgr::CCVar::cvar_s* pSndPlayMusic;
 
 extern Input::CInputMgr g_oInputMgr;
 

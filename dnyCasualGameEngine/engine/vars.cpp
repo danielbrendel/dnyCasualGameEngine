@@ -31,6 +31,7 @@ ConfigMgr::CCVar::cvar_s* pGfxResolutionWidth = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxResolutionHeight = nullptr;
 ConfigMgr::CCVar::cvar_s* pGfxFullscreen = nullptr;
 ConfigMgr::CCVar::cvar_s* pSndVolume = nullptr;
+ConfigMgr::CCVar::cvar_s* pSndPlayMusic = nullptr;
 
 Input::CInputMgr g_oInputMgr;
 

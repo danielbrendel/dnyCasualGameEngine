@@ -20,7 +20,7 @@ class CExplosionEntity : IScriptedEntity
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
-	Timer m_oExplosion;
+	Timer m_tmrExplosion;
 	int m_iFrameCount;
 	SpriteHandle m_hSprite;
 	SoundHandle m_hSound;
@@ -54,9 +54,9 @@ class CExplosionEntity : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\explosion.png", 6, this.m_vecSize[0], this.m_vecSize[1], 6, false);
-		this.m_oExplosion.SetDelay(100);
-		this.m_oExplosion.Reset();
-		this.m_oExplosion.SetActive(true);
+		this.m_tmrExplosion.SetDelay(100);
+		this.m_tmrExplosion.Reset();
+		this.m_tmrExplosion.SetActive(true);
 		this.m_hSound = S_QuerySound(GetPackagePath() + "sound\\explosion.wav");
 		S_PlaySound(this.m_hSound, 10);
 		CDecalEntity @dcl = CDecalEntity();
@@ -76,9 +76,9 @@ class CExplosionEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
-		this.m_oExplosion.Update();
-		if (this.m_oExplosion.IsElapsed()) {
-			this.m_oExplosion.Reset();
+		this.m_tmrExplosion.Update();
+		if (this.m_tmrExplosion.IsElapsed()) {
+			this.m_tmrExplosion.Reset();
 			this.m_iFrameCount++;
 		}
 	}

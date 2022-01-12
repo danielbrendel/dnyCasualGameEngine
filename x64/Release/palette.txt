@@ -63,6 +63,10 @@
 #settings.snd.sldvolume.hover 0 255 0 255
 #settings.snd.sldvolume.line 0 0 255 255
 #settings.snd.sldvolume.slider 255 255 0 255
+#settings.snd.cbplaymusic.checked 0 0 255 255
+#settings.snd.cbplaymusic.frame 255 255 255 255
+#settings.snd.cbplaymusic.hover 255 0 0 255
+#settings.snd.cbplaymusic.label 200 90 123 255
 #settings.snd.btnsave.fill 150 0 0 255
 #settings.snd.btnsave.frame 255 255 255 255
 #settings.snd.btnsave.hover 255 0 0 255

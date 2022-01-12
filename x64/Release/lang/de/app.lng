@@ -22,6 +22,7 @@ settingsmenu.gfx.restarthint:Hinweis: Ändern der Grafik/UI Einstellungen führt
 settingsmenu.gfx.info.saved:Einstellungen gespeichert!
 settingsmenu.snd.btnsave:Speichern
 settingsmenu.snd.volume:Lautstärke: 
+settingsmenu.snd.lblplaymusic:Musik abspielen
 settingsmenu.snd.info.saved:Einstellungen gespeichert!
 settingsmenu.tabs.bindings:Eingabe  
 settingsmenu.tabs.gfxui:Grafik/UI

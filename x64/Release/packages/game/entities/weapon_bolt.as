@@ -21,7 +21,7 @@ class CBoltEntity : IScriptedEntity
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;
-	Timer m_oFrameTime;
+	Timer m_tmrFrameTime;
 	SpriteHandle m_hSprite;
 	int m_iFrameCounter;
 	float m_fRotation;
@@ -45,9 +45,9 @@ class CBoltEntity : IScriptedEntity
 		Vector vAbsTargetPos = Vector(vTargetPos[0] + vTargetCenter[0], vTargetPos[1] + vTargetCenter[1]);
 		this.m_fRange = float(Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 5).Distance(vAbsTargetPos)) / 300;
 		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\lightning.png", 8, 32, 256, 8, false);
-		this.m_oFrameTime.SetDelay(10);
-		this.m_oFrameTime.Reset();
-		this.m_oFrameTime.SetActive(true);
+		this.m_tmrFrameTime.SetDelay(10);
+		this.m_tmrFrameTime.Reset();
+		this.m_tmrFrameTime.SetActive(true);
 		this.m_oModel.Alloc();
 	}
 	
@@ -59,12 +59,12 @@ class CBoltEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
-		this.m_oFrameTime.Update();
-		if (this.m_oFrameTime.IsElapsed()) {
-			this.m_oFrameTime.Reset();
+		this.m_tmrFrameTime.Update();
+		if (this.m_tmrFrameTime.IsElapsed()) {
+			this.m_tmrFrameTime.Reset();
 			this.m_iFrameCounter++;
 			if (this.m_iFrameCounter >= 8) {
-				this.m_oFrameTime.SetActive(false);
+				this.m_tmrFrameTime.SetActive(false);
 				
 				this.m_pTarget.OnDamage(BOLT_SHOT_DAMAGE);
 			}

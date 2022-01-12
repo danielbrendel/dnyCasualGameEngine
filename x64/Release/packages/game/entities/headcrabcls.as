@@ -27,12 +27,12 @@ class CHeadcrabEntity : IScriptedEntity
 	SpriteHandle m_hSprite;
 	float m_fRotation;
 	uint32 m_uiHealth;
-	Timer m_oMovement;
-	Timer m_oDirChange;
-	Timer m_oEnemyCheck;
-	Timer m_oShaking;
-	Timer m_oWalkSound;
-	Timer m_oAttack;
+	Timer m_tmrMovement;
+	Timer m_tmrDirChange;
+	Timer m_tmrEnemyCheck;
+	Timer m_tmrShaking;
+	Timer m_tmrWalkSound;
+	Timer m_tmrAttack;
 	Timer m_tmrFlicker;
 	bool m_bGotEnemy;
 	float m_fShakeRot;
@@ -75,11 +75,11 @@ class CHeadcrabEntity : IScriptedEntity
 			}
 
 			if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_HEADGRAB_ATTACK_RANGE) {
-				this.m_oAttack.Update();
-				if (this.m_oAttack.IsElapsed()) {
+				this.m_tmrAttack.Update();
+				if (this.m_tmrAttack.IsElapsed()) {
 					pEntity.OnDamage(C_HEADGRAB_DAMAGE_VALUE);
 					S_PlaySound(this.m_hAttackSound, S_GetCurrentVolume());
-					this.m_oAttack.Reset();
+					this.m_tmrAttack.Reset();
 				}
 			}
 		} else {
@@ -101,24 +101,24 @@ class CHeadcrabEntity : IScriptedEntity
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
 		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\headcrab.png", 1, 32, 32, 1, true);
-		this.m_oMovement.SetDelay(100);
-		this.m_oMovement.Reset();
-		this.m_oMovement.SetActive(true);
-		this.m_oDirChange.SetDelay(5000);
-		this.m_oDirChange.Reset();
-		this.m_oDirChange.SetActive(true);
-		this.m_oEnemyCheck.SetDelay(1);
-		this.m_oEnemyCheck.Reset();
-		this.m_oEnemyCheck.SetActive(true);
-		this.m_oShaking.SetDelay(1000);
-		this.m_oShaking.Reset();
-		this.m_oShaking.SetActive(true);
-		this.m_oWalkSound.SetDelay(1000 + Util_Random(1, 2000));
-		this.m_oWalkSound.Reset();
-		this.m_oWalkSound.SetActive(true);
-		this.m_oAttack.SetDelay(1000);
-		this.m_oAttack.Reset();
-		this.m_oAttack.SetActive(true);
+		this.m_tmrMovement.SetDelay(100);
+		this.m_tmrMovement.Reset();
+		this.m_tmrMovement.SetActive(true);
+		this.m_tmrDirChange.SetDelay(5000);
+		this.m_tmrDirChange.Reset();
+		this.m_tmrDirChange.SetActive(true);
+		this.m_tmrEnemyCheck.SetDelay(1);
+		this.m_tmrEnemyCheck.Reset();
+		this.m_tmrEnemyCheck.SetActive(true);
+		this.m_tmrShaking.SetDelay(1000);
+		this.m_tmrShaking.Reset();
+		this.m_tmrShaking.SetActive(true);
+		this.m_tmrWalkSound.SetDelay(1000 + Util_Random(1, 2000));
+		this.m_tmrWalkSound.Reset();
+		this.m_tmrWalkSound.SetActive(true);
+		this.m_tmrAttack.SetDelay(1000);
+		this.m_tmrAttack.Reset();
+		this.m_tmrAttack.SetActive(true);
 		this.m_tmrFlicker.SetDelay(250);
 		this.m_tmrFlicker.Reset();
 		this.m_tmrFlicker.SetActive(false);
@@ -145,30 +145,30 @@ class CHeadcrabEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
-		this.m_oShaking.Update();
-		if (this.m_oShaking.IsElapsed()) {
+		this.m_tmrShaking.Update();
+		if (this.m_tmrShaking.IsElapsed()) {
 			if (!this.m_bGotEnemy)
 				this.m_fShakeRot = -0.25 + float(Util_Random(1, 5)) / 10.0;
 		}
 		
-		this.m_oDirChange.Update();
-		if (this.m_oDirChange.IsElapsed()) {
-			this.m_oDirChange.Reset();
+		this.m_tmrDirChange.Update();
+		if (this.m_tmrDirChange.IsElapsed()) {
+			this.m_tmrDirChange.Reset();
 			if (!this.m_bGotEnemy)
 				this.m_fRotation = float(Util_Random(1, 360));
 		}
 		
-		this.m_oWalkSound.Update();
-		if (this.m_oWalkSound.IsElapsed()) {
-			this.m_oWalkSound.Reset();
+		this.m_tmrWalkSound.Update();
+		if (this.m_tmrWalkSound.IsElapsed()) {
+			this.m_tmrWalkSound.Reset();
 			S_PlaySound(this.m_hWalkSound, 8);
 		}
 		
 		this.CheckForEnemiesInRange();
 		
-		this.m_oMovement.Update();
-		if (this.m_oMovement.IsElapsed()) {
-			this.m_oMovement.Reset();
+		this.m_tmrMovement.Update();
+		if (this.m_tmrMovement.IsElapsed()) {
+			this.m_tmrMovement.Reset();
 			
 			Ent_Move(this, this.m_fSpeed, MOVE_FORWARD);
 		}

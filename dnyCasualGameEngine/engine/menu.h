@@ -2192,24 +2192,11 @@ namespace Menu {
 		Entity::Vector m_vecPos;
 		CSlider m_oVolume;
 		CButton m_btnSave;
+		CCheckbox m_oPlayMusic;
 		Entity::Color m_colLabel;
 		std::wstring m_wszLocaleVolumeLabel;
 
-		void SaveSoundSettings(void)
-		{
-			//Save sound settings
-
-			pSndVolume->iValue = this->m_oVolume.GetValue();
-
-			std::wofstream hFile;
-			hFile.open(wszBasePath + L"sound.cfg", std::wofstream::out);
-			if (hFile.is_open()) {
-				hFile << L"# Sound settings configuration file" << std::endl << std::endl;
-				hFile << L"snd_volume " + std::to_wstring(this->m_oVolume.GetValue()) << std::endl;
-
-				hFile.close();
-			}
-		}
+		void SaveSoundSettings(void);
 	public:
 		CSettingsSnd() {}
 		~CSettingsSnd() {}
@@ -2226,6 +2213,14 @@ namespace Menu {
 			this->m_oVolume.SetSliderColor(GetPaletteItem(L"settings.snd.sldvolume.slider", Entity::Color(150, 150, 0, 150)));
 			this->m_oVolume.SetValue(pSndVolume->iValue);
 			this->m_oVolume.SetWidth(200);
+
+			this->m_oPlayMusic.SetCheckColor(GetPaletteItem(L"settings.snd.cbplaymusic.checked", Entity::Color(50, 135, 0, 150)));
+			this->m_oPlayMusic.SetChecked(pSndPlayMusic->bValue);
+			this->m_oPlayMusic.SetFrameColor(GetPaletteItem(L"settings.snd.cbplaymusic.frame", Entity::Color(200, 200, 200, 150)));
+			this->m_oPlayMusic.SetHoverColor(GetPaletteItem(L"settings.snd.cbplaymusic.hover", Entity::Color(255, 255, 255, 150)));
+			this->m_oPlayMusic.SetLabel(oEngineLocaleMgr.QueryPhrase(L"app.settingsmenu.snd.lblplaymusic", L"Play music"));
+			this->m_oPlayMusic.SetLabelColor(GetPaletteItem(L"settings.snd.cbplaymusic.label", Entity::Color(200, 200, 200, 150)));
+			this->m_oPlayMusic.SetPosition(Entity::Vector(350, 350));
 
 			this->m_btnSave.SetOwner(this);
 			this->m_btnSave.SetFillColor(GetPaletteItem(L"settings.snd.btnsave.fill", Entity::Color(50, 135, 0, 150)));
@@ -2250,6 +2245,7 @@ namespace Menu {
 			pRenderer->DrawString(pDefaultFont, this->m_wszLocaleVolumeLabel, this->m_vecPos[0], this->m_vecPos[1], this->m_colLabel.r, this->m_colLabel.g, this->m_colLabel.b, this->m_colLabel.a);
 
 			this->m_oVolume.Draw();
+			this->m_oPlayMusic.Draw();
 
 			this->m_btnSave.Draw();
 		}
@@ -2259,6 +2255,7 @@ namespace Menu {
 			//Handle mouse events
 
 			this->m_oVolume.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oPlayMusic.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_btnSave.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 		}
 

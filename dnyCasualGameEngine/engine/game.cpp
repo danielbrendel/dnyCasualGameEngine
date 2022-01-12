@@ -287,16 +287,6 @@ namespace Game {
 		
 		this->m_oCursor.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 
-		if (this->m_bShowIntermission) { //Inform intermission menu
-			this->m_oIntermissionMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
-			return;
-		}
-
-		if (this->m_bGameOver) { //Inform game over menu
-			this->m_oGameOverMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
-			return;
-		}
-
 		if (!this->m_oMenu.IsOpen()) {
 			//Inform player entity
 			if (!iMouseKey) {
@@ -315,6 +305,17 @@ namespace Game {
 		} else {
 			//Pass to menu
 			this->m_oMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			return;
+		}
+
+		if (this->m_bShowIntermission) { //Inform intermission menu
+			this->m_oIntermissionMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			return;
+		}
+
+		if (this->m_bGameOver) { //Inform game over menu
+			this->m_oGameOverMenu.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			return;
 		}
 	}
 

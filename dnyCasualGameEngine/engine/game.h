@@ -111,6 +111,7 @@ namespace Game {
 		bool m_bInGameLoadingProgress;
 		std::wstring m_wszCurrentLoadingPackage;
 		std::wstring m_wszCurrentLoadingFromPath;
+		std::wstring m_wszCurrentLoadingMap;
 		bool m_bGameOver;
 		Entity::CSaveGameReader m_oSaveGameReader;
 		bool m_bLoadSavedGame;
@@ -142,7 +143,7 @@ namespace Game {
 		friend void Cmd_Exec(void);
 		friend void Cmd_Restart(void);
 
-		bool LoadPackage(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
+		bool LoadPackage(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"", const std::wstring& wszFromMap = L"")
 		{
 			//Load package game
 
@@ -173,6 +174,11 @@ namespace Game {
 			}
 
 			pConsole->AddLine(L"Package " + this->m_sPackage.wszName + L" v" + this->m_sPackage.wszVersion + L" by " + this->m_sPackage.wszAuthor + L" (" + this->m_sPackage.wszContact + L")");
+
+			//Overwrite index map if required
+			if (wszFromMap.length() > 0) {
+				this->m_sPackage.wszMapIndex = wszFromMap;
+			}
 
 			//Execute package index map file
 			if (!pConfigMgr->Execute(wszPackagePath + L"\\maps\\" + this->m_sPackage.wszMapIndex)) {
@@ -607,7 +613,7 @@ namespace Game {
 			return this->m_bInit;
 		}
 
-		bool StartGame(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
+		bool StartGame(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"", const std::wstring& wszFromMap = L"")
 		{
 			//Start a new game from package
 
@@ -638,7 +644,7 @@ namespace Game {
 			this->m_oCursor.SetActiveStatus(false);
 
 			//Load package
-			bool bResult = this->LoadPackage(wszPackage, wszFromPath);
+			bool bResult = this->LoadPackage(wszPackage, wszFromPath, wszFromMap);
 			if (!bResult) {
 				this->m_oMenu.SetOpenStatus(true);
 				this->m_oCursor.SetActiveStatus(true);
@@ -653,13 +659,14 @@ namespace Game {
 			return true;
 		}
 
-		void InitStartGame(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"")
+		void InitStartGame(const std::wstring& wszPackage, const std::wstring& wszFromPath = L"", const std::wstring& wszFromMap = L"")
 		{
 			//Init game start
 
 			this->m_bInGameLoadingProgress = true;
 			this->m_wszCurrentLoadingPackage = wszPackage;
 			this->m_wszCurrentLoadingFromPath = wszFromPath;
+			this->m_wszCurrentLoadingMap = wszFromMap;
 			this->m_uiSkipFrame = 0;
 		}
 
@@ -671,7 +678,9 @@ namespace Game {
 				this->StopGame();
 			}
 
-			this->InitStartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath);
+			this->m_wszCurrentLoadingMap = this->GetCurrentMap();
+
+			this->InitStartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath, this->m_wszCurrentLoadingMap);
 		}
 
 		void ShowGameOver(void)

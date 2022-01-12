@@ -101,7 +101,7 @@ namespace Game {
 						pAchievements->PublishAchievementAndStatProgress();
 					}
 
-					if (!this->StartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath)) {
+					if (!this->StartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath, this->m_wszCurrentLoadingMap)) {
 						pConsole->AddLine(L"Failed to start new game", Console::ConColor(250, 0, 0));
 					}
 

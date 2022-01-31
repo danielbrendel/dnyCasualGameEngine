@@ -201,8 +201,6 @@ namespace Entity {
 		{
 			//Determine whether this entity is in viewport so it should be drawn
 
-			const int C_SCREEN_ADDITION = 100;
-
 			Vector* vecPlayerPos = nullptr;
 			Vector* vecPlayerSize = nullptr;
 			
@@ -217,8 +215,8 @@ namespace Entity {
 			vDistance[0] = vMyPos[0] - (*vecPlayerPos)[0];
 			vDistance[1] = vMyPos[1] - (*vecPlayerPos)[1];
 
-			return (vDistance[0] + vMySize[0] > pRenderer->GetWindowWidth() / 2 * -1) && (vDistance[0] < pRenderer->GetWindowWidth() / 2 + C_SCREEN_ADDITION) &&
-				(vDistance[1] + vMySize[1] > pRenderer->GetWindowHeight() / 2 * -1) && (vDistance[1] < pRenderer->GetWindowHeight() / 2 + C_SCREEN_ADDITION);
+			return (vDistance[0] + vMySize[0] > pRenderer->GetWindowWidth() / 2 * -1) && (vDistance[0] < pRenderer->GetWindowWidth() / 2 + vMySize[0]) &&
+				(vDistance[1] + vMySize[1] > pRenderer->GetWindowHeight() / 2 * -1) && (vDistance[1] < pRenderer->GetWindowHeight() / 2 + vMySize[1]);
 		}
 
 		void GetDrawingPosition(const Vector& vMyPos, const Vector& vMySize, Vector& out)

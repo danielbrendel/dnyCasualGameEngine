@@ -798,7 +798,7 @@ namespace Entity {
 
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
 				if (this->m_vEnts[i]->CanBeDormant()) {
-					if (!this->IsEntityDormant(this->m_vEnts[i])) {
+					if (this->IsEntityDormant(this->m_vEnts[i])) {
 						continue;
 					}
 				}
@@ -813,7 +813,7 @@ namespace Entity {
 
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
 				if (this->m_vEnts[i]->CanBeDormant()) {
-					if (!this->IsEntityDormant(this->m_vEnts[i])) {
+					if (this->IsEntityDormant(this->m_vEnts[i])) {
 						continue;
 					}
 				}

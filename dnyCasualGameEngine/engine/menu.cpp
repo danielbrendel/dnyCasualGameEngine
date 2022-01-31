@@ -193,6 +193,12 @@ namespace Menu {
 		Game::pGame->ResumeGame();
 	}
 
+	void MainMenu_OnSaveGame(class CMenu* pMenu)
+	{
+		Game::pGame->SaveGame();
+		Game::pGame->ResumeGame();
+	}
+
 	void MainMenu_OnStopGame(class CMenu* pMenu)
 	{
 		Game::pGame->StopGame();

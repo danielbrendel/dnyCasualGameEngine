@@ -704,11 +704,22 @@ namespace Entity {
 
 		bool NeedsRemoval(void)
 		{
-			//Inform class instance of event
+			//Indicate if entity needs removal
 
 			bool bResult;
 
 			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "bool NeedsRemoval()", nullptr, &bResult, Scripting::FA_BYTE);
+
+			return bResult;
+		}
+
+		bool CanBeDormant(void)
+		{
+			//Indicate if entity can be dormant
+
+			bool bResult;
+
+			pScriptingInt->CallScriptMethod(this->m_hScript, this->m_pScriptObject, "bool CanBeDormant()", nullptr, &bResult, Scripting::FA_BYTE);
 
 			return bResult;
 		}
@@ -786,9 +797,13 @@ namespace Entity {
 			//Inform entities
 
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
-				if (!this->IsEntityDormant(this->m_vEnts[i])) {
-					this->m_vEnts[i]->OnDraw();
+				if (this->m_vEnts[i]->CanBeDormant()) {
+					if (!this->IsEntityDormant(this->m_vEnts[i])) {
+						continue;
+					}
 				}
+
+				this->m_vEnts[i]->OnDraw();
 			}
 		}
 
@@ -797,9 +812,13 @@ namespace Entity {
 			//Inform entities
 
 			for (size_t i = 0; i < this->m_vEnts.size(); i++) {
-				if (!this->IsEntityDormant(this->m_vEnts[i])) {
-					this->m_vEnts[i]->OnDrawOnTop();
+				if (this->m_vEnts[i]->CanBeDormant()) {
+					if (!this->IsEntityDormant(this->m_vEnts[i])) {
+						continue;
+					}
 				}
+
+				this->m_vEnts[i]->OnDrawOnTop();
 			}
 		}
 

@@ -55,8 +55,10 @@ namespace Entity {
 
 		for (size_t i = 0; i < this->m_vEnts.size(); i++) {
 			//Skip dormant entities
-			if (this->IsEntityDormant(this->m_vEnts[i])) {
-				continue;
+			if (this->m_vEnts[i]->CanBeDormant()) {
+				if (this->IsEntityDormant(this->m_vEnts[i])) {
+					continue;
+				}
 			}
 
 			//Let entity process
@@ -931,6 +933,7 @@ namespace Entity {
 		REG_IFM("IScriptedEntity", "void SetRotation(float)");
 		REG_IFM("IScriptedEntity", "void OnDamage(uint32)");
 		REG_IFM("IScriptedEntity", "bool NeedsRemoval()");
+		REG_IFM("IScriptedEntity", "bool CanBeDormant()");
 		REG_IFM("IScriptedEntity", "string GetName()");
 		REG_IFM("IScriptedEntity", "string GetSaveGameProperties()");
 

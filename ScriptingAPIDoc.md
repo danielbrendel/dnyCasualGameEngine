@@ -226,6 +226,8 @@ void SetRotation(float)
 void OnDamage(uint32)
 //Indicate whether this entity shall be removed by the game
 bool NeedsRemoval()
+//Indicate if this entity can be dormant
+bool CanBeDormant()
 //Return a name string here, e.g. the class name or instance name. Used to distinguish the entity class from others
 string GetName()
 //Return a string that contains all save game properties for this entity

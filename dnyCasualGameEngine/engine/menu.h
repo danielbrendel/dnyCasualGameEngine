@@ -1552,6 +1552,7 @@ namespace Menu {
 	class CKeyBinding : public IMenu {
 	private:
 		std::wstring m_wszCommand;
+		std::wstring m_wszDrawCmd;
 		int m_vKey;
 		std::wstring m_wszVKeyName;
 		bool m_bInSet;
@@ -1588,7 +1589,7 @@ namespace Menu {
 			return false;
 		}
 	public:
-		CKeyBinding() : m_bInSet(false), m_bHover(false) {}
+		CKeyBinding() : m_bInSet(false), m_bHover(false), m_wszDrawCmd(L"") {}
 		~CKeyBinding() {}
 
 		virtual bool Initialize(int w, int h, bool* pGameStarted)
@@ -1630,7 +1631,12 @@ namespace Menu {
 				sCmdColor = this->m_colCmd;
 			}
 
-			pRenderer->DrawString(pDefaultFont, this->m_wszCommand, this->m_vecPos[0] + 5, this->m_vecPos[1] + BK_OBJECT_HEIGHT / 2 - iDefaultFontSize[1] / 2, sCmdColor.r, sCmdColor.g, sCmdColor.b, sCmdColor.a);
+			if (!this->m_wszDrawCmd.length()) {
+				pRenderer->DrawString(pDefaultFont, this->m_wszCommand, this->m_vecPos[0] + 5, this->m_vecPos[1] + BK_OBJECT_HEIGHT / 2 - iDefaultFontSize[1] / 2, sCmdColor.r, sCmdColor.g, sCmdColor.b, sCmdColor.a);
+			} else {
+				pRenderer->DrawString(pDefaultFont, this->m_wszDrawCmd, this->m_vecPos[0] + 5, this->m_vecPos[1] + BK_OBJECT_HEIGHT / 2 - iDefaultFontSize[1] / 2, sCmdColor.r, sCmdColor.g, sCmdColor.b, sCmdColor.a);
+			}
+
 			pRenderer->DrawString(pDefaultFont, this->m_wszVKeyName, this->m_vecPos[0] + BK_OBJECT_WIDTH - BK_OBJECT_WIDTH / 4 - ((int)this->m_wszVKeyName.length() / 2 * iDefaultFontSize[0]), this->m_vecPos[1] + BK_OBJECT_HEIGHT / 2 - iDefaultFontSize[1] / 2, this->m_colKey.r, this->m_colKey.g, this->m_colKey.b, this->m_colKey.a);
 		}
 
@@ -1671,6 +1677,13 @@ namespace Menu {
 			//Set command
 
 			this->m_wszCommand = wszCommand;
+		}
+
+		void SetDrawCmd(const std::wstring& wszDrawCmd)
+		{
+			//Set drawing command name
+
+			this->m_wszDrawCmd = wszDrawCmd;
 		}
 
 		void SetVkey(int vKey)
@@ -1800,11 +1813,13 @@ namespace Menu {
 
 			this->m_oMoveForward.Initialize(0, 0, nullptr);
 			this->m_oMoveForward.SetCommand(L"MOVE_FORWARD");
+			this->m_oMoveForward.SetDrawCmd(L"FORWARD/NORTH");
 			this->m_oMoveForward.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MOVE_FORWARD"));
 			this->m_oMoveForward.SetPosition(Entity::Vector(350, 250));
 
 			this->m_oMoveBackward.Initialize(0, 0, nullptr);
 			this->m_oMoveBackward.SetCommand(L"MOVE_BACKWARD");
+			this->m_oMoveBackward.SetDrawCmd(L"BACKWARD/SOUTH");
 			this->m_oMoveBackward.SetVkey(g_oInputMgr.GetKeyBindingCode(L"MOVE_BACKWARD"));
 			this->m_oMoveBackward.SetPosition(Entity::Vector(350, 300));
 

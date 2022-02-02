@@ -296,6 +296,14 @@ namespace Entity {
 				} else if (dir == MOVE_RIGHT) {
 					vecPosition[0] -= (int)(sin(fRotation + 80.0) * fSpeed) / Game::pGame->GetCurrentFramerate();
 					vecPosition[1] += (int)(cos(fRotation + 80.0) * fSpeed) / Game::pGame->GetCurrentFramerate();
+				} else if (dir == MOVE_NORTH) {
+					vecPosition[1] -= (int)(cos(0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
+				} else if (dir == MOVE_SOUTH) {
+					vecPosition[1] += (int)(cos(0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
+				} else if (dir == MOVE_WEST) {
+					vecPosition[0] -= (int)(cos(0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
+				} else if (dir == MOVE_EAST) {
+					vecPosition[0] += (int)(cos(0.015) * fSpeed) / Game::pGame->GetCurrentFramerate();
 				}
 
 				//If not collided then move forward
@@ -767,6 +775,10 @@ namespace Entity {
 		ADD_ENUM(hEnum, "MOVE_BACKWARD", MOVE_BACKWARD);
 		ADD_ENUM(hEnum, "MOVE_LEFT", MOVE_LEFT);
 		ADD_ENUM(hEnum, "MOVE_RIGHT", MOVE_RIGHT);
+		ADD_ENUM(hEnum, "MOVE_NORTH", MOVE_NORTH);
+		ADD_ENUM(hEnum, "MOVE_SOUTH", MOVE_SOUTH);
+		ADD_ENUM(hEnum, "MOVE_WEST", MOVE_WEST);
+		ADD_ENUM(hEnum, "MOVE_EAST", MOVE_EAST);
 		REG_ENUM("FileSeekWay", hEnum);
 		ADD_ENUM(hEnum, "SEEKW_BEGIN", CFileReader::SEEKW_BEGIN);
 		ADD_ENUM(hEnum, "SEEKW_CURRENT", CFileReader::SEEKW_CURRENT);

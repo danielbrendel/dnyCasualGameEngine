@@ -18,7 +18,7 @@
 
 /* Entity environment */
 namespace Entity {
-	enum MovementDir { MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT };
+	enum MovementDir { MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, MOVE_NORTH, MOVE_SOUTH, MOVE_WEST, MOVE_EAST };
 
 	struct Color {
 		Color() {}

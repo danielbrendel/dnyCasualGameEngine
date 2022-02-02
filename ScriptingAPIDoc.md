@@ -17,10 +17,14 @@ __Version__: 1.0
 
 ## Enums:
 ### MovementDir:
-* MOVE_FORWARD: Move in forward direction
-* MOVE_BACKWARD: Move backwards in direction
-* MOVE_LEFT: Move left
-* MOVE_RIGHT: Move right
+* MOVE_FORWARD: Move in forward direction (according to view)
+* MOVE_BACKWARD: Move backwards in direction (according to view)
+* MOVE_LEFT: Move left (according to view)
+* MOVE_RIGHT: Move right (according to view)
+* MOVE_NORTH: Move to north
+* MOVE_SOUTH: Move to south
+* MOVE_WEST: Move to west
+* MOVE_EAST: Move to east
 ### FileSeekWay:
 * SEEKW_BEGIN: Start from the begin of a file
 * SEEKW_CURRENT: Start from current file offset

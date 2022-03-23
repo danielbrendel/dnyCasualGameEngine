@@ -497,6 +497,60 @@ namespace Entity {
 			return "";
 		}
 
+		bool SavePropsFile(const std::string& szProperties, const std::string& szFileName)
+		{
+			//Save properties to file
+
+			std::string szFullFileName = Utils::ConvertToAnsiString(Game::pGame->GetPackagePath()) +  "props\\" + szFileName;
+
+			if (!Utils::DirExists(Game::pGame->GetPackagePath() + L"props")) {
+				CreateDirectory((Game::pGame->GetPackagePath() + L"props").c_str(), nullptr);
+			}
+
+			std::ofstream hFile;
+			hFile.open(szFullFileName, std::ofstream::out);
+			if (!hFile.is_open()) {
+				return false;
+			}
+
+			std::vector<std::string> vItems = Utils::Split(szProperties, ";");
+
+			for (size_t i = 0; i < vItems.size(); i++) {
+				std::string szLine = vItems[i] + "\n";
+				hFile.write(szLine.c_str(), szLine.length());
+			}
+
+			hFile.close();
+
+			return true;
+		}
+
+		std::string GetPropsFileContent(const std::string& szFileName)
+		{
+			//Get properties file content
+
+			std::string szFullFileName = Utils::ConvertToAnsiString(Game::pGame->GetPackagePath()) + "props\\" + szFileName;
+			
+			std::ifstream hFile;
+			hFile.open(szFullFileName, std::ifstream::in);
+			if (!hFile.is_open()) {
+				return "";
+			}
+
+			std::string szResult = "";
+
+			while (!hFile.eof()) {
+				char szLineBuffer[1024 * 4] = { 0 };
+				hFile.getline(szLineBuffer, sizeof(szLineBuffer), '\n');
+
+				szResult += std::string(szLineBuffer) + ";";
+			}
+
+			hFile.close();
+
+			return szResult;
+		}
+
 		void SetSteamAchievement(const std::string& szName)
 		{
 			pAchievements->UnlockAchievement(szName.c_str());
@@ -1005,6 +1059,8 @@ namespace Entity {
 			{ "string Util_StrReplace(const string& in szSource, const string &in szTarget, const string &in szNew)", &APIFuncs::StrReplace },
 			{ "string Props_CreateProperty(const string &in ident, const string &in value)", &APIFuncs::CreateProperty },
 			{ "string Props_ExtractValue(const string &in properties, const string &in ident)", &APIFuncs::ExtractValueFromProperties },
+			{ "bool Props_SaveToFile(const string &in properties, const string &in fileName)", &APIFuncs::SavePropsFile },
+			{ "string Props_GetFromFile(const string &in fileName)", &APIFuncs::GetPropsFileContent },
 			{ "void Steam_SetAchievement(const string &in szName)", &APIFuncs::SetSteamAchievement },
 			{ "void Steam_SetStat(const string &in szName, int iValue)", &APIFuncs::SetSteamStatInt },
 			{ "void Steam_SetStat(const string &in szName, float fValue)", &APIFuncs::SetSteamStatFloat },

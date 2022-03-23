@@ -362,6 +362,10 @@ string Util_StrReplace(const string& in szSource, const string &in szTarget, con
 string Props_CreateProperty(const string &in ident, const string &in value)
 //Extract a value by ident from a property string
 string Props_ExtractValue(const string &in properties, const string &in ident)
+//Save properties content to file
+bool Props_SaveToFile(const string &in properties, const string &in fileName)
+//Get properties content from file
+string Props_GetFromFile(const string &in fileName)
 //Unlock an achievement
 void Steam_SetAchievement(const string &in szName)
 //Set stat value (int)

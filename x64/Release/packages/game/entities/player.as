@@ -788,6 +788,8 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	
 	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
 	HUD_UpdateCollectable("coins", 0);
+	
+	Props_SaveToFile(Props_CreateProperty("lol", "rofl") + Props_CreateProperty("lal", "rafl"), "test.txt");
 }
 
 //Restore game state

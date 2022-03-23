@@ -319,6 +319,15 @@ namespace DxSound {
 			return SUCCEEDED(this->m_vSounds[hSound].pSoundBuffer->Stop());
 		}
 
+		void StopAll(void)
+		{
+			//Stop all sounds
+
+			for (size_t i = 0; i < this->m_vSounds.size(); i++) {
+				this->StopSound(i);
+			}
+		}
+
 		void SetGlobalVolume(const long iVolume)
 		{
 			//Set global volume

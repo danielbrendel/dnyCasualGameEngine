@@ -718,6 +718,13 @@ namespace Game {
 			this->InitStartGame(Utils::ConvertToWideString(szPackage), Utils::ConvertToWideString(szFromPath));
 		}
 
+		bool DeleteSavedGameState(const std::wstring& wszFile)
+		{
+			//Delete a saved game state
+
+			return DeleteFile((wszBasePath + L"saves\\" + wszFile).c_str()) == TRUE;
+		}
+
 		void QuickLoad(void)
 		{
 			//Init quick load
@@ -857,9 +864,11 @@ namespace Game {
 		void ToggleMenuTheme(bool value)
 		{
 			if (value) {
-				pSound->Play(this->m_hMenuTheme, pSndVolume->iValue, DSBPLAY_LOOPING);
+				if (!this->m_bGameStarted) {
+					pSound->Play(this->m_hMenuTheme, pSndVolume->iValue, DSBPLAY_LOOPING);
+				}
 			} else {
-				pSound->StopSound(this->m_hMenuTheme);
+				pSound->StopAll();
 			}
 		}
 

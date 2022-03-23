@@ -1010,6 +1010,7 @@ namespace Menu {
 		CButton m_oPlay;
 		CListBox m_oSaveGames;
 		CButton m_oLoad;
+		CButton m_oDelete;
 		DxSound::HDXSOUND m_hSelect;
 		DxRenderer::HD3DSPRITE m_hUp;
 		DxRenderer::HD3DSPRITE m_hDown;
@@ -1119,6 +1120,15 @@ namespace Menu {
 			this->m_oLoad.SetFillColor(GetPaletteItem(L"playmenu.btnload.fill", Entity::Color(50, 50, 50, 150)));
 			this->m_oLoad.SetHoverColor(GetPaletteItem(L"playmenu.btnload.hover", Entity::Color(100, 100, 100, 150)));
 
+			this->m_oDelete.SetText(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.btndelete", L"Delete"));
+			this->m_oDelete.SetPosition(Entity::Vector(365 + 180, 300 + 300 + 10));
+			this->m_oDelete.SetSize(Entity::Vector(150, 35));
+			this->m_oDelete.SetOwner(this);
+			this->m_oDelete.SetTextColor(GetPaletteItem(L"playmenu.btndelete.text", Entity::Color(250, 250, 250, 255)));
+			this->m_oDelete.SetFrameColor(GetPaletteItem(L"playmenu.btndelete.frame", Entity::Color(0, 0, 0, 150)));
+			this->m_oDelete.SetFillColor(GetPaletteItem(L"playmenu.btndelete.fill", Entity::Color(255, 83, 83, 150)));
+			this->m_oDelete.SetHoverColor(GetPaletteItem(L"playmenu.btndelete.hover", Entity::Color(255, 111, 111, 150)));
+
 			this->m_colSavedGamesTitle = GetPaletteItem(L"playmenu.savedgamestitle", Entity::Color(200, 200, 200, 150));
 			this->m_colNoSavedGamesYet = GetPaletteItem(L"playmenu.nosavedgamesyet", Entity::Color(200, 200, 200, 150));
 
@@ -1177,6 +1187,7 @@ namespace Menu {
 			this->m_oPlay.Draw();
 			this->m_oSaveGames.Draw();
 			this->m_oLoad.Draw();
+			this->m_oDelete.Draw();
 
 			pRenderer->DrawSprite(this->m_hUp, 365 + 604, 300 + 300 / 2 - 50 / 2 - 10, 0, 0.0f);
 			pRenderer->DrawSprite(this->m_hDown, 365 + 604, 300 + 300 / 2 - 50 / 2 + 50 - 10, 0, 0.0f);
@@ -1199,6 +1210,7 @@ namespace Menu {
 			this->m_oPlay.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oSaveGames.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 			this->m_oLoad.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
+			this->m_oDelete.OnMouseEvent(x, y, iMouseKey, bDown, bCtrlHeld, bShiftHeld, bAltHeld);
 
 			if ((iMouseKey == 1) && (!bDown)) {
 				if ((this->m_vecMousePos[0] > 365 + 604) && (this->m_vecMousePos[0] < 365 + 604 + 50) && (this->m_vecMousePos[1] > 300 + 300 / 2 - 50 / 2 - 10) && (this->m_vecMousePos[1] < 300 + 300 / 2 - 50 / 2 - 10 + 50)) {

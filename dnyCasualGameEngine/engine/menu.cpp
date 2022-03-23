@@ -67,6 +67,17 @@ namespace Menu {
 			} else {
 				Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.info.selectgamestate", L"Please select a saved game state"), Entity::HudMessageColor::HM_RED, 5000);
 			}
+		} else if (pButton == &this->m_oDelete) {
+			if (this->m_oSaveGames.GetSelectedItem() != std::string::npos) {
+				if (Game::pGame->DeleteSavedGameState(this->m_oSaveGames.GetItem(this->m_oSaveGames.GetSelectedItem()))) {
+					this->m_oSaveGames.RemoveItem(this->m_oSaveGames.GetSelectedItem());
+					Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.info.gamestatedeleted", L"The saved game state has been deleted successfully"), Entity::HudMessageColor::HM_GREEN, 5000);
+				} else {
+					Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.info.itemremovalfailure", L"Failed to delete the saved game state"), Entity::HudMessageColor::HM_RED, 5000);
+				}
+			} else {
+				Game::pGame->AddHudInfoMessage(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.info.selectgamestate", L"Please select a saved game state"), Entity::HudMessageColor::HM_RED, 5000);
+			}
 		}
 	}
 

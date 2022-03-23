@@ -628,14 +628,14 @@ namespace Game {
 				pConsole->AddLine(L"Loading game from path: " + wszFromPath);
 			}
 
-			//Stop menu theme
-			pSound->StopSound(this->m_hMenuTheme);
-
 			//Stop current game if running any
 			if (this->m_bGameStarted) {
 				this->StopGame();
 				pConsole->AddLine(L"Stopped previous game");
 			}
+
+			//Stop menu theme
+			pSound->StopSound(this->m_hMenuTheme);
 
 			if (!this->m_bInit) {
 				return false;

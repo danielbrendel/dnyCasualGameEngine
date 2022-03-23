@@ -192,6 +192,12 @@ namespace Entity {
 			return Utils::ConvertToAnsiString(oPackageLocaleMgr.QueryPhrase(Utils::ConvertToWideString(szIdent), Utils::ConvertToWideString(szDefault)));
 		}
 
+		void LoadMap(const std::string& szMapName)
+		{
+			//Game::pGame->LoadMap(Utils::ConvertToWideString(szMapName) + L".cfg");
+			Game::pGame->InitStartGame(Game::pGame->GetPackageName(), Game::pGame->GetPackagePath(), Utils::ConvertToWideString(szMapName) + L".cfg");
+		}
+
 		void TriggerGameSave(void)
 		{
 			Game::pGame->SaveGame();
@@ -1091,6 +1097,7 @@ namespace Entity {
 			{ "void HUD_AddMessage(const string &in msg, HudInfoMessageColor color, int duration = 3000)", &APIFuncs::AddHudMessage },
 			{ "string Lang_QueryPhrase(const string &in szIdent, const string &in szDefault = \"\")", &APIFuncs::QueryLangPhrase },
 			{ "string _(const string &in szIdent, const string &in szDefault = \"\")", &APIFuncs::QueryLangPhrase },
+			{ "void LoadMap(const string &in map)", &APIFuncs::LoadMap },
 			{ "void TriggerGameSave()", &APIFuncs::TriggerGameSave }
 		};
 
